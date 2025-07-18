@@ -56,14 +56,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- وظائف مساعدة ---
 
-    function loadUserAlertsDisplay() {
-        google.script.run
-            .withSuccessHandler(renderAlerts)
-            .withFailureHandler(error => {
-                console.error("Error loading alerts for display:", error.message);
-                alertsList.innerHTML = '<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات للعرض.</li>';
-            })
-            .getActiveAlertsForDisplay(); 
+    async function loadUserAlertsDisplay() {
+
+  try {
+    const res = await fetch(APPS_SCRIPT_WEB_APP_URL);
+    if (!res.ok) throw new Error("خطأ في الاتصال بالخادم");
+
+    const alerts = await res.json();
+    renderAlerts(alerts);
+  } catch (err) {
+    console.error("خطأ في تحميل التنبيهات:", err.message);
+    const alertsList = document.getElementById("alertsList");
+    alertsList.innerHTML = '<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات.</li>';
+  }
+}
+
+function renderAlerts(alerts) {
+  const alertsList = document.getElementById("alertsList");
+  alertsList.innerHTML = "";
+
+  if (!alerts || alerts.length === 0) {
+    alertsList.innerHTML = "<li>لا توجد تنبيهات حالياً.</li>";
+    return;
+  }
+
+  alerts.forEach((alert) => {
+    const li = document.createElement("li");
+    li.textContent = `${alert.symbol} - ${alert.price} (${alert.condition})`;
+    alertsList.appendChild(li);
+  });
+
+
     }
 
     function renderAlerts(alerts) {
