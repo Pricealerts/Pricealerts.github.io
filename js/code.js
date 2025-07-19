@@ -439,3 +439,27 @@ function getActiveAlertsForDisplay() {
     }
     return alertsToDisplay;
 }
+
+function alertsOfTable() {
+    let sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(ALERTS_SHEET_NAME);
+    let data = sheet.getDataRange().getValues();
+    let alertsToDisplay = [];
+
+    // رؤوس الأعمدة المتوقعة: ID, Exchange, Symbol, Target Price, Alert Condition, Telegram Chat ID, Status, Request Time, Last Checked
+    // الصفوف تبدأ من 1 (بعد الرؤوس)
+    for (let i = 1; i < data.length; i++) {
+        let row = data[i];
+        if (row[0] === idChat) { // التحقق من عمود Status (G)
+            alertsToDisplay.push({
+                id: row[0],
+                exchangeId: row[1],
+                symbol: row[2],
+                targetPrice: parseFloat(row[3]),
+                alertCondition: row[4],
+                telegramChatId: row[5],
+                alertType: 'telegram' // دائما 'telegram' هنا لأننا لا نحفظ تنبيهات المتصفح
+            });
+        }
+    }
+    return alertsToDisplay;
+}
