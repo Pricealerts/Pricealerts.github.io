@@ -307,7 +307,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			if (price !== null) {
 				currentPrice = price;
-				currentPriceDisplay.textContent = `${currentPrice.toFixed(10)} USDT`;
+				currentPriceDisplay.textContent = `${currentPrice/* .toFixed(10) */} USDT`;
 				checkForBrowserAlerts(); // فحص تنبيهات المتصفح عند تحديث السعر
 				return currentPrice;
 			} else {
