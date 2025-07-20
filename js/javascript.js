@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 		},
 		coingecko: {
 			name: "CoinGecko",
-			exchangeInfoUrl: "https://api.coingecko.com/v2/public/symbols", // لأسواق Spot
+			exchangeInfoUrl: "https://api.coingecko.com/api/v3/coins/list", // لأسواق Spot
 			tickerPriceUrl: "https://api.coingecko.com/v2/public/tickers", // لجلب أسعار Ticker لأسواق Spot
 			usdtSuffix: "USDT",
 		},
@@ -154,27 +154,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
 		try {
 			let symbols = [];
-			let response, data;
 			let urlCrpts = APPS_SCRIPT_WEB_APP_URL + "?action=getCryptoSymbols&urlSmbls=" +
-				EXCHANGES[exchangeId].exchangeInfoUrl;
+				exchange.exchangeInfoUrl;
+			let response, data;
+			
 			switch (exchangeId) {
-				case "binance":
+				case 'binance':
 					response = await fetch(exchange.exchangeInfoUrl);
                     data = await response.json();
                     symbols = data.symbols
                         .filter(s => s.symbol.endsWith(exchange.usdtSuffix) && s.status === 'TRADING')
                         .map(s => s.symbol);
 					break;
-				case "kucoin":
+				case 'kucoin':
 
-					response = await fetch(urlCrpts)
-						.then(rslt => rslt.json())
-						.then(res => {
-							data = res;
-						});
-console.error("حدث خطأ في البيانات:", data);
+					response = await fetch(urlCrpts);
+					data = await response.json();
+					console.error("حدث خطأ في البيانات:", data);
 					if (data.code == "200000" && data.data) {
-							symbols =  data.data
+						symbols = data.data
 							.filter(
 								s => s.symbol.endsWith(exchange.usdtSuffix) && s.enableTrading
 							)
@@ -183,12 +181,9 @@ console.error("حدث خطأ في البيانات:", data);
 						console.error("حدث خطأ في البيانات:", data);
 					}
 					break;
-				case "coingecko":
-					let response = await fetch("https://api.coingecko.com/api/v3/coins/list")
-						.then(rslt => rslt.json())
-						.then(res => {
-							data = res;
-						});
+				case 'coingecko':
+					response = await fetch(exchange.exchangeInfoUrl);
+					data = await response.json();
 					console.log("response", data);
 
 					// تحويل النتائج إلى أسماء العملات (id) فقط — مثلاً التي تنتهي بـ "usd"
@@ -198,12 +193,9 @@ console.error("حدث خطأ في البيانات:", data);
 
 					console.log(symbols.slice(0, 20)); // عرض أول 20 فقط
 					break;
-				case "okx":
-					response = await fetch(exchange.exchangeInfoUrl)
-						.then(res => res.json())
-						.then(res => {
-							data = res;
-						});
+				case 'okx':
+					response = await fetch(exchange.exchangeInfoUrl);
+					data = await response.json();
 					if (data.code === "0" && data.data) {
 						symbols = data.data
 							.filter(
@@ -250,13 +242,7 @@ console.error("حدث خطأ في البيانات:", data);
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
 		}
 	}
-	function flatten(arr) {
-		return arr.reduce(
-			(acc, val) =>
-				Array.isArray(val) ? acc.concat(flatten(val)) : acc.concat(val),
-			[]
-		);
-	}
+
 
 	async function fetchCurrentPrice(exchangeId, symbol) {
 		const exchange = EXCHANGES[exchangeId];
