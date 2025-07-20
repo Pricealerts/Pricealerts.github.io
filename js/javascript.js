@@ -38,14 +38,14 @@ document.addEventListener("DOMContentLoaded", () => {
 		},
 		kucoin: {
 			name: "KuCoin",
-			exchangeInfoUrl: "https://api.kucoin.com/api/v1/exchangeInfo",
+			exchangeInfoUrl: "https://api.kucoin.com/api/v1/symbols",
 			tickerPriceUrl: "https://api.kucoin.com/api/v1/market/orderbook/level1",
 			usdtSuffix: "USDT",
 		},
-		bybit: {
-			name: "Bybit",
-			exchangeInfoUrl: "https://api.bybit.com/v2/public/symbols", // لأسواق Spot
-			tickerPriceUrl: "https://api.bybit.com/v2/public/tickers", // لجلب أسعار Ticker لأسواق Spot
+		coingecko: {
+			name: "CoinGecko",
+			exchangeInfoUrl: "https://api.coingecko.com/v2/public/symbols", // لأسواق Spot
+			tickerPriceUrl: "https://api.coingecko.com/v2/public/tickers", // لجلب أسعار Ticker لأسواق Spot
 			usdtSuffix: "USDT",
 		},
 		okx: {
@@ -67,7 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 	async function loadUserAlertsDisplay() {
 		const apScrptAndId =
-			APPS_SCRIPT_WEB_APP_URL + "?idChat=" + telegramChatIdInput.value;
+			APPS_SCRIPT_WEB_APP_URL +
+			"?action=getId&idChat=" +
+			telegramChatIdInput.value;
 		try {
 			const res = await fetch(apScrptAndId)
 				.then(res => res.json())
@@ -153,56 +155,48 @@ document.addEventListener("DOMContentLoaded", () => {
 		try {
 			let symbols = [];
 			let response, data;
+			let urlCrpts = APPS_SCRIPT_WEB_APP_URL + "?action=getCryptoSymbols&urlSmbls=" +
+				EXCHANGES[exchangeId].exchangeInfoUrl;
 			switch (exchangeId) {
 				case "binance":
-					response = await fetch(exchange.exchangeInfoUrl)
+					response = await fetch(exchange.exchangeInfoUrl);
+                    data = await response.json();
+                    symbols = data.symbols
+                        .filter(s => s.symbol.endsWith(exchange.usdtSuffix) && s.status === 'TRADING')
+                        .map(s => s.symbol);
+					break;
+				case "kucoin":
+
+					response = await fetch(urlCrpts)
 						.then(rslt => rslt.json())
 						.then(res => {
 							data = res;
 						});
-					symbols = data.symbols
-						.filter(
-							s =>
-								s.symbol.endsWith(exchange.usdtSuffix) && s.status === "TRADING"
-						)
-						.map(s => s.symbol);
-					break;
-				case "kucoin":
-					response = await fetch("https://api.kucoin.com/api/v1/symbols");
-					data = await response.json();
-
+console.error("حدث خطأ في البيانات:", data);
 					if (data.code == "200000" && data.data) {
-						const symbols = data.data
+							symbols =  data.data
 							.filter(
 								s => s.symbol.endsWith(exchange.usdtSuffix) && s.enableTrading
 							)
 							.map(s => s.symbol);
-
-						console.log("Symbols:", symbols);
 					} else {
 						console.error("حدث خطأ في البيانات:", data);
 					}
 					break;
-				case "bybit":
-					response = await fetch(exchange.exchangeInfoUrl)
+				case "coingecko":
+					let response = await fetch("https://api.coingecko.com/api/v3/coins/list")
 						.then(rslt => rslt.json())
 						.then(res => {
 							data = res;
 						});
-					if (data.ret_code === 0 && data.result) {
-						symbols = data.result
-							.filter(
-								s =>
-									s.quote_currency === exchange.usdtSuffix &&
-									s.status === "Trading"
-							)
-							.map(s => s.base_currency + exchange.usdtSuffix);
-					} else {
-						console.error(
-							`خطأ من Bybit API (exchangeInfo):`,
-							data.ret_msg || JSON.stringify(data)
-						);
-					}
+					console.log("response", data);
+
+					// تحويل النتائج إلى أسماء العملات (id) فقط — مثلاً التي تنتهي بـ "usd"
+					 symbols = data
+						.filter(s => s.id && s.symbol) // فقط العملات التي لها id و رمز
+						.map(s => s.id); // يمكن أيضًا فلترة لاحقًا حسب الشرط الذي تريده
+
+					console.log(symbols.slice(0, 20)); // عرض أول 20 فقط
 					break;
 				case "okx":
 					response = await fetch(exchange.exchangeInfoUrl)
@@ -232,7 +226,6 @@ document.addEventListener("DOMContentLoaded", () => {
 			}
 
 			currencySelect.innerHTML = "";
-
 			if (symbols.length > 0) {
 				symbols.sort();
 				symbols.forEach(symbol => {
@@ -251,11 +244,18 @@ document.addEventListener("DOMContentLoaded", () => {
 				if (priceUpdateInterval) clearInterval(priceUpdateInterval);
 			}
 		} catch (error) {
-			console.error(`حدث خطأ في جلب أزواج العملات من ${exchange.name}:`, error);
+			//console.error(`حدث خطأ في جلب أزواج العملات من ${exchange.name}:`, error);
 			currentPriceDisplay.textContent = "خطأ في التحميل.";
 			currencySelect.innerHTML = '<option value="">خطأ في التحميل</option>';
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
 		}
+	}
+	function flatten(arr) {
+		return arr.reduce(
+			(acc, val) =>
+				Array.isArray(val) ? acc.concat(flatten(val)) : acc.concat(val),
+			[]
+		);
 	}
 
 	async function fetchCurrentPrice(exchangeId, symbol) {
@@ -289,21 +289,12 @@ document.addEventListener("DOMContentLoaded", () => {
 						);
 					}
 					break;
-				case "bybit":
-					apiUrl = `${exchange.tickerPriceUrl}?symbol=${symbol}`;
-					response = await fetch(apiUrl);
-					data = await response.json();
-					if (data.ret_code === 0 && data.result && data.result.length > 0) {
-						const ticker = data.result.find(t => t.symbol === symbol);
-						if (ticker && ticker.last_price) {
-							price = parseFloat(ticker.last_price);
-						}
-					} else {
-						console.error(
-							`خطأ من Bybit API (ticker):`,
-							data.ret_msg || JSON.stringify(data)
-						);
-					}
+				case "coingecko":
+					apiUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${symbol}&vs_currencies=usd`;
+					response = await fetch(apiUrl).then(res => res.json());
+					data =  response;
+					console.log("coingecko data", data[symbol]);
+					price = data[symbol];
 					break;
 				case "okx":
 					apiUrl = `${exchange.tickerPriceUrl}&instId=${symbol}`;
@@ -330,7 +321,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 			if (price !== null) {
 				currentPrice = price;
-				currentPriceDisplay.textContent = `${currentPrice.toFixed(4)} USDT`;
+				currentPriceDisplay.textContent = `${currentPrice.toFixed(10)} USDT`;
 				checkForBrowserAlerts(); // فحص تنبيهات المتصفح عند تحديث السعر
 				return currentPrice;
 			} else {

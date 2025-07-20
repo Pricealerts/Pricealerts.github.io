@@ -1,7 +1,8 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const axios = require("axios");
-const cors = require("cors")({ origin: true });
+const cors = require("cors")({ origin: "https://pricealerts.github.io" });
+
 
 // إعدادات عامة (يمكنك تغيير region أو cpu)
 setGlobalOptions({
