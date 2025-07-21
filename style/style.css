@@ -119,7 +119,6 @@ input[type="text"]:focus {
 .alert-type-selection > div {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
 }
 
 .alert-condition-selection input[type="radio"],
@@ -143,7 +142,7 @@ input[type="text"]:focus {
 #telegramChatIdContainer {
     margin-top: 15px;
     padding-top: 15px;
-    border-top: 1px dashed #e0e0e0;
+    border-bottom: 1px dashed #e0e0e0;
 }
 
 .small-note {
@@ -332,3 +331,69 @@ button:active {
 /* هذا الملف يحتوي على تصميم CSS لتطبيق تنبيهات أسعار العملات الرقمية.
    تم استخدام خطوط Google Fonts وخلفيات وألوان جذابة لتحسين تجربة المستخدم.
    التصميم متجاوب ليتناسب مع مختلف أحجام الشاشات. */
+
+
+      .dropdown-container {
+      position: relative;
+      width: 100%;
+      z-index: 1; /* لضمان ظهورها فوق العناصر الأخرى */
+    }
+    /* .dropdown-container::before{
+        content: "‹";
+        position: absolute;
+        width: 0px;
+        font-size: 25px;
+        top: 10px;
+        left: 12px;
+        bottom: 10px;
+        color: #000; 
+        transform: rotate(90deg);
+        z-index: 1;
+    } */
+    .dropdown-container input {
+        position: relative;
+        background-color: transparent;
+        z-index: 3; /* لضمان ظهورها فوق القائمة المنسدلة */
+    }
+    .dropdown-container select {
+      position: absolute; 
+      right: 0;
+      top: 0;
+      z-index: 2; 
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      box-sizing: border-box;
+    height: 45px;
+    }
+
+    .custom-select {
+      position: relative;
+    }
+
+    .dropdown-list {
+      position: absolute;
+      top: 40px;
+      left: 0;
+      right: 0;
+      max-height: 200px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+      background: white;
+      display: none;
+      z-index: 10;
+    }
+
+    .dropdown-list div {
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .dropdown-list div:hover {
+      background-color: #f0f0f0;
+    }
+    .alert-condition-selection img{
+            height: 25px;
+    margin-bottom: -7px;
+    }

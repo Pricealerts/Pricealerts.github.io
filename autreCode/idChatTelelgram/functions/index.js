@@ -24,7 +24,7 @@ exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
   // parse_mode: "HTML" // يمكنك استخدام Markdown أو HTML حسب الحاجة
   const reply =
     "أهلاً بك! معرف دردشتك (Chat ID) هو:\n" +
-    `<code>${chatId}</code>\n\n` +
+    `<a href="https://pricealerts.github.io?id=${chatId}">${chatId}</a>\n\n` +
     "انسخ هذا المعرف والصقه في حقل \"معرف دردشة تيليجرام\" في تطبيق " +
     "تنبيهات الأسعار.";
 

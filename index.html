@@ -22,10 +22,11 @@
 
         <div class="currency-selection">
             <label for="currencySelect">اختر العملة:</label>
-            
-            <select id="currencySelect">
-                
-                </select>
+            <div class="dropdown-container" >
+                <input type="text" id="searchPrice" onfocus="showDropdown()" oninput="filterList()">
+                <div class="dropdown-list" id="dropdownList"></div>
+                <select ></select>
+            </div>
         </div>
 
         <div class="price-display">
@@ -47,17 +48,17 @@
                 <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر <strong>تيليجرام</strong> فقط (وتُحذف تلقائيًا بعد التفعيل). تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
             </p> -->
             <label for="targetPrice">السعر المستهدف (USDT):</label>
-            <input type="number" id="targetPrice" placeholder="مثال: 0.50" step="any">
+            <input type="number" id="targetPrice" placeholder="مثال: 0.50" step="any" oninput="updateTargetPrice()">
 
             <div class="alert-condition-selection">
                 <label>تنبيه عندما يكون السعر:</label>
                 <div>
                     <input type="radio" id="conditionLessThanOrEqual" name="alertCondition" value="less_than_or_equal" checked>
-                    <label for="conditionLessThanOrEqual">أقل من أو يساوي القيمة المستهدفة</label>
+                    <label for="conditionLessThanOrEqual"> <img src="imgs/up-arrow-svgrepo-com (1).svg" alt="">أعلى من أو يساوي <span class="prcTrgt"></span> </label>
                 </div>
                 <div>
                     <input type="radio" id="conditionGreaterThanOrEqual" name="alertCondition" value="greater_than_or_equal">
-                    <label for="conditionGreaterThanOrEqual">أعلى من أو يساوي القيمة المستهدفة</label>
+                    <label for="conditionGreaterThanOrEqual"><img src="imgs/down-arrow-svgrepo-com (1).svg" alt="">أقل من أو يساوي <span class="prcTrgt"></span></label>
                 </div>
             </div>
 
@@ -74,11 +75,13 @@
             </div>
 
             <div id="telegramChatIdContainer">
+                <p class="small-note">
+                  أدخل الى هذا البوت <a href="http://t.me/Crypto_prices_alerts_bot">@Crypto_prices_alerts_bot</a>
+                    للحصول على ID الخاص بك وأكتبه على معرف الدردشة
+                </p>
                 <label for="telegramChatId">معرّف دردشة تيليجرام (Chat ID):</label>
                 <input type="text" id="telegramChatId" placeholder="أدخل معرّف دردشة تيليجرام">
-                <p class="small-note">
-                    للحصول على Chat ID الخاص بك: ابحث عن البوت الذي أنشأته في تيليجرام (على سبيل المثال، <code>@MyCryptoAlertBot</code>) وأرسل له أي رسالة. سيرد البوت عليك فورًا بمعرف الدردشة الخاص بك.
-                </p>
+                
             </div>
 
             <button id="setAlertButton">تعيين تنبيه</button>
