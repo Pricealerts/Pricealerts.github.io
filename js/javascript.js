@@ -607,6 +607,9 @@ requestNotificationPermission(); // طلب إذن الإشعارات للمتص�
 if (localStorage.getItem("idChat")) {
 	telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
 	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
+}else {
+	telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
+	document.getElementById("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 }
 // إظهار/إخفاء حقل Chat ID عند التحميل الأولي
 if (alertTypeTelegramCheckbox.checked) {
