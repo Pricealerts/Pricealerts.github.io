@@ -5,12 +5,30 @@ const searchPrice = document.getElementById("searchPrice");
 const dropdownList = document.getElementById("dropdownList");
 let allCrpto = [];
 
+/* // استيراد Firebase Functions
+const manageAlertsFunction = firebase.functions().httpsCallable('manageAlerts');
+
+async function sendAddCommand() {
+  try {
+    const result = await manageAlertsFunction({
+      command: 'add',
+      symbol: 'BTC',
+      targetPrice: 70000,
+      condition: 'greater_than_or_equal',
+      telegramChatId: '5399098591' // هذا يجب أن يأتي من بيانات المستخدم
+    });
+    console.log('Function call successful:', result.data.message);
+  } catch (error) {
+    console.error('Error calling function:', error.message);
+  }
+}
+ */
 const conditionLessThanOrEqual = document.getElementById(
 	"conditionLessThanOrEqual"
 );
 const conditionGreaterThanOrEqual = document.getElementById(
 	"conditionGreaterThanOrEqual"
-);
+); 
 
 const alertTypeBrowserCheckbox = document.getElementById("alertTypeBrowser"); // تم تغيير الاسم
 const alertTypeTelegramCheckbox = document.getElementById("alertTypeTelegram"); // تم تغيير الاسم
@@ -23,8 +41,9 @@ const alertStatus = document.getElementById("alertStatus");
 const alertsList = document.getElementById("alertsList");
 
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
+let getPriceUrl = 'https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec';
 const APPS_SCRIPT_WEB_APP_URL =
-	"https://script.google.com/macros/s/AKfycbxc9Hk-vv-jJIZFzdAHUBwTxK2eNR44AnM2ExFPQGb8TrqSCyTxLpCeFC4LJ19v7hyf/exec";
+	"https://script.google.com/macros/s/AKfycbzoUtqwTKdx2OcCL5DZ4-rUjGj5f0qBVlPVLPRSyiBqI0nbWCFuEJ3fOtOkJ_ujfhc/exec";
 
 const MAX_ALERTS = 5; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 
@@ -115,9 +134,9 @@ function renderAlerts(alerts) {
 	alerts.forEach(alert => {
 		let conditionText = "";
 		if (alert.alertCondition === "less_than_or_equal") {
-			conditionText = "عندما يصبح السعر ≤";
-		} else if (alert.alertCondition === "greater_than_or_equal") {
 			conditionText = "عندما يصبح السعر ≥";
+		} else if (alert.alertCondition === "greater_than_or_equal") {
+			conditionText = "عندما يصبح السعر ≤";
 		}
 
 		const listItem = document.createElement("li");
@@ -154,7 +173,7 @@ async function fetchTradingPairs(exchangeId) {
 	try {
 		let symbols = [];
 		let urlCrpts =
-			APPS_SCRIPT_WEB_APP_URL +
+			getPriceUrl +
 			"?action=getCryptoSymbols&urlSmbls=" +
 			exchange.exchangeInfoUrl;
 		let response, data;
@@ -247,7 +266,7 @@ async function fetchCurrentPrice(exchangeId, symbol ,isPriceUpdate = false)  {
 
 	try {
 		let urlCrpts =
-			APPS_SCRIPT_WEB_APP_URL +
+			getPriceUrl +
 			"?action=getPrice&urlSmbl=" +
 			exchange.tickerPriceUrl;
 		let apiUrl = "";
@@ -364,9 +383,9 @@ function requestNotificationPermission() {
 function showBrowserNotification(symbol, price, targetPrice, condition) {
 	let conditionText = "";
 	if (condition === "less_than_or_equal") {
-		conditionText = `أصبح ≤ ${targetPrice} USDT`;
-	} else if (condition === "greater_than_or_equal") {
 		conditionText = `أصبح ≥ ${targetPrice} USDT`;
+	} else if (condition === "greater_than_or_equal") {
+		conditionText = `أصبح ≤ ${targetPrice} USDT`;
 	}
 
 	if (Notification.permission === "granted") {
@@ -392,12 +411,12 @@ function checkForBrowserAlerts() {
 				let shouldTrigger = false;
 				if (
 					alert.alertCondition === "less_than_or_equal" &&
-					currentPrice <= alert.targetPrice
+					currentPrice >= alert.targetPrice
 				) {
 					shouldTrigger = true;
 				} else if (
 					alert.alertCondition === "greater_than_or_equal" &&
-					currentPrice >= alert.targetPrice
+					currentPrice <= alert.targetPrice
 				) {
 					shouldTrigger = true;
 				}
@@ -418,7 +437,6 @@ function checkForBrowserAlerts() {
 }
 // دالة لتعيين/حذف التنبيهات على Apps Script
 async function manageAlertOnAppsScript(action, alertData = null) {
-	console.log(`إجراء: ${action}`, alertData);
 	let data = {};
 	alertStatus.textContent = `جاري ${
 		action === "setAlert" ? "تعيين" : "حذف"
@@ -556,8 +574,12 @@ setAlertButton.addEventListener("click", async () => {
 		// (أو يمكن أن يتم التحكم في هذا الحد على جانب Apps Script فقط).
 		// حاليًا، هذا الحد يتعلق فقط بما يتم عرضه في الواجهة الأمامية وليس العدد الفعلي في الشيت
 		// (لأن AlertsList يعرض فقط تنبيهات تيليجرام النشطة).
-
-		localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
+		if (localStorage.idChat !== telegramChatId) {
+			console.log('rah fat');
+			
+			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
+		}
+		
 		// إنشاء معرف فريد للتنبيه
 		const alertId = Date.now().toString();
 
@@ -631,7 +653,6 @@ https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWe
 
     */
 /*  May code */
-
 
 function showDropdown() {
 	dropdownList.style.display = "block";

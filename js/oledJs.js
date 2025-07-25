@@ -506,3 +506,12 @@ document.addEventListener('DOMContentLoaded', () => {
         telegramChatIdContainer.style.display = 'none';
     }
 });
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,20 @@
+{
+  "functions": [
+    {
+      "source": "functions",
+    "runtime": "nodejs22",
+    "region": "europe-west1",
+    "concurrency": 80, 
+    "memory": "256MiB",
+      "codebase": "default",
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
+}
+

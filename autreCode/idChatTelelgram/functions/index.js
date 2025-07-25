@@ -16,6 +16,7 @@ exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
   }
 
   const chatId = message.chat.id;
+  const username = message.from.username || "مستخدم بدون اسم";
   const text = message.text || "";
 
   console.log("Received from Telegram:", text);
@@ -23,10 +24,10 @@ exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
   // 👇 مثال: إعادة إرسال نفس الرسالة مع إضافة ردّ
   // parse_mode: "HTML" // يمكنك استخدام Markdown أو HTML حسب الحاجة
   const reply =
-    "أهلاً بك! معرف دردشتك (Chat ID) هو:\n" +
-    `<a href="https://pricealerts.github.io?id=${chatId}">${chatId}</a>\n\n` +
-    "انسخ هذا المعرف والصقه في حقل \"معرف دردشة تيليجرام\" في تطبيق " +
-    "تنبيهات الأسعار.";
+    `أهلاً بك! ${username} معرف دردشتك (Chat ID) هو:\n` +
+    `<code>${chatId}</code>\n\n` +
+    `لإضافة تنبيه سعر عملة رقمية، استخدم تطبيق ` +
+    `<a href='https://pricealerts.github.io?id=${chatId}'>تنبيهات الأسعار</a>` ;
 
   try {
     await fetch(TELEGRAM_API, {
