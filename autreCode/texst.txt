@@ -1,0 +1,16 @@
+
+
+rd /s /q node_modules
+
+npm install
+
+firebase deploy --only functions
+
+
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 
+                          functions.config().telegram?.bot_token || 
+                          "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"; // Fallback للتنمية فقط
+
+                          admin.initializeApp({
+  databaseURL: "https://alertprice-c0176.firebaseio.com"
+});
