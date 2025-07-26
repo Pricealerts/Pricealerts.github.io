@@ -5,24 +5,7 @@ const searchPrice = document.getElementById("searchPrice");
 const dropdownList = document.getElementById("dropdownList");
 let allCrpto = [];
 
-/* // استيراد Firebase Functions
-const manageAlertsFunction = firebase.functions().httpsCallable('manageAlerts');
-
-async function sendAddCommand() {
-  try {
-    const result = await manageAlertsFunction({
-      command: 'add',
-      symbol: 'BTC',
-      targetPrice: 70000,
-      condition: 'greater_than_or_equal',
-      telegramChatId: '5399098591' // هذا يجب أن يأتي من بيانات المستخدم
-    });
-    console.log('Function call successful:', result.data.message);
-  } catch (error) {
-    console.error('Error calling function:', error.message);
-  }
-}
- */
+/* med email */
 const conditionLessThanOrEqual = document.getElementById(
 	"conditionLessThanOrEqual"
 );
@@ -706,3 +689,4 @@ function updateTargetPrice() {
 		document.querySelectorAll(".prcTrgt").forEach(el => el.innerHTML = "0.00");
 	}
 }
+
