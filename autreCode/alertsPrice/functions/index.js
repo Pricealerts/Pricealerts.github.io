@@ -1,4 +1,4 @@
-const functions = require("firebase-functions");
+//const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const { onRequest } = require("firebase-functions/v2/https");
 const logger = require("firebase-functions/logger");
@@ -14,9 +14,9 @@ let responseAppScrpt = {
   dltRw : []
 };
 
-let dltRwApp = []
+//let dltRwApp = []
 const APPS_SCRIPT_WEB_APP_URL =
-	"https://script.google.com/macros/s/AKfycbzoUtqwTKdx2OcCL5DZ4-rUjGj5f0qBVlPVLPRSyiBqI0nbWCFuEJ3fOtOkJ_ujfhc/exec";
+	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
 
 exports.proxyRequest = onRequest(
   { region: "europe-west1" },

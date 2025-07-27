@@ -6,12 +6,12 @@ const dropdownList = document.getElementById("dropdownList");
 let allCrpto = [];
 
 /* med email */
-const conditionLessThanOrEqual = document.getElementById(
+/* const conditionLessThanOrEqual = document.getElementById(
 	"conditionLessThanOrEqual"
 );
 const conditionGreaterThanOrEqual = document.getElementById(
 	"conditionGreaterThanOrEqual"
-); 
+);  */
 
 const alertTypeBrowserCheckbox = document.getElementById("alertTypeBrowser"); // تم تغيير الاسم
 const alertTypeTelegramCheckbox = document.getElementById("alertTypeTelegram"); // تم تغيير الاسم
@@ -26,7 +26,7 @@ const alertsList = document.getElementById("alertsList");
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl = 'https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec';
 const APPS_SCRIPT_WEB_APP_URL =
-	"https://script.google.com/macros/s/AKfycbzoUtqwTKdx2OcCL5DZ4-rUjGj5f0qBVlPVLPRSyiBqI0nbWCFuEJ3fOtOkJ_ujfhc/exec";
+	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
 
 const MAX_ALERTS = 5; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 
