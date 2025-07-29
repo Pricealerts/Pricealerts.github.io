@@ -9,18 +9,18 @@ admin.initializeApp();
 
 // *** بيانات اعتماد Telegram Bot API (لا تنس تحديثها) ***
 const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"; // احصل عليه من @BotFather
-let responseAppScrpt = {
+/* let responseAppScrpt = {
   action : 'okResponse',
   dltRw : []
-};
+}; */
 
-//let dltRwApp = []
+let dltRwApp = []
 const APPS_SCRIPT_WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
 
 exports.proxyRequest = onRequest(
   { region: "europe-west1" },
-  async (req, res) => {
+   (req, res) => {
     const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
 
     if (!tabelAlert) {
@@ -28,21 +28,14 @@ exports.proxyRequest = onRequest(
         .status(400)
         .json({ error: "The 'url' parameter is required." });
     }
-res.send("cbn");
+    res.send("cbn");
     try {
       //const response = await axios.get(tabelAlert);
       checkAndSendAlerts(tabelAlert)
 
-    /*   // إذا كان الرد يحتوي على HTML بدل JSON
-      if (typeof response.data === "string" && response.data.startsWith("<")) {
-        return res.status(500).json({
-          error: "problem of datas.",
-          raw: response.data.slice(0, 1000),
-        });
-      }
+ /*  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
+  res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`); */
 
-      // إرسال البيانات كـ JSON
-      return res.status(200).json(response.data); */
     } catch (error) {
       logger.error("Axios error:", error.message);
       return res.status(500).json({
@@ -143,7 +136,7 @@ async function checkAndSendAlerts(data) {
   const currentTriggerTime = new Date(); // وقت تشغيل الـ Trigger الحالي
 
   // نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
-  for (let i = data.length - 1; i >= 1; i--) { // البدء من آخر صف بيانات (باستثناء الرؤوس)
+  for (let i = data.length - 1; i >= 0; i--) { // البدء من آخر صف بيانات (باستثناء الرؤوس)
     let row = data[i];
     let exchangeId = row[1];
     let symbol = row[2];
@@ -207,8 +200,8 @@ async function checkAndSendAlerts(data) {
           let sendResult =await sendTelegramMessage(telegramChatId, message);
 
           if (sendResult.success) {
-              let iPls = i+1
-              responseAppScrpt.dltRw.push(iPls)
+              let iPls = i+2
+              dltRwApp.push(iPls)
               // بما أننا حذفنا الصف، يجب أن نقلل الفهرس لتجنب تخطي صفوف
               data.splice(i, 1); // إزالة الصف المحذوف من مصفوفة البيانات المحلية أيضًا
           } else {
@@ -277,9 +270,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
                 return null;
         }
     
-        
-    
-  
         datas = await axios.get(apiUrl);
 
         let candles = [];
@@ -318,15 +308,19 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 }
 
 async function callFirebaseWithPost() {
+    //console.log(responseAppScrpt);
+    
  
-  if (responseAppScrpt.dltRw.length == 0) {return 'walo'}
+  if (dltRwApp.length == 0) {return 'walo'}
   const options = {
     method: "post",
     contentType: "application/json",
-    payload: JSON.stringify(responseAppScrpt),
+    action : 'okResponse',
+    dltRw : dltRwApp,
+    //payload: JSON.stringify(responseAppScrpt),
     muteHttpExceptions: true
   };
-  responseAppScrpt.dltRw=[];
+  dltRwApp = [];
   try {
     const response = await axios.post(APPS_SCRIPT_WEB_APP_URL, options);
     

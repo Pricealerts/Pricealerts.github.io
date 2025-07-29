@@ -1,27 +1,27 @@
-const exchangeSelect = document.getElementById("exchangeSelect");
-const currentPriceDisplay = document.getElementById("currentPrice");
-const targetPriceInput = document.getElementById("targetPrice");
-const searchPrice = document.getElementById("searchPrice");
-const dropdownList = document.getElementById("dropdownList");
+const exchangeSelect = gebi("exchangeSelect");
+const currentPriceDisplay = gebi("currentPrice");
+const targetPriceInput = gebi("targetPrice");
+const searchPrice = gebi("searchPrice");
+const dropdownList = gebi("dropdownList");
 let allCrpto = [];
 
 /* med email */
-/* const conditionLessThanOrEqual = document.getElementById(
+/* const conditionLessThanOrEqual = gebi(
 	"conditionLessThanOrEqual"
 );
-const conditionGreaterThanOrEqual = document.getElementById(
+const conditionGreaterThanOrEqual = gebi(
 	"conditionGreaterThanOrEqual"
 );  */
 
-const alertTypeBrowserCheckbox = document.getElementById("alertTypeBrowser"); // تم تغيير الاسم
-const alertTypeTelegramCheckbox = document.getElementById("alertTypeTelegram"); // تم تغيير الاسم
-const telegramChatIdContainer = document.getElementById(
+const alertTypeBrowserCheckbox = gebi("alertTypeBrowser"); // تم تغيير الاسم
+const alertTypeTelegramCheckbox = gebi("alertTypeTelegram"); // تم تغيير الاسم
+const telegramChatIdContainer = gebi(
 	"telegramChatIdContainer"
 );
-const telegramChatIdInput = document.getElementById("telegramChatId");
-const setAlertButton = document.getElementById("setAlertButton");
-const alertStatus = document.getElementById("alertStatus");
-const alertsList = document.getElementById("alertsList");
+const telegramChatIdInput = gebi("telegramChatId");
+const setAlertButton = gebi("setAlertButton");
+const alertStatus = gebi("alertStatus");
+const alertsList = gebi("alertsList");
 
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl = 'https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec';
@@ -84,14 +84,14 @@ async function loadUserAlertsDisplay() {
 			});
 	} catch (err) {
 		console.error("خطأ في تحميل التنبيهات:", err.message);
-		const alertsList = document.getElementById("alertsList");
+		const alertsList = gebi("alertsList");
 		alertsList.innerHTML =
 			'<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات.</li>';
 	}
 }
 
 function renderAlerts(alerts) {
-	const alertsList = document.getElementById("alertsList");
+	const alertsList = gebi("alertsList");
 	alertsList.innerHTML = "";
 
 	if (!alerts || alerts.length === 0) {
@@ -614,7 +614,7 @@ if (localStorage.getItem("idChat")) {
 	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
 }else {
 	telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
-	document.getElementById("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
+	gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 }
 // إظهار/إخفاء حقل Chat ID عند التحميل الأولي
 if (alertTypeTelegramCheckbox.checked) {
@@ -622,20 +622,12 @@ if (alertTypeTelegramCheckbox.checked) {
 } else {
 	telegramChatIdContainer.style.display = "none";
 }
-// });
-
-/* 
-  
-https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/getWebhookInfo
-
-https://api.telegram.org/bot7706768538:AAG08VBdNT9bD_L0mGGgQUEDgS08qHA14VA/deleteWebhook
 
 
-https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://us-central1-get-id-telegram.cloudfunctions.net/telegramWebhook
 
 
-    */
 /*  May code */
+function gebi(el){return document.getElementById(el)}
 
 function showDropdown() {
 	dropdownList.style.display = "block";
@@ -690,3 +682,40 @@ function updateTargetPrice() {
 	}
 }
 
+
+/* instalation app */
+let deferredPrompt;
+/* if app is instal */
+window.addEventListener('appinstalled', () => {
+    // Hide the app-provided install promotion
+    gebi('dvdw').style.display = 'none';
+    // Clear the deferredPrompt so it can be garbage collected
+    deferredPrompt = null; 
+
+  });
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // Update UI notify the user they can install the PWA
+    let os = navigator.userAgent.toLocaleLowerCase();
+
+    if (os.includes('android') || os.includes('ipad') || os.includes('iphone')) {
+        gebi('dvdw').style.display = 'block';
+    }
+
+});
+
+let buttonInstall = gebi('dvdw');
+buttonInstall.addEventListener('click', async () => {
+    gebi('dvdw').style.display = 'none';
+    deferredPrompt.prompt();
+    /* if (vUp.dwAapp >0) {
+        
+    } */
+    /* 
+        const { outcome } = await deferredPrompt.userChoice;
+    
+        console.log(`User response to the install prompt: ${outcome}`); */
+    deferredPrompt = null;
+});
