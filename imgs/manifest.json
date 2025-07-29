@@ -6,7 +6,7 @@
   "theme_color": "#FFFFFF" ,
   "orientation": "portrait",
   "scope": "https://pricealerts.github.io/",
-  "start_url": "https://pricealerts.github.io/index.min.html",
+  "start_url": "https://pricealerts.github.io/index.html",
   "splash_pages": null,
   "icons": [
     { "src": "/web/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
