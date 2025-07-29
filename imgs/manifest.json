@@ -9,10 +9,10 @@
   "start_url": "https://pricealerts.github.io/index.html",
   "splash_pages": null,
   "icons": [
-    { "src": "/web/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
-    { "src": "/web/icon-192.png", "type": "image/png", "sizes": "192x192" },
-    { "src": "/web/icon-512.png", "type": "image/png", "sizes": "512x512" },
-    { "src": "/web/icon-192-maskable.png", "type": "image/png", "sizes": "192x192", "purpose": "maskable" },
-    { "src": "/web/icon-512-maskable.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
+    { "src": "/imgs/web/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
+    { "src": "/imgs/web/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "/imgs/web/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "/imgs/web/icon-192-maskable.png", "type": "image/png", "sizes": "192x192", "purpose": "maskable" },
+    { "src": "/imgs/web/icon-512-maskable.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
   ]
 }
