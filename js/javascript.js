@@ -682,27 +682,31 @@ function updateTargetPrice() {
 	}
 }
 
-
+  
 /* instalation app */
 let deferredPrompt;
 /* if app is instal */
-window.addEventListener('appinstalled', () => {
+/* window.addEventListener('appinstalled', () => {
     // Hide the app-provided install promotion
     gebi('dvdw').style.display = 'none';
     // Clear the deferredPrompt so it can be garbage collected
     deferredPrompt = null; 
 
-  });
+  }); */
 
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
+	console.log('fat');
+	
     // Update UI notify the user they can install the PWA
-    let os = navigator.userAgent.toLocaleLowerCase();
 
-    if (os.includes('android') || os.includes('ipad') || os.includes('iphone')) {
+    gebi('dvdw').style.display = 'block';
+
+    /* let os = navigator.userAgent.toLocaleLowerCase();
+	if (os.includes('android') || os.includes('ipad') || os.includes('iphone')) {
         gebi('dvdw').style.display = 'block';
-    }
+    } */
 
 });
 
