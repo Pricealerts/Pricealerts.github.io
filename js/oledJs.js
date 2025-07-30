@@ -508,6 +508,57 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+/* had khati
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////
+
+*/
+
+
+
+
+
+// تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
+const EXCHANGES = {
+    binance: {
+		name: "Binance",
+		tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
+		usdtSuffix: "USDT",
+		intervalData: 5000,
+	},
+	kucoin: {
+		name: "KuCoin",
+		exchangeInfoUrl: "https://api.kucoin.com/api/v1/symbols",
+		tickerPriceUrl: "https://api.kucoin.com/api/v1/market/orderbook/level1",
+		usdtSuffix: "-USDT",
+		intervalData: 60000,
+	},
+	coingecko: {
+		name: "CoinGecko",
+		exchangeInfoUrl: "https://api.coingecko.com/api/v3/coins/list", // لأسواق Spot
+		tickerPriceUrl: "https://api.coingecko.com/api/v3/simple/price", // لجلب أسعار Ticker لأسواق Spot
+		usdtSuffix: "USDT",
+		intervalData: 60000,
+	},
+	okx: {
+		name: "OKX",
+		exchangeInfoUrl:
+			"https://www.okx.com/api/v5/public/instruments?instType=SPOT",
+		tickerPriceUrl: "https://www.okx.com/api/v5/market/tickers?instType=SPOT",
+		usdtSuffix: "-USDT", // لاحظ التنسيق المختلف للرمز في OKX
+		intervalData: 5000,
+	},
+};
 
 
 
@@ -515,3 +566,90 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+async function fetchCurrentPrice(exchangeId, symbol ,isPriceUpdate = false)  {
+	const exchange = EXCHANGES[exchangeId];
+	if (!exchange) return null;
+
+	try {
+		let urlCrpts =
+			getPriceUrl +
+			"?action=getPrice&urlSmbl=" +
+			exchange.tickerPriceUrl;
+		let apiUrl = "";
+		let price = null;
+		let response, data;
+
+		switch (exchangeId) {
+			case "binance":
+				apiUrl = `${exchange.tickerPriceUrl}?symbol=${symbol}`;
+				response = await fetch(apiUrl);
+				data = await response.json();
+				if (data && data.price) {
+					price = parseFloat(data.price);
+				}
+				break;
+			case "kucoin":
+				apiUrl = `${urlCrpts}&symbole=${symbol}`;
+				response = await fetch(apiUrl);
+				data = await response.json();
+				
+				// إذا كانت البيانات تحتوي على رمز السعر
+				if (data.code === "200000" && data.data && data.data.price) {
+					price = parseFloat(data.data.price);
+				} else {
+					console.error(
+						`خطأ من KuCoin API (ticker):`,
+						data.msg || JSON.stringify(data)
+					);
+				}
+				break;
+			case "coingecko":
+				apiUrl = `${exchange.tickerPriceUrl}?ids=${symbol}&vs_currencies=usd`;
+				response = await fetch(apiUrl).then(res => res.json());
+				data = response;
+				price = data[symbol].usd;
+				break;
+			case "okx":
+				apiUrl = `${exchange.tickerPriceUrl}&instId=${symbol}`;
+				response = await fetch(apiUrl);
+				data = await response.json();
+				if (
+					data.code === "0" &&
+					data.data &&
+					data.data.length > 0 &&
+					data.data[0].last
+				) {
+					price = parseFloat(data.data[0].last);
+				} else {
+					console.error(
+						`خطأ من OKX API (ticker):`,
+						data.msg || JSON.stringify(data)
+					);
+				}
+				break;
+			default:
+				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
+				break;
+		}
+
+		if (price !== null) {
+			currentPrice = price;
+			currentPriceDisplay.textContent = `${currentPrice} USDT`;
+			if (isPriceUpdate) {
+				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
+				document.querySelectorAll(".prcTrgt").forEach(el => el.innerHTML = currentPrice);
+			}
+			checkForBrowserAlerts(); // فحص تنبيهات المتصفح عند تحديث السعر
+			return currentPrice;
+		} else {
+			currentPriceDisplay.textContent = "السعر غير متاح.";
+			currentPrice = null;
+			return null;
+		}
+	} catch (error) {
+		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
+		currentPriceDisplay.textContent = "خطأ في جلب السعر.";
+		currentPrice = null;
+		return null;
+	}
+}

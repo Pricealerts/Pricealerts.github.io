@@ -259,7 +259,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
                 break;
             case 'coingecko':
                 // coingecko v2 kline uses 'from' in seconds
-                apiUrl = `${exchange.candlestickUrl}?${coinId}/ohlc?vs_currency=usd&days=1`;
+                apiUrl = `${exchange.candlestickUrl}?${symbol}/ohlc?vs_currency=usd&days=1`;
             break;
             case 'okx':
                 // OKX uses 'before' and 'after' in milliseconds
@@ -270,14 +270,29 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
                 return null;
         }
     
-        datas = await axios.get(apiUrl);
+        //datas = (await axios.get(apiUrl)).data;
+        console.log(`apiUrl   is :${apiUrl}`)
+        //console.log(datas);
+        /* let tt= 'https://api.kucoin.com/api/v1/market/candles?symbol=BTC-USDT&type=1min&startAt=1753910841&endAt=1753911021'
+        apiUrl = 'https://api.kucoin.com/api/v1/market/candles?symbol=BTC-USDT&type=1min&startAt=1722307200&endAt=1722307800'; */
+        datas = (await axios.get(apiUrl)).data;
 
+        
+        console.log(`datas ed data  is :`)
+        console.log(datas);
+        
         let candles = [];
         if (exchangeId === 'binance') {
-          candles = datas.data.map(exchange.parseCandle);
-        }else if (exchangeId === 'kucoin' || exchangeId === 'okx') { 
-            if (datas.code === '200000' || datas.code === '0') {
+          candles = datas.map(exchange.parseCandle);
+        }else if (exchangeId === 'kucoin') {
+             if (datas.code === '200000' ) { 
                 candles = datas.data.map(exchange.parseCandle);
+            } else {
+                console.error(`خطأ من ${exchange.name} API (شموع):`, datas.msg || JSON.stringify(datas));
+            }
+        }else if (  exchangeId === 'okx') { 
+            if (datas.code === '200000' || datas.code === '0') {
+                candles = datas.map(exchange.parseCandle);
             } else {
                 console.error(`خطأ من ${exchange.name} API (شموع):`, datas.msg || JSON.stringify(datas));
             }
@@ -287,7 +302,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
             } else {
                 console.error(`خطأ من ${exchange.name} API (شموع):`, datas.ret_msg || JSON.stringify(datas));
             }
-        }else  {
+        }else {
             if (Array.isArray(datas) && datas.length) {
                 candles = datas.map(exchange.parseCandle);
             } else {
@@ -312,7 +327,7 @@ async function callFirebaseWithPost() {
     
  
   if (dltRwApp.length == 0) {return 'walo'}
-  const options = {
+  /* const options = {
     method: "post",
     contentType: "application/json",
     action : 'okResponse',
@@ -320,10 +335,16 @@ async function callFirebaseWithPost() {
     //payload: JSON.stringify(responseAppScrpt),
     muteHttpExceptions: true
   };
-  dltRwApp = [];
+  dltRwApp = []; */
   try {
-    const response = await axios.post(APPS_SCRIPT_WEB_APP_URL, options);
-    
+    //const response = await axios.post(APPS_SCRIPT_WEB_APP_URL, options);
+    await axios.post(APPS_SCRIPT_WEB_APP_URL, {
+        action: 'okResponse',
+        dltRw: dltRwApp
+        },{
+        headers: { 'Content-Type': 'application/json' }
+        });
+            
     
     } catch (error) {
         console.error("error  respons", error.response ? error.response.data : error.message);

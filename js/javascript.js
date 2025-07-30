@@ -117,9 +117,9 @@ function renderAlerts(alerts) {
 	alerts.forEach(alert => {
 		let conditionText = "";
 		if (alert.alertCondition === "less_than_or_equal") {
-			conditionText = "عندما يصبح السعر ≤";
-		} else if (alert.alertCondition === "greater_than_or_equal") {
 			conditionText = "عندما يصبح السعر ≥";
+		} else if (alert.alertCondition === "greater_than_or_equal") {
+			conditionText = "عندما يصبح السعر ≤";
 		}
 
 		const listItem = document.createElement("li");
@@ -373,8 +373,8 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 
 	if (Notification.permission === "granted") {
 		new Notification(`تنبيه سعر ${symbol}!`, {
-			body: `وصل السعر إلى ${price} USDT. ${conditionText}`,
-			icon: "https://www.google.com/s2/favicons?domain=binance.com", // يمكنك تغيير الأيقونة حسب المنصة
+			body: `وصل السعر إلى ${price} USDT. ${conditionText}`,//https://www.google.com/s2/favicons?domain=binance.com
+			icon: "../imgs/apple-touch-icon.png", // يمكنك تغيير الأيقونة حسب المنصة
 		});
 	} else if (Notification.permission === "default") {
 		requestNotificationPermission();
@@ -443,11 +443,13 @@ async function manageAlertOnAppsScript(action, alertData = null) {
 			});
 
 		if (data.status === "success") {
+			
 			alertStatus.textContent = `${
 				action === "setAlert" ? "تم تعيين" : "تم حذف"
 			} التنبيه بنجاح.`;
 			alertStatus.style.color = "green";
 			loadUserAlertsDisplay(); // تحديث قائمة التنبيهات بعد كل عملية
+			setTimeout(() => {alertStatus.textContent = '' }, 3000);
 			return true;
 		} else {
 			alertStatus.textContent = `فشل ${
@@ -558,8 +560,6 @@ setAlertButton.addEventListener("click", async () => {
 		// حاليًا، هذا الحد يتعلق فقط بما يتم عرضه في الواجهة الأمامية وليس العدد الفعلي في الشيت
 		// (لأن AlertsList يعرض فقط تنبيهات تيليجرام النشطة).
 		if (localStorage.idChat !== telegramChatId) {
-			console.log('rah fat');
-			
 			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
 		}
 		
@@ -697,7 +697,6 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-	console.log('fat');
 	
     // Update UI notify the user they can install the PWA
 
