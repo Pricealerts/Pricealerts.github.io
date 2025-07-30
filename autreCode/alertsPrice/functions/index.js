@@ -22,13 +22,13 @@ exports.proxyRequest = onRequest(
   { region: "europe-west1" },
    (req, res) => {
     const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
+    res.send("cbn");
 
     if (!tabelAlert) {
       return res
         .status(400)
         .json({ error: "The 'url' parameter is required." });
     }
-    res.send("cbn");
     try {
       //const response = await axios.get(tabelAlert);
       checkAndSendAlerts(tabelAlert)
@@ -114,8 +114,8 @@ const EXCHANGES_CONFIG = {
 
     okx: {
         name: "OKX",
-        tickerPriceUrl: 'https://www.okx.com/api/v5/market/tickers?instType=SPOT',
-        candlestickUrl: 'https://www.okx.com/api/v5/market/candles?instType=SPOT',
+        tickerPriceUrl: 'https://www.okx.com/api/v5/market/tickers',
+        candlestickUrl: 'https://www.okx.com/api/v5/market/candles',
         usdtSuffix: '-USDT',
         // لتفسير بيانات الشمعة [timestamp, open, high, low, close, volume, ...]
         parseCandle: (c) => ({
@@ -259,27 +259,23 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
                 break;
             case 'coingecko':
                 // coingecko v2 kline uses 'from' in seconds
-                apiUrl = `${exchange.candlestickUrl}?${symbol}/ohlc?vs_currency=usd&days=1`;
+                apiUrl = `${exchange.candlestickUrl}${symbol}/ohlc?vs_currency=usd&days=1`;
             break;
             case 'okx':
                 // OKX uses 'before' and 'after' in milliseconds
-                apiUrl = `${exchange.candlestickUrl}&instId=${symbol}&bar=${mappedInterval}&limit=${limit}&before=${endTimeMs}&after=${startTimeMs}`;
+                apiUrl = `${exchange.candlestickUrl}?instId=${symbol}&bar=${mappedInterval}`;
                 break;
             default:
                 console.warn(`جلب الشموع غير مدعوم للمنصة: ${exchangeId}`);
                 return null;
         }
     
-        //datas = (await axios.get(apiUrl)).data;
-        console.log(`apiUrl   is :${apiUrl}`)
-        //console.log(datas);
-        /* let tt= 'https://api.kucoin.com/api/v1/market/candles?symbol=BTC-USDT&type=1min&startAt=1753910841&endAt=1753911021'
-        apiUrl = 'https://api.kucoin.com/api/v1/market/candles?symbol=BTC-USDT&type=1min&startAt=1722307200&endAt=1722307800'; */
+       
+        //console.log(`apiUrl   is :${apiUrl}`)
         datas = (await axios.get(apiUrl)).data;
 
-        
-        console.log(`datas ed data  is :`)
-        console.log(datas);
+        //console.log(`datas ed data  is :`)
+        //console.log(datas);
         
         let candles = [];
         if (exchangeId === 'binance') {
@@ -292,7 +288,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
             }
         }else if (  exchangeId === 'okx') { 
             if (datas.code === '200000' || datas.code === '0') {
-                candles = datas.map(exchange.parseCandle);
+                candles = datas.data.map(exchange.parseCandle);
             } else {
                 console.error(`خطأ من ${exchange.name} API (شموع):`, datas.msg || JSON.stringify(datas));
             }
