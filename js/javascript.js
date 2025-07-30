@@ -117,9 +117,9 @@ function renderAlerts(alerts) {
 	alerts.forEach(alert => {
 		let conditionText = "";
 		if (alert.alertCondition === "less_than_or_equal") {
-			conditionText = "عندما يصبح السعر ≥";
+			conditionText = "عندما يصبح السعر أصغر أو يساوي";
 		} else if (alert.alertCondition === "greater_than_or_equal") {
-			conditionText = "عندما يصبح السعر ≤";
+			conditionText = "عندما يصبح السعر أكبر أو يساوي";
 		}
 
 		const listItem = document.createElement("li");
