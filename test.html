@@ -1,36 +1,24 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Call Firebase Function</title>
-	</head>
-	<body>
-		<button onclick="callFunction()">Call Function</button>
-		<pre id="output"></pre>
+<head>
+  <title>Call Firebase Function</title>
+</head>
+<body>
+  <button onclick="callFunction()">Call Function</button>
+  <pre id="output"></pre>
 
-		<script>
-			async function callFunction() {
-				const url =
-					"https://europe-west1-alertprice-c0176.cloudfunctions.net/helloWorld";
+  <script>
+    async function callFunction() {
+      const url = "https://europe-west1-alertprice-c0176.cloudfunctions.net/helloWorld";
 
-				try {
-					const response = await fetch(url, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/json",
-						},
-						body: JSON.stringify({ datas: ["BTCUSDT", "ETHUSDT"] }),
-					});
-					const data = await response.json();
-					document.getElementById("output").textContent = JSON.stringify(
-						data,
-						null,
-						2
-					);
-				} catch (err) {
-					document.getElementById("output").textContent =
-						"Error2: " + err.message;
-				}
-			}
-		</script>
-	</body>
+      try {
+        const response = await fetch(url); // طلب GET
+        const data = await response.json();
+        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+      } catch (err) {
+        document.getElementById("output").textContent = "Error2: " + err.message;
+      }
+    }
+  </script>
+</body>
 </html>
