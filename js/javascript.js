@@ -91,7 +91,7 @@ const EXCHANGES = {
 	coincap: {
 		name: "CoinCap",
 		exchangeInfoUrl: "https://cors-anywhere.herokuapp.com/https://api.coincap.io/v2/assets",
-		tickerPriceUrl: "https://api.coincap.io/v2/assets", // يحتاج فلترة حسب الرمز
+		tickerPriceUrl: "https://api.coincap.io/v2/assets?symbol=bitcoin", // يحتاج فلترة حسب الرمز
 		usdtSuffix: "USDT",
 		intervalData: 60000,
 	},
@@ -278,7 +278,9 @@ async function fetchTradingPairs(exchangeId) {
 				break;
 
 			case "coincap":
-				response = await fetch(exchange.exchangeInfoUrl);
+				response = await fetch(exchange.tickerPriceUrl);
+				console.log(response);
+				
 				data = await response.json();
 				symbols = data.data
 					.filter(s => s.symbol && s.symbol.length <= 10) // تصفية تقريبية
@@ -811,3 +813,12 @@ buttonInstall.addEventListener("click", async () => {
         console.log(`User response to the install prompt: ${outcome}`); */
 	deferredPrompt = null;
 });
+async function getPrc() {
+	const symbol = "bitcoin";
+const url = `https://europe-west1-alertprice-c0176.cloudfunctions.net/proxyCoinCap?symbol=${symbol}`;
+const response = await fetch(url);
+const data = await response.json();
+console.log(data);
+}
+
+getPrc()

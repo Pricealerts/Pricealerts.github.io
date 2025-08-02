@@ -22,32 +22,18 @@ exports.proxyRequest = onRequest(
 	async (req, res) => {
 		const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
 
-		 // ✅ ترويسات CORS - يجب أن تكون دائمًا
-  res.set('Access-Control-Allow-Origin', 'https://pricealerts.github.io/test.html');
-  res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.set('Access-Control-Allow-Headers', 'Content-Type');
-
-  // ✅ طلبات OPTIONS (preflight)
-  if (req.method === 'OPTIONS') {
-    res.status(204).send('');
-    return;
-  }
-
-  // ✅ طلبات POST
-  if (req.method === 'POST') {
-    const tabelAlert = req.body.datas;
-    // اكتب هنا ما تريد أن تفعله بالبيانات
-    res.json({ message: "تمت المعالجة بنجاح", data: tabelAlert });
-    return;
-  }
-
-  // ✅ باقي الحالات (مثلاً GET)
-  res.json({ message: "Hello from Firebase!" });
-		res.send("cbn");
-		if (!tabelAlert) {
-			return res
-				.status(400)
-				.json({ error: "The 'url' parameter is required." });
+		try {
+			const symbol = req.query.symbol || "bitcoin";
+			const response = await fetch(
+				`https://api.coincap.io/v2/assets/${symbol.toLowerCase()}`
+			);
+			const data = await response.json();
+			res.set("Access-Control-Allow-Origin", "*"); // حل مشكلة CORS
+			res.json(data);
+		} catch (error) {
+			res
+				.status(500)
+				.json({ error: "فشل جلب البيانات من CoinCap", details: error.message });
 		}
 		try {
 			//const response = await axios.get(tabelAlert);
@@ -68,8 +54,8 @@ exports.proxyRequest = onRequest(
 const EXCHANGES_CONFIG = {
 	binance: {
 		name: "Binance",
-		tickerPriceUrl: 'https://api.binance.com/api/v3/ticker/price',
-        candlestickUrl: 'https://api.binance.com/api/v3/klines', // نقطة نهاية الشموع
+		tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
+		candlestickUrl: "https://api.binance.com/api/v3/klines", // نقطة نهاية الشموع
 		usdtSuffix: "USDT",
 		parseCandle: c => ({
 			time: parseInt(c[0]),
@@ -354,7 +340,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 
 		switch (exchangeId) {
 			case "binance":
-                apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
 				break;
 			case "mexc":
 				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}${exchange.usdtSuffix}&interval=${mappedInterval}&limit=${limit}`;
@@ -404,22 +390,22 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				return null;
 		}
 
-		console.log(`apiUrl   is :${apiUrl}`)
+		console.log(`apiUrl   is :${apiUrl}`);
 		datas = (await axios.get(apiUrl)).data;
 
-		console.log(`datas ed data  is :`)
+		console.log(`datas ed data  is :`);
 		console.log(datas);
 
 		let candles = [];
-        /* if (exchangeId === "coingecko") candles = datas.prices;
+		/* if (exchangeId === "coingecko") candles = datas.prices;
 		else if (exchangeId === "bitget") candles = datas.data;
 		else if (exchangeId === "gateio") candles = datas.data;
 		else if (exchangeId === "coinbase") candles = datas;
 		else candles = datas; */
 		if (exchangeId === "binance") {
 			candles = datas.map(exchange.parseCandle);
-            console.log(`candles  is :`)
-		console.log(candles);
+			console.log(`candles  is :`);
+			console.log(candles);
 		} else if (exchangeId === "kucoin") {
 			if (datas.code === "200000") {
 				candles = datas.data.map(exchange.parseCandle);
@@ -457,12 +443,12 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				);
 			}
 		}
-		
+
 		// قد ترجع المنصات شموعًا أكثر مما طلبناه، أو بترتيب معكوس.
 		// للتأكد من الحصول على أحدث الشموع وحتى العدد المحدد.
 		// غالبًا ما يتم إرجاعها بترتيب زمني تصاعدي (الأقدم أولاً).
 		// إذا كان كذلك، نأخذ آخر 'limit' من الشموع.
-		
+
 		return candles.slice(-limit);
 	} catch (error) {
 		console.error(
