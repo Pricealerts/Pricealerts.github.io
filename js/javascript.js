@@ -91,7 +91,7 @@ const EXCHANGES = {
 	},
 	coincap: {
 		name: "CoinCap",
-		exchangeInfoUrl: "https://api.coincap.io/v2/assets",
+		exchangeInfoUrl: "https://cors-anywhere.herokuapp.com/https://api.coincap.io/v2/assets",
 		tickerPriceUrl: "https://api.coincap.io/v2/assets", // يحتاج فلترة حسب الرمز
 		usdtSuffix: "USDT",
 		intervalData: 60000,
