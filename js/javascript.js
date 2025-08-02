@@ -82,11 +82,11 @@ const EXCHANGES = {
 		usdtSuffix: "USDT_SPBL",
 		intervalData: 60000,
 	},
-	gateio: {
-		name: "Gate.io",
-		exchangeInfoUrl: "https://api.gate.io/api/v4/spot/currency_pairs",
-		tickerPriceUrl: "https://api.gate.io/api/v4/spot/tickers",
-		usdtSuffix: "_USDT",
+	lbank: {
+		name: "LBank",
+		exchangeInfoUrl: "https://api.lbkex.com/v2/ticker.do?symbol=all", // ترجع جميع الرموز والأسعار
+		tickerPriceUrl: "https://api.lbkex.com/v2/ticker.do?symbol=", // يتبعها رمز العملة
+		usdtSuffix: "usdt", // الأحرف كلها صغيرة
 		intervalData: 60000,
 	},
 	coincap: {
@@ -189,9 +189,7 @@ function renderAlerts(alerts) {
 
 ///// https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec?action=getCryptoSymbols&urlSmbls=https://api.bybit.com/v2/public/symbols
 
-
 // https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec?action=getCryptoSymbols&urlSmbls=https://api.kucoin.com/api/v1/symbols
-
 
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
@@ -213,16 +211,14 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
 				symbols = allPrices
-					.filter(s => s.symbol.includes("USDT") )
+					.filter(s => s.symbol.includes("USDT"))
 					.map(s => s.symbol);
 				break;
 			case "mexc":
 				response = await fetch(urlCrpts);
 				allPrices = await response.json();
 				symbols = allPrices
-					.filter(
-						s => s.symbol.endsWith(exchange.usdtSuffix)
-					)
+					.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
 					.map(s => s.symbol);
 				break;
 
@@ -253,63 +249,33 @@ async function fetchTradingPairs(exchangeId) {
 			case "coingecko":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-				
+
 				// coingecko doesn't return symbol symbols, it returns coin IDs
 				symbols = data.map(c => c.id); // مثل: ['bitcoin', 'ethereum']
 				break;
 
-
-
-
-
 			case "bybit":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-				allPrices = data.result.list 
+				allPrices = data.result.list;
 				//.filter(s => s.symbol.includes("USDT") );
 				symbols = allPrices.map(s => s.symbol);
 				break;
 
-
 			case "bitget":
 				response = await fetch(exchange.tickerPriceUrl);
 				data = await response.json();
-				allPrices = data.data
+				allPrices = data.data;
 				symbols = allPrices.map(s => s.symbol);
 				break;
-			case "gateio":
-				response = await fetch(exchange.tickerPriceUrl);
-				console.log(response);
-				data = await response.json();
-				
-
-	/* try {
-		const response = await fetch(getPriceUrl, {
-			method: "POST" ,
-			body: JSON.stringify({
-				action: 'symbols',
-				urlSmbl:exchange.tickerPriceUrl
-			}),
-		})
-			.then(res => res.json())
-			.then(dt => {
-				data = dt;
-			});
-
-		if (data.reslt == "success") {
-		console.log(data);
-		
-			return true;
-		} 
-	} catch (error) {
-		console.error("خطأ في إرسال طلب Apps Script:", error);
-		return false;
-	} */
+			case "lbank":
 				response = await fetch(urlCrpts);
 				data = await response.json();
-				symbols = data
-					.filter(s => s.quote === "USDT")
-					.map(s => s.id.replace("_", "").toUpperCase());
+				allPrices = data.data;
+				console.log(allPrices);
+				
+				symbols = allPrices.map(s => s.symbol);
+
 				break;
 
 			case "coincap":
@@ -374,13 +340,13 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				price = allPrices.find(obj => obj.symbol == symbol).price;
 				break;
 			case "mexc":
-			price = allPrices.find(obj => obj.symbol == symbol).price;
+				price = allPrices.find(obj => obj.symbol == symbol).price;
 				break;
 			case "kucoin":
 				apiUrl = `${urlCrpts}&symbole=${symbol}`;
 				response = await fetch(apiUrl);
 				data = await response.json();
-				
+
 				// إذا كانت البيانات تحتوي على رمز السعر
 				if (data.code === "200000" && data.data && data.data.price) {
 					price = parseFloat(data.data.price);
@@ -415,11 +381,14 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 					);
 				}
 				break;
-				case "bybit":
-					price = allPrices.find(obj => obj.symbol == symbol).lastPrice;
+			case "bybit":
+				price = allPrices.find(obj => obj.symbol == symbol).lastPrice;
 				break;
-				case "bitget":
-					price = allPrices.find(obj => obj.symbol == symbol).close;
+			case "bitget":
+				price = allPrices.find(obj => obj.symbol == symbol).close;
+				break;
+			case "lbank":
+				price = allPrices.find(obj => obj.symbol == symbol).ticker.latest;
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);

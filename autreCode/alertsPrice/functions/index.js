@@ -23,7 +23,7 @@ exports.proxyRequest = onRequest(
 		const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
 
 		 // ✅ ترويسات CORS - يجب أن تكون دائمًا
-  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Access-Control-Allow-Origin', 'https://pricealerts.github.io/test.html');
   res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.set('Access-Control-Allow-Headers', 'Content-Type');
 
