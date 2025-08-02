@@ -13,7 +13,7 @@ let allPrices = [];
 const conditionGreaterThanOrEqual = gebi(
 	"conditionGreaterThanOrEqual"
 );  */
-
+/* dadi */
 const alertTypeBrowserCheckbox = gebi("alertTypeBrowser"); // تم تغيير الاسم
 const alertTypeTelegramCheckbox = gebi("alertTypeTelegram"); // تم تغيير الاسم
 const telegramChatIdContainer = gebi("telegramChatIdContainer");
