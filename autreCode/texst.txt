@@ -14,3 +14,29 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ||
                           admin.initializeApp({
   databaseURL: "https://alertprice-c0176.firebaseio.com"
 });
+
+/* nta3 firebase */
+case "bybit":
+				const payload = {
+					action : 'getSmbls',
+					datas: exchange.exchangeInfoUrl,
+				};
+
+				const options = {
+					method: "post",
+					contentType: "application/json",
+					payload: JSON.stringify(payload),
+					muteHttpExceptions: true,
+				};
+
+				const url = "https://proxyrequest-kuwu5xovza-ew.a.run.app";
+				 response = await fetch(url, options);
+				console.log(response);
+				 data = await response.data;
+				console.log(data);
+					symbols = data.result
+						.filter(
+							s => s.quote_currency === "USDT" && s.status === "Trading"
+						)
+						.map(s => s.name);
+				break;

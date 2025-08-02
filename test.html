@@ -1,113 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Country Dropdown</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
+<html>
+	<head>
+		<title>Call Firebase Function</title>
+	</head>
+	<body>
+		<button onclick="callFunction()">Call Function</button>
+		<pre id="output"></pre>
 
-    .dropdown-container {
-      position: relative;
-      width: 300px;
-    }
+		<script>
+			async function callFunction() {
+				const url =
+					"https://europe-west1-alertprice-c0176.cloudfunctions.net/helloWorld";
 
-    select, input {
-      width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-    }
-
-    .custom-select {
-      position: relative;
-    }
-
-    .dropdown-list {
-      position: absolute;
-      top: 40px;
-      left: 0;
-      right: 0;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      background: white;
-      display: none;
-      z-index: 10;
-    }
-
-    .dropdown-list div {
-      padding: 8px 10px;
-      cursor: pointer;
-    }
-
-    .dropdown-list div:hover {
-      background-color: #f0f0f0;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="dropdown-container">
-    <input type="text" id="search" placeholder="Select country..." onfocus="showDropdown()" oninput="filterList()">
-    <div class="dropdown-list" id="dropdownList"></div>
-  </div>
-
-  <script>
-    const countries = [
-      "Australia", "Bangladesh", "Belarus", "Brazil", "Canada",
-      "China", "France", "Germany", "India", "Indonesia",
-      "Italy", "Japan", "Kenya", "Mexico", "Morocco",
-      "Pakistan", "Russia", "Saudi Arabia", "South Africa", "Spain",
-      "Turkey", "Ukraine", "United Kingdom", "United States"
-    ];
-
-    const dropdownList = document.getElementById("dropdownList");
-    const searchInput = document.getElementById("search");
-
-    function showDropdown() {
-      dropdownList.style.display = "block";
-      populateList(countries);
-    }
-
-    function hideDropdown() {
-      setTimeout(() => {
-        dropdownList.style.display = "none";
-      }, 200); // Give some time for click event
-    }
-
-    function populateList(items) {
-      dropdownList.innerHTML = "";
-      items.forEach(country => {
-        const div = document.createElement("div");
-        div.textContent = country;
-        div.onclick = () => {
-          searchInput.value = country;
-          dropdownList.style.display = "none";
-        };
-        dropdownList.appendChild(div);
-      });
-    }
-
-    function filterList() {
-      const query = searchInput.value.toLowerCase();
-      const filtered = countries.filter(c => c.toLowerCase().includes(query));
-      populateList(filtered);
-    }
-
-    // Hide dropdown when clicking outside
-    document.addEventListener("click", function (e) {
-      if (!document.querySelector(".dropdown-container").contains(e.target)) {
-        hideDropdown();
-      }
-    });
-
-
-
-   
-  </script>
-
-</body>
+				try {
+					const response = await fetch(url, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/json",
+						},
+						body: JSON.stringify({ datas: ["BTCUSDT", "ETHUSDT"] }),
+					});
+					const data = await response.json();
+					document.getElementById("output").textContent = JSON.stringify(
+						data,
+						null,
+						2
+					);
+				} catch (err) {
+					document.getElementById("output").textContent =
+						"Error2: " + err.message;
+				}
+			}
+		</script>
+	</body>
 </html>
