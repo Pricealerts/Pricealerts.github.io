@@ -9,17 +9,15 @@ admin.initializeApp();
 // *** بيانات اعتماد Telegram Bot API (لا تنس تحديثها) ***
 const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"; // احصل عليه من @BotFather
 
-
 let dltRwApp = [];
 const APPS_SCRIPT_WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
-
 
 exports.proxyRequest = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
 		const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
-		 res.send("cbn");
+		res.send("cbn");
 		try {
 			//const response = await axios.get(tabelAlert);
 			checkAndSendAlerts(tabelAlert);
@@ -85,7 +83,7 @@ const EXCHANGES_CONFIG = {
 	coingecko: {
 		name: "CoinGecko",
 		tickerPriceUrl: "https://api.coingecko.com/api/v3/coins/",
-		candlestickUrl: "https://api.coingecko.com/api/v3/coins/",
+		candlestickUrl: "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart",
 		usdtSuffix: "USD",
 		parseCandle: c => ({
 			time: c[0],
@@ -174,7 +172,8 @@ const EXCHANGES_CONFIG = {
 	coinbase: {
 		name: "Coinbase",
 		tickerPriceUrl: "https://api.exchange.coinbase.com/products",
-		candlestickUrl:"https://api.exchange.coinbase.com/products/{symbol}/candles",
+		candlestickUrl:
+			"https://api.exchange.coinbase.com/products/{symbol}/candles",
 		usdtSuffix: "-USDT",
 		parseCandle: c => ({
 			time: c[0] * 1000,
@@ -269,6 +268,7 @@ async function checkAndSendAlerts(data) {
 				if (sendResult.success) {
 					let iPls = i + 2;
 					dltRwApp.push(iPls);
+					
 					// بما أننا حذفنا الصف، يجب أن نقلل الفهرس لتجنب تخطي صفوف
 					data.splice(i, 1); // إزالة الصف المحذوف من مصفوفة البيانات المحلية أيضًا
 				} else {
@@ -327,22 +327,27 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
 				break;
 			case "mexc":
-				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}${exchange.usdtSuffix}&interval=${mappedInterval}&limit=${limit}`;
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
 				break;
 
 			case "kucoin":
-				apiUrl = `${exchange.candlestickUrl}?type=${mappedInterval}&symbol=${symbol}-${exchange.usdtSuffix}&limit=${limit}`;
+				apiUrl = `${exchange.candlestickUrl}?type=${mappedInterval}&symbol=${symbol}&limit=${limit}`;
 				break;
 
 			case "okx":
-				apiUrl = `${exchange.candlestickUrl}?instId=${symbol}${exchange.usdtSuffix}&bar=${mappedInterval}&limit=${limit}&before=${endTimeMs}&after=${startTimeMs}`;
+				apiUrl = `${exchange.candlestickUrl}?instId=${symbol}&bar=${mappedInterval}&limit=${limit}`;
+				/* https://www.okx.com/api/v5/market/candles?instId=1INCH-USDT&bar=1m&limit=1
+				&before=${endTimeMs}&after=${startTimeMs} */
 				break;
 
 			case "coingecko":
-				// coingecko لا تدعم API رسمي مباشر للشموع لكل العملات، عادة تحتاج ID العملة
-				// افتراضياً نستخدم 'bitcoin' للتوضيح فقط
-				const coinId = "bitcoin";
-				apiUrl = `${exchange.candlestickUrl}${coinId}/market_chart?vs_currency=usd&days=1&interval=minute`;
+				const url = exchange.candlestickUrl;
+				const params = new URLSearchParams({
+					vs_currency: "usd",
+					days: "1", // هذا يعيد بيانات محدثة كل 5 دقائق تقريبا
+				});
+				apiUrl = `${url}?${params}`;
+
 				break;
 
 			case "coincap":
@@ -350,11 +355,11 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				break;
 
 			case "bybit":
-				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}${exchange.usdtSuffix}&interval=${mappedInterval}&limit=${limit}`;
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
 				break;
 
 			case "bitget":
-				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}${exchange.usdtSuffix}&granularity=${mappedInterval}&limit=${limit}`;
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&granularity=${mappedInterval}&limit=${limit}`;
 				break;
 
 			case "gateio":
@@ -417,6 +422,30 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 					datas.ret_msg || JSON.stringify(datas)
 				);
 			}
+		} else if (exchangeId === "coingecko") {
+			const now = Date.now();
+			const fiveMinutesAgo = now - 5 * 60 * 1000;
+
+			// تصفية الأسعار في آخر 5 دقائق
+			const pricesLast5Min = datas.prices.filter(
+				item => item[0] >= fiveMinutesAgo
+			);
+
+			const open = pricesLast5Min[0][1];
+			const close = pricesLast5Min[pricesLast5Min.length - 1][1];
+			const high = Math.max(...pricesLast5Min.map(p => p[1]));
+			const low = Math.min(...pricesLast5Min.map(p => p[1]));
+			datas = [[
+				new Date(pricesLast5Min[0][0]).toISOString(),
+				open,
+				high,
+				low,
+				close,
+			]];
+
+			candles = datas.map(exchange.parseCandle);
+			
+			
 		} else {
 			if (Array.isArray(datas) && datas.length) {
 				candles = datas.map(exchange.parseCandle);
@@ -444,11 +473,12 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 }
 
 async function callFirebaseWithPost() {
-	//console.log(responseAppScrpt);
-
+//console.log('fat mna');
 	if (dltRwApp.length == 0) {
 		return "walo";
 	}
+	console.log('fast mnhak dltRwApp : '+ dltRwApp );
+	
 	try {
 		//const response = await axios.post(APPS_SCRIPT_WEB_APP_URL, options);
 		await axios.post(
@@ -461,6 +491,7 @@ async function callFirebaseWithPost() {
 				headers: { "Content-Type": "application/json" },
 			}
 		);
+		dltRwApp = [];
 	} catch (error) {
 		console.error(
 			"error  respons",

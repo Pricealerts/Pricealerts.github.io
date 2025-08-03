@@ -65,7 +65,7 @@ const EXCHANGES = {
 			"https://www.okx.com/api/v5/public/instruments?instType=SPOT",
 		tickerPriceUrl: "https://www.okx.com/api/v5/market/tickers?instType=SPOT",
 		usdtSuffix: "-USDT",
-		intervalData: 5000,
+		intervalData: 60000,
 	},
 	bybit: {
 		name: "Bybit",
@@ -95,10 +95,10 @@ const EXCHANGES = {
 		tickerPriceUrl: "https://api.coincap.io/v2/assets?symbol=bitcoin", // يحتاج فلترة حسب الرمز
 		usdtSuffix: "USDT",
 		intervalData: 60000,
-	},coinmarketcap:{
+	},
+	coinmarketcap: {
 		name: "Coinmarketcap",
-		exchangeInfoUrl:
-			"https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
+		exchangeInfoUrl: "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
 		tickerPriceUrl: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC`, // يحتاج فلترة حسب الرمز
 		usdtSuffix: "USDT",
 		intervalData: 60000,
@@ -224,6 +224,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "mexc":
 				response = await fetch(urlCrpts);
 				allPrices = await response.json();
+
 				symbols = allPrices
 					.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
 					.map(s => s.symbol);
@@ -243,22 +244,23 @@ async function fetchTradingPairs(exchangeId) {
 				}
 				break;
 			case "okx":
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				console.log(data);
-				symbols = data.data
-					.filter(
+				response = await fetch(exchange.tickerPriceUrl);
+				allPrices = await response.json();
+				allPrices = allPrices.data
+				symbols = allPrices
+					/* .filter(
 						s => s.instType === "SPOT" && s.instId.endsWith(exchange.usdtSuffix)
-					)
-					.map(s => s.instId.replace("-", ""));
+					) */
+					.map(s => s.instId/* .replace("-", "") */);
 				break;
 
 			case "coingecko":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
+				console.log(data);
 
 				// coingecko doesn't return symbol symbols, it returns coin IDs
-				symbols = data.map(c => c.id); // مثل: ['bitcoin', 'ethereum']
+				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
 				break;
 
 			case "bybit":
@@ -301,7 +303,6 @@ async function fetchTradingPairs(exchangeId) {
 				});
 				data = await response.json();
 				symbols = data.smbls.map(s => s.symbol);
-				
 
 				break;
 			case "coinbase":
@@ -330,10 +331,9 @@ async function fetchTradingPairs(exchangeId) {
 			});
 			selectedSymbol = symbols[0];
 			searchPrice.value = selectedSymbol;
-setTimeout(() => {
-	startPriceUpdates();
-}, 1);
-			
+			setTimeout(() => {
+				startPriceUpdates();
+			}, 1);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -386,10 +386,9 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				price = data[symbol].usd;
 				break;
 			case "okx":
-				apiUrl = `${exchange.tickerPriceUrl}&instId=${symbol}`;
-				response = await fetch(apiUrl);
-				data = await response.json();
-				if (
+				price = allPrices.find(obj => obj.instId == symbol).last;
+				
+				/* if (
 					data.code === "0" &&
 					data.data &&
 					data.data.length > 0 &&
@@ -401,7 +400,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 						`خطأ من OKX API (ticker):`,
 						data.msg || JSON.stringify(data)
 					);
-				}
+				} */
 				break;
 			case "bybit":
 				price = allPrices.find(obj => obj.symbol == symbol).lastPrice;
@@ -413,13 +412,12 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				price = allPrices.find(obj => obj.symbol == symbol).ticker.latest;
 				break;
 			case "coinmarketcap":
-
 				response = await fetch(getPriceUrl, {
 					method: "POST",
-					body: JSON.stringify({ action: "getPrs",smbl:symbol }),
+					body: JSON.stringify({ action: "getPrs", smbl: symbol }),
 				});
 				data = await response.json();
-				price=data.price
+				price = data.price;
 
 				break;
 			case "coinbase":
@@ -597,7 +595,7 @@ async function manageAlertOnAppsScript(action, alertData = null) {
 // --- معالجات الأحداث ---
 
 exchangeSelect.addEventListener("change", () => {
-		currentPriceDisplay.textContent = "--.-- USDT"; 
+	currentPriceDisplay.textContent = "--.-- USDT";
 	currentExchangeId = exchangeSelect.value;
 	fetchTradingPairs(currentExchangeId);
 	alertStatus.textContent = "";
@@ -775,7 +773,7 @@ function populateList(items) {
 	});
 }
 
-function filterList() { 
+function filterList() {
 	const query = searchPrice.value.toLowerCase();
 	const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
 	populateList(filtered);
