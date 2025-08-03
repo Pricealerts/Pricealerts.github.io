@@ -8,33 +8,18 @@ admin.initializeApp();
 
 // *** بيانات اعتماد Telegram Bot API (لا تنس تحديثها) ***
 const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"; // احصل عليه من @BotFather
-/* let responseAppScrpt = {
-  action : 'okResponse',
-  dltRw : []
-}; */
+
 
 let dltRwApp = [];
 const APPS_SCRIPT_WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
 
+
 exports.proxyRequest = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
 		const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
-
-		try {
-			const symbol = req.query.symbol || "bitcoin";
-			const response = await fetch(
-				`https://api.coincap.io/v2/assets/${symbol.toLowerCase()}`
-			);
-			const data = await response.json();
-			res.set("Access-Control-Allow-Origin", "*"); // حل مشكلة CORS
-			res.json(data);
-		} catch (error) {
-			res
-				.status(500)
-				.json({ error: "فشل جلب البيانات من CoinCap", details: error.message });
-		}
+		 res.send("cbn");
 		try {
 			//const response = await axios.get(tabelAlert);
 			checkAndSendAlerts(tabelAlert);
@@ -189,8 +174,7 @@ const EXCHANGES_CONFIG = {
 	coinbase: {
 		name: "Coinbase",
 		tickerPriceUrl: "https://api.exchange.coinbase.com/products",
-		candlestickUrl:
-			"https://api.exchange.coinbase.com/products/{symbol}/candles",
+		candlestickUrl:"https://api.exchange.coinbase.com/products/{symbol}/candles",
 		usdtSuffix: "-USDT",
 		parseCandle: c => ({
 			time: c[0] * 1000,

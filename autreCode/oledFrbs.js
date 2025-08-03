@@ -17,7 +17,50 @@ const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"; // 
 let dltRwApp = []
 const APPS_SCRIPT_WEB_APP_URL =
   "https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
-
+//  ¯\_(ツ)_/¯
+/* nta3 getCoinMarketCapPrice */
+/* function setCors(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-CMC_PRO_API_KEY");
+} */
+/* const API_KEY =  process.env.CMC_API_KEY ||  "65ba4c71-91b8-4e0e-b65e-458e0646b84f"; // استبدله بمفتاحك الحقيقي
+const API_BASE = "https://pro-api.coinmarketcap.com/v1";
+exports.getCoinMarketCapPrice = onRequest(
+    {
+		region: "europe-west1",
+		invoker: "public", // ✅ يسمح بالوصول العام بدون مصادقة
+	}, async (req, res) => {
+        setCors(res) ;
+		if (req.method === "OPTIONS") {
+			return res.status(204).send();
+		}
+	  try {
+        const { data } = await axios.get(`${API_BASE}/cryptocurrency/map`, {
+          headers: {
+            "X-CMC_PRO_API_KEY": API_KEY,
+            Accept: "application/json"
+          }
+        });
+    
+        // استخراج الرموز والاسماء فقط
+        const currencies = data.data.map(c => ({
+          id: c.id,
+          symbol: c.symbol,
+          name: c.name,
+          slug: c.slug,
+          rank: c.rank,
+          is_active: c.is_active
+        }));
+    
+        res.json({ count: currencies.length, currencies });
+      } catch (err) {
+        res.status(500).json({
+          error: "فشل جلب قائمة العملات",
+          details: err.response?.data || err.message
+        });
+      }
+}); */
 exports.proxyRequest = onRequest(
   { region: "europe-west1" },
    (req, res) => {
@@ -380,6 +423,88 @@ async function sendTelegramMessage(chatId, messageText) {
     }
 }
 
+
+
+
+const { onRequest } = require("firebase-functions/v2/https");
+const axios = require("axios");
+
+const API_BASE = "https://pro-api.coinmarketcap.com/v1";
+const API_KEY = process.env.CMC_API_KEY || "YOUR_API_KEY";
+
+function setCors(res) {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type,X-CMC_PRO_API_KEY");
+}
+
+async function callCMC(url, params = {}) {
+  return axios.get(API_BASE + url, {
+    params,
+    headers: {
+      "X-CMC_PRO_API_KEY": API_KEY,
+      Accept: "application/json"
+    }
+  });
+}
+
+exports.getCMCPrice = onRequest({ region: "europe-west1", invoker: "public" }, async (req, res) => {
+  setCors(res);
+  if (req.method === "OPTIONS") return res.status(204).send();
+
+  const symbol = (req.query.symbol || "BTC").toUpperCase();
+  try {
+    const { data } = await callCMC("/cryptocurrency/quotes/latest", {
+      symbol,
+      convert: "USD"
+    });
+    const info = data.data?.[symbol];
+    if (!info) throw new Error("رمز العملة غير موجود.");
+    res.json({ symbol, price: info.quote.USD.price });
+  } catch (err) {
+    res.status(500).json({ error: "فشل جلب السعر", details: err.response?.data || err.message });
+  }
+});
+
+exports.listCMCAssets = onRequest({ region: "europe-west1", invoker: "public" }, async (req, res) => {
+  setCors(res);
+  if (req.method === "OPTIONS") return res.status(204).send();
+
+  try {
+    const { data } = await callCMC("/cryptocurrency/listings/latest", {
+      start: req.query.start || 1,
+      limit: req.query.limit || 100,
+      convert: "USD"
+    });
+    res.json({ assets: data.data, status: data.status });
+  } catch (err) {
+    res.status(500).json({ error: "فشل جلب قائمة العملات", details: err.response?.data || err.message });
+  }
+});
+
+exports.getCMCAssetHistory = onRequest({ region: "europe-west1", invoker: "public" }, async (req, res) => {
+  setCors(res);
+  if (req.method === "OPTIONS") return res.status(204).send();
+
+  const symbol = (req.query.symbol || "").toUpperCase();
+  const time_start = req.query.time_start;
+  const time_end = req.query.time_end;
+  const interval = req.query.interval || "15m"; // دقائق: 1m,5m,15m,1h,1d
+
+  if (!symbol || !time_start) {
+    return res.status(400).json({ error: "يرجى تمرير symbol و time_start (ISO 8601 أو unix)" });
+  }
+
+  try {
+    const { data } = await axios.get(API_BASE + "/cryptocurrency/quotes/historical", {
+      params: { symbol, time_start, time_end, interval, convert: "USD" },
+      headers: { "X-CMC_PRO_API_KEY": API_KEY, Accept: "application/json" }
+    });
+    res.json({ history: data.data, status: data.status });
+  } catch (err) {
+    res.status(500).json({ error: "فشل جلب بيانات تاريخية", details: err.response?.data || err.message });
+  }
+});
 
 
 

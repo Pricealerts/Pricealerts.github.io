@@ -90,8 +90,16 @@ const EXCHANGES = {
 	},
 	coincap: {
 		name: "CoinCap",
-		exchangeInfoUrl: "https://cors-anywhere.herokuapp.com/https://api.coincap.io/v2/assets",
+		exchangeInfoUrl:
+			"https://cors-anywhere.herokuapp.com/https://api.coincap.io/v2/assets",
 		tickerPriceUrl: "https://api.coincap.io/v2/assets?symbol=bitcoin", // يحتاج فلترة حسب الرمز
+		usdtSuffix: "USDT",
+		intervalData: 60000,
+	},coinmarketcap:{
+		name: "Coinmarketcap",
+		exchangeInfoUrl:
+			"https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
+		tickerPriceUrl: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC`, // يحتاج فلترة حسب الرمز
 		usdtSuffix: "USDT",
 		intervalData: 60000,
 	},
@@ -272,7 +280,7 @@ async function fetchTradingPairs(exchangeId) {
 				data = await response.json();
 				allPrices = data.data;
 				console.log(allPrices);
-				
+
 				symbols = allPrices.map(s => s.symbol);
 
 				break;
@@ -280,19 +288,30 @@ async function fetchTradingPairs(exchangeId) {
 			case "coincap":
 				response = await fetch(exchange.tickerPriceUrl);
 				console.log(response);
-				
+
 				data = await response.json();
 				symbols = data.data
 					.filter(s => s.symbol && s.symbol.length <= 10) // تصفية تقريبية
 					.map(s => s.symbol + "USDT");
 				break;
+			case "coinmarketcap":
+				response = await fetch(getPriceUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "symbols" }),
+				});
+				data = await response.json();
+				symbols = data.smbls.map(s => s.symbol);
+				
 
+				break;
 			case "coinbase":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
 				symbols = data
-					.filter(s => s.quote_currency === "USDT")
-					.map(s => s.id.replace("-", ""));
+					.filter(
+						s => /* s.quote_currency === "USDT" &&  */ !s.trading_disabled
+					)
+					.map(s => s.id);
 				break;
 
 			default:
@@ -311,8 +330,10 @@ async function fetchTradingPairs(exchangeId) {
 			});
 			selectedSymbol = symbols[0];
 			searchPrice.value = selectedSymbol;
-
-			startPriceUpdates();
+setTimeout(() => {
+	startPriceUpdates();
+}, 1);
+			
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -390,6 +411,22 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				break;
 			case "lbank":
 				price = allPrices.find(obj => obj.symbol == symbol).ticker.latest;
+				break;
+			case "coinmarketcap":
+
+				response = await fetch(getPriceUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "getPrs",smbl:symbol }),
+				});
+				data = await response.json();
+				price=data.price
+
+				break;
+			case "coinbase":
+				let urll = `https://api.exchange.coinbase.com/products/${symbol}/ticker`;
+				response = await fetch(urll);
+				data = await response.json();
+				price = data.price;
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
@@ -560,6 +597,7 @@ async function manageAlertOnAppsScript(action, alertData = null) {
 // --- معالجات الأحداث ---
 
 exchangeSelect.addEventListener("change", () => {
+		currentPriceDisplay.textContent = "--.-- USDT"; 
 	currentExchangeId = exchangeSelect.value;
 	fetchTradingPairs(currentExchangeId);
 	alertStatus.textContent = "";
@@ -737,7 +775,7 @@ function populateList(items) {
 	});
 }
 
-function filterList() {
+function filterList() { 
 	const query = searchPrice.value.toLowerCase();
 	const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
 	populateList(filtered);
@@ -813,12 +851,32 @@ buttonInstall.addEventListener("click", async () => {
         console.log(`User response to the install prompt: ${outcome}`); */
 	deferredPrompt = null;
 });
+
 async function getPrc() {
 	const symbol = "bitcoin";
-const url = `https://europe-west1-alertprice-c0176.cloudfunctions.net/proxyCoinCap?symbol=${symbol}`;
-const response = await fetch(url);
-const data = await response.json();
-console.log(data);
+	const url = `https://europe-west1-alertprice-c0176.cloudfunctions.net/getCoinMarketCapPrice`;
+	const response = await fetch(url);
+	const data = await response.json();
+	console.log(data);
 }
 
-getPrc()
+//getPrc()
+
+async function tstfun() {
+	const response = await fetch(getPriceUrl, {
+		method: "POST" /* 
+			headers: {
+				'Content-Type': 'application/json',
+			}, */,
+		body: JSON.stringify({
+			action: "symbols",
+			//...alertData,
+		}),
+	})
+		.then(res => res.json())
+		.then(dt => {
+			let data = dt.smbls.map(s => s.symbol);
+			console.log(data);
+		});
+}
+//tstfun()
