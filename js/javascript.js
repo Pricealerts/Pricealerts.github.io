@@ -96,11 +96,11 @@ const EXCHANGES = {
 		usdtSuffix: "USDT",
 		intervalData: 60000,
 	},
-	coinmarketcap: {
-		name: "Coinmarketcap",
-		exchangeInfoUrl: "https://pro-api.coinmarketcap.com/v1/cryptocurrency/map",
-		tickerPriceUrl: `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=BTC`, // يحتاج فلترة حسب الرمز
-		usdtSuffix: "USDT",
+	kraken: {
+		name: "Kraken",
+		exchangeInfoUrl: "https://api.kraken.com/0/public/AssetPairs",
+		tickerPriceUrl: "https://api.kraken.com/0/public/Ticker",
+		usdtSuffix: "USDT", // في Kraken يتم تسعير USDT مقابل الدولار فعليًا
 		intervalData: 60000,
 	},
 	coinbase: {
@@ -218,7 +218,7 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
 				symbols = allPrices
-					.filter(s => s.symbol.includes("USDT"))
+					//.filter(s => s.symbol.includes("USDT"))
 					.map(s => s.symbol);
 				break;
 			case "mexc":
@@ -246,18 +246,18 @@ async function fetchTradingPairs(exchangeId) {
 			case "okx":
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
-				allPrices = allPrices.data
+				allPrices = allPrices.data;
 				symbols = allPrices
 					/* .filter(
 						s => s.instType === "SPOT" && s.instId.endsWith(exchange.usdtSuffix)
 					) */
-					.map(s => s.instId/* .replace("-", "") */);
+					.map(s => s.instId /* .replace("-", "") */);
 				break;
 
 			case "coingecko":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-				console.log(data);
+				//console.log(data);
 
 				// coingecko doesn't return symbol symbols, it returns coin IDs
 				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
@@ -270,7 +270,6 @@ async function fetchTradingPairs(exchangeId) {
 				//.filter(s => s.symbol.includes("USDT") );
 				symbols = allPrices.map(s => s.symbol);
 				break;
-
 			case "bitget":
 				response = await fetch(exchange.tickerPriceUrl);
 				data = await response.json();
@@ -280,8 +279,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "lbank":
 				response = await fetch(urlCrpts);
 				data = await response.json();
-				allPrices = data.data;
-				console.log(allPrices);
+				allPrices = await data.data;
 
 				symbols = allPrices.map(s => s.symbol);
 
@@ -289,7 +287,6 @@ async function fetchTradingPairs(exchangeId) {
 
 			case "coincap":
 				response = await fetch(exchange.tickerPriceUrl);
-				console.log(response);
 
 				data = await response.json();
 				symbols = data.data
@@ -302,8 +299,17 @@ async function fetchTradingPairs(exchangeId) {
 					body: JSON.stringify({ action: "symbols" }),
 				});
 				data = await response.json();
+
 				symbols = data.smbls.map(s => s.symbol);
 
+				break;
+			case "kraken":
+				response = await fetch(exchange.exchangeInfoUrl);
+				data = await response.json();
+				let aa = data.result//.map(s => s.altname);
+				let bb = Object.entries(aa)
+				symbols = bb.map(s=> s[0])
+				
 				break;
 			case "coinbase":
 				response = await fetch(exchange.exchangeInfoUrl);
@@ -333,7 +339,7 @@ async function fetchTradingPairs(exchangeId) {
 			searchPrice.value = selectedSymbol;
 			setTimeout(() => {
 				startPriceUpdates();
-			}, 1);
+			}, 10);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -387,7 +393,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				break;
 			case "okx":
 				price = allPrices.find(obj => obj.instId == symbol).last;
-				
+
 				/* if (
 					data.code === "0" &&
 					data.data &&
@@ -411,14 +417,17 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 			case "lbank":
 				price = allPrices.find(obj => obj.symbol == symbol).ticker.latest;
 				break;
-			case "coinmarketcap":
-				response = await fetch(getPriceUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "getPrs", smbl: symbol }),
-				});
+			case "kraken":
+				//apiUrl = ;
+				response = await fetch(`${exchange.tickerPriceUrl}?pair=${symbol}`);
 				data = await response.json();
-				price = data.price;
-
+				if (data.error && data.error.length > 0) {
+					console.error("Kraken API Error:", data.error);
+				} else {
+					const pairKey = Object.keys(data.result)[0];
+					price = parseFloat(data.result[pairKey].c[0]); // السعر الحالي (close field)
+					
+				}
 				break;
 			case "coinbase":
 				let urll = `https://api.exchange.coinbase.com/products/${symbol}/ticker`;
@@ -597,6 +606,7 @@ async function manageAlertOnAppsScript(action, alertData = null) {
 exchangeSelect.addEventListener("change", () => {
 	currentPriceDisplay.textContent = "--.-- USDT";
 	currentExchangeId = exchangeSelect.value;
+	searchPrice.value = "";
 	fetchTradingPairs(currentExchangeId);
 	alertStatus.textContent = "";
 });
@@ -813,14 +823,6 @@ function updateTargetPrice() {
 
 /* instalation app */
 let deferredPrompt;
-/* if app is instal */
-/* window.addEventListener('appinstalled', () => {
-    // Hide the app-provided install promotion
-    gebi('dvdw').style.display = 'none';
-    // Clear the deferredPrompt so it can be garbage collected
-    deferredPrompt = null; 
-
-  }); */
 
 window.addEventListener("beforeinstallprompt", e => {
 	e.preventDefault();
@@ -830,10 +832,7 @@ window.addEventListener("beforeinstallprompt", e => {
 
 	gebi("dvdw").style.display = "block";
 
-	/* let os = navigator.userAgent.toLocaleLowerCase();
-	if (os.includes('android') || os.includes('ipad') || os.includes('iphone')) {
-        gebi('dvdw').style.display = 'block';
-    } */
+
 });
 
 let buttonInstall = gebi("dvdw");
@@ -850,31 +849,4 @@ buttonInstall.addEventListener("click", async () => {
 	deferredPrompt = null;
 });
 
-async function getPrc() {
-	const symbol = "bitcoin";
-	const url = `https://europe-west1-alertprice-c0176.cloudfunctions.net/getCoinMarketCapPrice`;
-	const response = await fetch(url);
-	const data = await response.json();
-	console.log(data);
-}
 
-//getPrc()
-
-async function tstfun() {
-	const response = await fetch(getPriceUrl, {
-		method: "POST" /* 
-			headers: {
-				'Content-Type': 'application/json',
-			}, */,
-		body: JSON.stringify({
-			action: "symbols",
-			//...alertData,
-		}),
-	})
-		.then(res => res.json())
-		.then(dt => {
-			let data = dt.smbls.map(s => s.symbol);
-			console.log(data);
-		});
-}
-//tstfun()

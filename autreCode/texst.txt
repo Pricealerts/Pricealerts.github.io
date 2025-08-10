@@ -4,6 +4,7 @@ rd /s /q node_modules
 
 npm install
 
+cd C:\Users\hp\Documents\progects\Pricealerts\autreCode\alertsPrice
 firebase deploy --only functions
 
 

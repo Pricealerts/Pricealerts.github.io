@@ -508,4 +508,247 @@ exports.getCMCAssetHistory = onRequest({ region: "europe-west1", invoker: "publi
 
 
 
+import { useState, useEffect } from 'react';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { RefreshCcw, Loader, AlertCircle } from 'lucide-react';
 
+// Firebase configuration. The Canvas environment provides these global variables.
+const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+// CoinMarketCap API configuration.
+// IMPORTANT: You need to replace "YOUR_COINMARKETCAP_API_KEY" with your actual key.
+const coinmarketcap = {
+  apiKey: "YOUR_COINMARKETCAP_API_KEY",
+  historicalUrl: "https://pro-api.coinmarketcap.com/v3/cryptocurrency/quotes/historical",
+  // The symbol to check. Note: CMC uses symbol name, not a suffix.
+  symbol: "BTC",
+  // The currency to convert to.
+  convert: "USD",
+  // The interval to fetch. 'hourly' is the smallest supported interval for historical data.
+  interval: "hourly",
+  // The time period to check for high/low. Let's get the last 24 data points (24 hours).
+  timePeriod: "24h"
+};
+
+const App = () => {
+  const [highPrice, setHighPrice] = useState('...');
+  const [lowPrice, setLowPrice] = useState('...');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [isAuthReady, setIsAuthReady] = useState(false);
+
+  // ----------------------------------------------------
+  // Firebase Setup and Authentication
+  // ----------------------------------------------------
+  useEffect(() => {
+    let unsubscribe = () => {};
+    const initFirebase = async () => {
+      try {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Sign in the user. Use the custom token if available, otherwise sign in anonymously.
+        if (initialAuthToken) {
+          await signInWithCustomToken(auth, initialAuthToken);
+        } else {
+          await signInAnonymously(auth);
+        }
+
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            setUserId(user.uid);
+            setIsAuthReady(true);
+
+            // Set up a real-time listener for the data in Firestore
+            const docRef = doc(db, `/artifacts/${appId}/public/data/bitcoin-high-low/${user.uid}`);
+            unsubscribe = onSnapshot(docRef, (docSnap) => {
+              if (docSnap.exists()) {
+                const data = docSnap.data();
+                setHighPrice(data.highPrice);
+                setLowPrice(data.lowPrice);
+                setLoading(false);
+              } else {
+                setHighPrice("لا يوجد بيانات");
+                setLowPrice("لا يوجد بيانات");
+                setLoading(false);
+              }
+            }, (error) => {
+              console.error("Error listening to Firestore:", error);
+              setError("فشل في جلب البيانات من Firebase.");
+              setLoading(false);
+            });
+          } else {
+            console.log("No user is signed in.");
+            setIsAuthReady(true);
+          }
+        });
+      } catch (e) {
+        console.error("Error during Firebase initialization:", e);
+        setError("فشل في تهيئة Firebase. تأكد من أن التكوين صحيح.");
+        setLoading(false);
+      }
+    };
+
+    initFirebase();
+    // Clean up the listener on component unmount
+    return () => unsubscribe();
+  }, []);
+
+  // ----------------------------------------------------
+  // Fetch data from CoinMarketCap and update Firestore
+  // ----------------------------------------------------
+  useEffect(() => {
+    if (!isAuthReady || !userId) return;
+
+    if (coinmarketcap.apiKey === "YOUR_COINMARKETCAP_API_KEY") {
+      setError("الرجاء إدخال مفتاح API الخاص بك في الكود.");
+      setLoading(false);
+      return;
+    }
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const docRef = doc(db, `/artifacts/${appId}/public/data/bitcoin-high-low/${userId}`);
+
+    const fetchDataAndStore = async () => {
+      setLoading(true);
+      setError(null);
+      let high = 0;
+      let low = Infinity;
+
+      let retryCount = 0;
+      const maxRetries = 5;
+      const baseDelay = 1000; // 1 second
+
+      while (retryCount < maxRetries) {
+        try {
+          // Construct the API URL to get historical data for the last 24 hours (24 data points)
+          const url = `${coinmarketcap.historicalUrl}?symbol=${coinmarketcap.symbol}&time_period=${coinmarketcap.timePeriod}&interval=${coinmarketcap.interval}&convert=${coinmarketcap.convert}`;
+          
+          const response = await fetch(url, {
+            headers: {
+              'X-CMC_PRO_API_KEY': coinmarketcap.apiKey
+            }
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          
+          const data = await response.json();
+          const prices = data.data?.[coinmarketcap.symbol]?.[0]?.quotes;
+          
+          if (!prices || prices.length === 0) {
+            throw new Error("لا توجد بيانات متاحة للأسعار.");
+          }
+
+          // Find the highest and lowest price from the last 24 data points
+          prices.forEach(dataPoint => {
+            const price = dataPoint.quote.USD.price;
+            if (price > high) high = price;
+            if (price < low) low = price;
+          });
+
+          // Update Firestore with the new high/low prices
+          await setDoc(docRef, {
+            highPrice: high,
+            lowPrice: low,
+            lastUpdated: new Date()
+          });
+
+          setLoading(false);
+          return; // Exit the loop on success
+
+        } catch (e) {
+          console.error("Error fetching data:", e);
+          setError("فشل في جلب البيانات من CoinMarketCap.");
+          retryCount++;
+          const delay = baseDelay * Math.pow(2, retryCount);
+          await new Promise(res => setTimeout(res, delay));
+        }
+      }
+      setLoading(false); // Set loading to false after all retries
+    };
+
+    // Fetch data initially and then every hour
+    fetchDataAndStore();
+    const intervalId = setInterval(fetchDataAndStore, 3600000); // 3600000 ms = 1 hour
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [isAuthReady, userId]);
+
+  // Helper function to format numbers
+  const formatUSD = (number) => {
+    if (typeof number !== 'number') return number;
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(number);
+  };
+
+  return (
+    <div className="bg-gray-900 min-h-screen text-gray-100 flex flex-col items-center justify-center p-4">
+      <div className="bg-gray-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-gray-700">
+        <h1 className="text-3xl font-bold text-center text-white mb-6">
+          أعلى وأدنى سعر للبيتكوين (آخر 24 ساعة)
+        </h1>
+        
+        {/* Loading and Error States */}
+        {loading && (
+          <div className="flex items-center justify-center p-4">
+            <Loader className="animate-spin text-blue-400 mr-2" />
+            <span className="text-gray-400">جاري التحميل...</span>
+          </div>
+        )}
+        {error && (
+          <div className="flex items-center justify-center p-4 text-red-400 font-medium bg-red-900 bg-opacity-30 rounded-lg">
+            <AlertCircle className="mr-2" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {/* Display Prices */}
+        {!loading && !error && (
+          <>
+            <div className="bg-slate-700 p-4 rounded-lg mb-4 flex justify-between items-center">
+              <div>
+                <p className="text-lg text-gray-300">أعلى سعر:</p>
+                <p id="highPrice" className="text-3xl font-extrabold text-green-400 mt-2">
+                  {formatUSD(highPrice)}
+                </p>
+              </div>
+              <RefreshCcw className="text-gray-400" />
+            </div>
+            
+            <div className="bg-slate-700 p-4 rounded-lg flex justify-between items-center">
+              <div>
+                <p className="text-lg text-gray-300">أدنى سعر:</p>
+                <p id="lowPrice" className="text-3xl font-extrabold text-red-400 mt-2">
+                  {formatUSD(lowPrice)}
+                </p>
+              </div>
+              <RefreshCcw className="text-gray-400" />
+            </div>
+          </>
+        )}
+        
+        {/* User ID for Firestore */}
+        <div className="mt-6 text-center text-gray-500 text-sm">
+          <p>معرف المستخدم (للمشاركة):</p>
+          <p className="break-all font-mono text-xs">{userId || 'جاري التحميل...'}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default App;
