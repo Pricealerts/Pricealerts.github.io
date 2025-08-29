@@ -38,8 +38,13 @@
 
         <div class="currency-selection">
             <label for="searchPrice">اختر العملة:</label>
+            <button class="crbtBtn" >USDT</button>
+            <button class="crbtBtn" >USDC</button>
+            <button class="crbtBtn" >BNB</button>
+            <button class="crbtBtn" >BTC</button>
             <div class="dropdown-container" >
-                <input type="text" id="searchPrice" onfocus="showDropdown()" oninput="filterList()">
+                <input type="text" id="searchPrice" onfocus="showDropdown()" oninput="filterList()"
+                    placeholder="ابحث عن عملة (مثال: BTC, ETH, ADA)" style="text-align: center;">
                 <div class="dropdown-list" id="dropdownList"></div>
                 <select id="dsf" ></select>
             </div>
@@ -47,7 +52,7 @@
 
         <div class="price-display">
             <h2>السعر الحالي:</h2>
-            <p id="currentPrice">--.-- USDT</p>
+            <p id="currentPrice">--.-- </p>
         </div>
  
  
@@ -56,7 +61,7 @@
             <!-- <p class="note">
                 <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر <strong>تيليجرام</strong> فقط (وتُحذف تلقائيًا بعد التفعيل). تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
             </p> -->
-            <label for="targetPrice">السعر المستهدف (USDT):</label>
+            <label for="targetPrice">السعر المستهدف :</label>
             <input type="number" id="targetPrice" placeholder="مثال: 0.50" step="any" oninput="updateTargetPrice()">
 
             <div class="alert-condition-selection">
@@ -79,7 +84,7 @@
                 </div>
                 <div>
                     <input type="checkbox" id="alertTypeBrowser" name="alertTypeBrowser" value="browser">
-                    <label for="alertTypeBrowser">إشعار المتصفح (مرة واحدة عند فتح الصفحة)</label>
+                    <label for="alertTypeBrowser">إشعار المتصفح</label>
                 </div>
             </div>
 
@@ -101,8 +106,8 @@
 
         <div class="active-alerts-section">
             <h2>تنبيهاتي النشطة (تيليجرام)</h2>
-            <p class="small-note">التنبيهات التي تظهر هنا ستعمل في الخلفية وستُحذف تلقائيًا بعد إرسالها.</p>
-            <ul id="alertsList">
+            <!-- <p class="small-note">التنبيهات التي تظهر هنا ستعمل في الخلفية وستُحذف تلقائيًا بعد إرسالها.</p>  --> 
+             <ul id="alertsList">
                 <li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>
             </ul>
         </div>
@@ -123,7 +128,7 @@
     </div>
 
 
-    <script src="js/javascript.js"></script>
+     <script src="js/javascript.js"></script>
      <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {

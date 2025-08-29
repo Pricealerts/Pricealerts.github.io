@@ -68,7 +68,11 @@ label {
     font-weight: 700;
     color: #555;
 }
-
+.crbtBtn{
+    width: auto;
+    margin: -10px 4px 10px;
+    padding: 5px 10px;
+}
 select,
 input[type="number"],
 input[type="text"] {
@@ -387,6 +391,7 @@ button:active {
 
     .dropdown-list div {
       padding: 8px 10px;
+      text-align: center;
       cursor: pointer;
     }
 

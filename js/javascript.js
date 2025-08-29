@@ -1,3 +1,5 @@
+//const { document } = require("firebase-functions/v1/firestore");
+
 const exchangeSelect = gebi("exchangeSelect");
 const currentPriceDisplay = gebi("currentPrice");
 const targetPriceInput = gebi("targetPrice");
@@ -175,7 +177,7 @@ function renderAlerts(alerts) {
 		listItem.innerHTML = `
 			<span class="alert-info">
 				<strong>${EXCHANGES[alert.exchangeId].name} - ${alert.symbol}</strong>
-				${conditionText} ${alert.targetPrice} USDT
+				${conditionText} ${alert.targetPrice} 
 				(النوع: تيليجرام)
 				<br>المعرف: ${alert.telegramChatId}
 			</span>
@@ -291,7 +293,6 @@ async function fetchTradingPairs(exchangeId) {
 				data = await response.json();
 				symbols = data.data
 					.filter(s => s.symbol && s.symbol.length <= 10) // تصفية تقريبية
-					.map(s => s.symbol + "USDT");
 				break;
 			case "coinmarketcap":
 				response = await fetch(getPriceUrl, {
@@ -316,7 +317,7 @@ async function fetchTradingPairs(exchangeId) {
 				data = await response.json();
 				symbols = data
 					.filter(
-						s => /* s.quote_currency === "USDT" &&  */ !s.trading_disabled
+						s => !s.trading_disabled
 					)
 					.map(s => s.id);
 				break;
@@ -442,7 +443,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 
 		if (price !== null) {
 			currentPrice = price;
-			currentPriceDisplay.textContent = `${currentPrice} USDT`;
+			currentPriceDisplay.textContent = `${currentPrice} `;
 			if (isPriceUpdate) {
 				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
 				document
@@ -507,7 +508,7 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 	if (Notification.permission === "granted") {
 		new Notification(`تنبيه سعر ${symbol}!`, {
 			body: `وصل السعر إلى ${price} USDT. ${conditionText}`, //https://www.google.com/s2/favicons?domain=binance.com
-			icon: "../imgs/apple-touch-icon.png", // يمكنك تغيير الأيقونة حسب المنصة
+			icon: "../imgs/web/icon-512.png", // يمكنك تغيير الأيقونة حسب المنصة
 		});
 	} else if (Notification.permission === "default") {
 		requestNotificationPermission();
@@ -527,12 +528,12 @@ function checkForBrowserAlerts() {
 				let shouldTrigger = false;
 				if (
 					alert.alertCondition === "less_than_or_equal" &&
-					currentPrice >= alert.targetPrice
+					currentPrice <= alert.targetPrice
 				) {
 					shouldTrigger = true;
 				} else if (
 					alert.alertCondition === "greater_than_or_equal" &&
-					currentPrice <= alert.targetPrice
+					currentPrice >= alert.targetPrice
 				) {
 					shouldTrigger = true;
 				}
@@ -628,7 +629,7 @@ alertTypeTelegramCheckbox.addEventListener("change", () => {
 	alertStatus.textContent = "";
 });
 
-// طلب إذن الإشعارات عند اختيار تنبيه المتصفح
+// طلب إذن الإشعارات عند اختيار تنبيه المتصفح  "/imgs/web/icon-512.png"
 alertTypeBrowserCheckbox.addEventListener("change", () => {
 	if (alertTypeBrowserCheckbox.checked) {
 		requestNotificationPermission();
@@ -747,7 +748,10 @@ requestNotificationPermission(); // طلب إذن الإشعارات للمتص�
 
 if (localStorage.getItem("idChat")) {
 	telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
+	alertsList.innerHTML =
+		'<li class="no-alerts-message">جار التحميل...</li>' ;
 	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
+	// 
 } else {
 	telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
 	gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
@@ -849,4 +853,9 @@ buttonInstall.addEventListener("click", async () => {
 	deferredPrompt = null;
 });
 
-
+document.querySelectorAll('.crbtBtn').forEach(btn => {
+	btn.addEventListener('click', () => {
+		gebi('searchPrice').value = btn.textContent;
+		filterList()
+	});
+});
