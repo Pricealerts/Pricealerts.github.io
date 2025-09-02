@@ -500,10 +500,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				apiUrl = `${exchange.candlestickUrl}?currency_pair=${symbol}${exchange.usdtSuffix}&interval=${mappedInterval}&limit=${limit}`;
 				break; */
 
-			case "coinbase" /* https://api.exchange.coinbase.com/products/BTC-USD/candles
-  ?start=2025-08-03T19:00:00Z
-  &end=2025-08-03T20:00:00Z
-  &granularity=300 */:
+			case "coinbase" /* https://api.exchange.coinbase.com/products/BTC-USD/candles?start=2025-08-03T19:00:00Z&end=2025-08-03T20:00:00Z&granularity=300 */:
 				let ndt = new Date();
 				const startDate =
 					new Date(ndt.getTime() - 60 * 120 * 1000)
@@ -521,7 +518,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		console.log(`apiUrl   is :${apiUrl}`);
 		datas = (await axios.get(apiUrl)).data;
 
-		
+
 		let candles = [];
 
 		if (exchangeId === "binance") {
