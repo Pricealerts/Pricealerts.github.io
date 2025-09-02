@@ -22,8 +22,19 @@ exports.proxyRequest = onRequest(
 	async (req, res) => {
 		const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
 		res.send("cbn");
+		
 		try {
 			//const response = await axios.get(tabelAlert);
+/* const urlAlrt = "https://api.binance.com/api/v3/ticker/24hr";
+
+  		const rslt = await axios.get(urlAlrt);
+			let alrtTlgrm = rslt.data.filter(coin => parseFloat(coin.priceChangePercent) > 20 && coin.symbol.endsWith("USDT"));
+			console.log('alrtTlgrm is :');
+			console.log(alrtTlgrm);
+			*/
+
+
+			if(!tabelAlert){ return null}
 			checkAndSendAlerts(tabelAlert);
 			/*  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
   res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`); */
@@ -328,12 +339,8 @@ function rplSmblFn(row1,row2) {rpl.push(row2);rplcSmbl[row1].push(rpl);}
 
 async function checkAndSendAlerts(data) {
 	let inpt =JSON.stringify(data)
-	console.log('data1  is :');
-	console.log(data);
 	const rsltcandles = await fltrCrpto(data);
 	inpt =	JSON.parse(inpt);
-	console.log('inpt  is : ');
-	console.log(inpt); 
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
 	for (let i = inpt.length - 1; i >= 0; i--) {
 		// البدء من آخر صف بيانات (باستثناء الرؤوس)
@@ -346,8 +353,6 @@ async function checkAndSendAlerts(data) {
 		//const status = row[6]; // العمود G في الشيت (Status)
 		//const requestTimeStr = row[7]; // العمود H في الشيت (Request Time)
 		// عمود Last Checked هو row[8]
-console.log('symbol is :');
-console.log(symbol );
 
 		const candles = rsltcandles[symbol];
 		
@@ -516,9 +521,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		console.log(`apiUrl   is :${apiUrl}`);
 		datas = (await axios.get(apiUrl)).data;
 
-		console.log(`datas ed data  is :`);
-		console.log(datas);
-
+		
 		let candles = [];
 
 		if (exchangeId === "binance") {
