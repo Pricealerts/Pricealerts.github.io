@@ -861,13 +861,12 @@ document.querySelectorAll('.crbtBtn').forEach(btn => {
 });
 
 
+
+
+
 async function loadStockSymbols() {
   const nasdaqUrl = "https://datahub.io/core/nasdaq-listings/r/nasdaq-listed.csv";
   const nyseUrl = "https://datahub.io/core/nyse-other-listings/r/nyse-listed.csv";
-const corsProxy = "https://api.allorigins.win/raw?url=";
-const url = corsProxy + encodeURIComponent("https://datahub.io/core/nasdaq-listings/r/nasdaq-listed.csv");
-const res = await fetch(url);
-const csv = await res.text();
 
   const [nasdaqRes, nyseRes] = await Promise.all([
     fetch(nasdaqUrl),
