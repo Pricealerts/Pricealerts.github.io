@@ -861,12 +861,12 @@ document.querySelectorAll('.crbtBtn').forEach(btn => {
 });
 
 
-
+/*  */
 
 
 async function loadStockSymbols() {
-  const nasdaqUrl = "https://datahub.io/core/nasdaq-listings/r/nasdaq-listed.csv";
-  const nyseUrl = "https://datahub.io/core/nyse-other-listings/r/nyse-listed.csv";
+  const nasdaqUrl = "../csvdata/nasdaq-listed.csv";
+  const nyseUrl = "../csvdata/nyse-listed.csv";
 
   const [nasdaqRes, nyseRes] = await Promise.all([
     fetch(nasdaqUrl),
@@ -893,5 +893,28 @@ async function loadStockSymbols() {
 
 // مثال: استخدمها
 loadStockSymbols().then(symbols => {
-  console.log(symbols.slice(0, 20)); // أول 20 سهم فقط
+  console.log(symbols/* .slice(0, 20) */); // أول 20 سهم فقط
 });
+
+
+
+async function getCandles(symbol, interval = "5m", range = "1d") {
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
+  const response = await fetch(url);
+  const json = await response.json();
+  const result = json.chart.result[0];
+
+  const timestamps = result.timestamp;
+  const q = result.indicators.quote[0];
+
+  return timestamps.map((t, i) => ({
+    time: new Date(t * 1000),
+    open: q.open[i],
+    high: q.high[i],
+    low: q.low[i],
+    close: q.close[i],
+  }));
+}
+
+// مثال:
+getCandles("AAPL").then(console.log);
