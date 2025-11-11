@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+    <script>
+console.log('here');</script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <meta charset="UTF-8">
@@ -124,18 +126,26 @@
   frameborder="0"
   allowtransparency="true"
   scrolling="no">
-</iframe> -->
-    </div>
+</iframe> 
 
-
-     <script src="js/javascript.js"></script>
-     <script>
+<script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
                 navigator.serviceWorker.register('sw.js')
             });
         }
     </script>
+
+-->
+    </div>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+
+     <script src="js/javascript.js"></script>
+     
 </body>
+
 </html>
  

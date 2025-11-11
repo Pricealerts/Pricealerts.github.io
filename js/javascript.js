@@ -859,3 +859,40 @@ document.querySelectorAll('.crbtBtn').forEach(btn => {
 		filterList()
 	});
 });
+
+
+async function loadStockSymbols() {
+  const nasdaqUrl = "https://datahub.io/core/nasdaq-listings/r/nasdaq-listed.csv";
+  const nyseUrl = "https://datahub.io/core/nyse-other-listings/r/nyse-listed.csv";
+const corsProxy = "https://api.allorigins.win/raw?url=";
+const url = corsProxy + encodeURIComponent("https://datahub.io/core/nasdaq-listings/r/nasdaq-listed.csv");
+const res = await fetch(url);
+const csv = await res.text();
+
+  const [nasdaqRes, nyseRes] = await Promise.all([
+    fetch(nasdaqUrl),
+    fetch(nyseUrl)
+  ]);
+
+  const [nasdaqCsv, nyseCsv] = await Promise.all([
+    nasdaqRes.text(),
+    nyseRes.text()
+  ]);
+
+  const nasdaqData = Papa.parse(nasdaqCsv, { header: true }).data;
+  const nyseData = Papa.parse(nyseCsv, { header: true }).data;
+
+  const nasdaqSymbols = nasdaqData.map(r => r.Symbol).filter(Boolean);
+  const nyseSymbols = nyseData.map(r => r.Symbol).filter(Boolean);
+
+  // دمج القوائم بدون تكرار
+  const allSymbols = Array.from(new Set([...nasdaqSymbols, ...nyseSymbols]));
+
+  console.log("عدد الأسهم الإجمالي:", allSymbols.length);
+  return allSymbols;
+}
+
+// مثال: استخدمها
+loadStockSymbols().then(symbols => {
+  console.log(symbols.slice(0, 20)); // أول 20 سهم فقط
+});
