@@ -862,7 +862,13 @@ document.querySelectorAll('.crbtBtn').forEach(btn => {
 
 
 /*  */
+const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
+const targetUrl =proxyUrl + 'https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=5m&range=1d';
 
+fetch( targetUrl)
+  .then(response => response.json())
+  .then(data => console.log('Data : ', data))
+  .catch(error => console.error('Error : ', error));
 
 async function loadStockSymbols() {
   const nasdaqUrl = "../csvdata/nasdaq-listed.csv";
@@ -898,6 +904,9 @@ loadStockSymbols().then(symbols => {
 
 
 
+
+
+
 async function getCandles(symbol, interval = "5m", range = "1d") {
   const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
   const response = await fetch(url);
@@ -917,4 +926,4 @@ async function getCandles(symbol, interval = "5m", range = "1d") {
 }
 
 // مثال:
-getCandles("AAPL").then(console.log);
+//getCandles("AAPL").then(console.log);
