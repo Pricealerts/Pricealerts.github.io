@@ -7,6 +7,7 @@ npm install
 cd C:\Users\hp\Documents\progects\Pricealerts\autreCode\alertsPrice
 firebase deploy --only functions
 
+firebase functions:config:set telegram.token="8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"
 
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 
                           functions.config().telegram?.bot_token || 
@@ -43,4 +44,7 @@ case "bybit":
 				break;
 
 
-        
+    gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+
+gcloud config set project pricealert-31787
+gcloud config set account raki.chai3i@gmail.com

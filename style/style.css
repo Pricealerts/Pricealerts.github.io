@@ -103,12 +103,12 @@ input[type="text"]:focus {
     border-color: #b3e0ff;
 }
 
-#currentPrice {
+.currentPrice {
+    display: inline-block;
     font-size: 2.5em;
     font-weight: 700;
     color: #28a745; /* لون أخضر للسعر */
-    margin-top: 10px;
-    margin-bottom: 5px;
+    margin: 5px;
 }
 
 /* --- شروط التنبيه وأنواع التنبيه (Radio/Checkbox) --- */
@@ -291,7 +291,7 @@ button:active {
         font-size: 0.95em;
     }
 
-    #currentPrice {
+    .currentPrice {
         font-size: 2em;
     }
 

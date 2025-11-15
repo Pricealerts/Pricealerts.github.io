@@ -7,6 +7,7 @@ const searchPrice = gebi("searchPrice");
 const dropdownList = gebi("dropdownList");
 let allCrpto = [];
 let allPrices = [];
+let rfrsh = 0;
 
 /* med email */
 /* const conditionLessThanOrEqual = gebi(
@@ -112,6 +113,24 @@ const EXCHANGES = {
 		usdtSuffix: "-USDT",
 		intervalData: 60000,
 	},
+	nasdaq: {
+		name: "NASDAQ",
+		exchangeInfoUrl:
+			"https://script.google.com/macros/s/AKfycbwdxG-b1ou27_3QKpeALag3_gA-CHS2iyni2GvJcPu87BEGnXr_9qfMBgBkdklVBPV2pA/exec",
+		tickerPriceUrl:
+			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
+		usdtSuffix: "-USDT",
+		intervalData: 600000,
+	},
+	nyse: {
+		name: "NYSE",
+		exchangeInfoUrl:
+			"https://script.google.com/macros/s/AKfycbwdxG-b1ou27_3QKpeALag3_gA-CHS2iyni2GvJcPu87BEGnXr_9qfMBgBkdklVBPV2pA/exec",
+		tickerPriceUrl:
+			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
+		usdtSuffix: "-USDT",
+		intervalData: 600000,
+	},
 };
 
 let currentExchangeId = exchangeSelect.value;
@@ -202,6 +221,7 @@ function renderAlerts(alerts) {
 
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
+	gebi("usdDsply").style.display = "none";
 	if (!exchange) {
 		currentPriceDisplay.textContent = "منصة غير متاحة.";
 		searchPrice.placeholder = "الرجاء اختيار منصة صحيحة";
@@ -217,6 +237,7 @@ async function fetchTradingPairs(exchangeId) {
 		let response, data;
 		switch (exchangeId) {
 			case "binance":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
 				symbols = allPrices
@@ -224,6 +245,7 @@ async function fetchTradingPairs(exchangeId) {
 					.map(s => s.symbol);
 				break;
 			case "mexc":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(urlCrpts);
 				allPrices = await response.json();
 
@@ -233,6 +255,7 @@ async function fetchTradingPairs(exchangeId) {
 				break;
 
 			case "kucoin":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(urlCrpts);
 				data = await response.json();
 				if (data.code == "200000" && data.data) {
@@ -245,7 +268,18 @@ async function fetchTradingPairs(exchangeId) {
 					console.error("حدث خطأ في البيانات:", data);
 				}
 				break;
+			case "coingecko":
+				gebi("crptChos").style.display = "none";
+				gebi("usdDsply").style.display = "inline-block";
+				response = await fetch(exchange.exchangeInfoUrl);
+				data = await response.json();
+				//console.log(data);
+
+				// coingecko doesn't return symbol symbols, it returns coin IDs
+				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
+				break;
 			case "okx":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
 				allPrices = allPrices.data;
@@ -256,16 +290,8 @@ async function fetchTradingPairs(exchangeId) {
 					.map(s => s.instId /* .replace("-", "") */);
 				break;
 
-			case "coingecko":
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				//console.log(data);
-
-				// coingecko doesn't return symbol symbols, it returns coin IDs
-				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
-				break;
-
 			case "bybit":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
 				allPrices = data.result.list;
@@ -273,17 +299,20 @@ async function fetchTradingPairs(exchangeId) {
 				symbols = allPrices.map(s => s.symbol);
 				break;
 			case "bitget":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(exchange.tickerPriceUrl);
 				data = await response.json();
 				allPrices = data.data;
 				symbols = allPrices.map(s => s.symbol);
 				break;
 			case "lbank":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(urlCrpts);
 				data = await response.json();
 				allPrices = await data.data;
+				console.log(allPrices);
 
-				symbols = allPrices.map(s => s.symbol);
+				symbols = await allPrices.map(s => s.symbol);
 
 				break;
 
@@ -291,8 +320,7 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.tickerPriceUrl);
 
 				data = await response.json();
-				symbols = data.data
-					.filter(s => s.symbol && s.symbol.length <= 10) // تصفية تقريبية
+				symbols = data.data.filter(s => s.symbol && s.symbol.length <= 10); // تصفية تقريبية
 				break;
 			case "coinmarketcap":
 				response = await fetch(getPriceUrl, {
@@ -305,23 +333,37 @@ async function fetchTradingPairs(exchangeId) {
 
 				break;
 			case "kraken":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-				let aa = data.result//.map(s => s.altname);
-				let bb = Object.entries(aa)
-				symbols = bb.map(s=> s[0])
-				
+				let aa = data.result; //.map(s => s.altname);
+				let bb = Object.entries(aa);
+				symbols = bb.map(s => s[0]);
 				break;
 			case "coinbase":
+				gebi("crptChos").style.display = "block";
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-				symbols = data
-					.filter(
-						s => !s.trading_disabled
-					)
-					.map(s => s.id);
+				symbols = data.filter(s => !s.trading_disabled).map(s => s.id);
 				break;
-
+			case "nasdaq":
+				gebi("crptChos").style.display = "none";
+				gebi("usdDsply").style.display = "inline-block";
+				response = await fetch(exchange.exchangeInfoUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "allStocks", exchange: "nasdaq" }),
+				});
+				symbols = await response.json();
+				break;
+			case "nyse":
+				gebi("crptChos").style.display = "none";
+				gebi("usdDsply").style.display = "inline-block";
+				response = await fetch(exchange.exchangeInfoUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "allStocks", exchange: "nyse" }),
+				});
+				symbols = await response.json();
+				break;
 			default:
 				console.warn(`Exchange info parsing not implemented for ${exchangeId}`);
 				return [];
@@ -340,16 +382,23 @@ async function fetchTradingPairs(exchangeId) {
 			searchPrice.value = selectedSymbol;
 			setTimeout(() => {
 				startPriceUpdates();
-			}, 10);
+			}, 100);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
 		}
+		rfrsh = 0;
 	} catch (error) {
 		//console.error(`حدث خطأ في جلب أزواج العملات من ${exchange.name}:`, error);
-		currentPriceDisplay.textContent = "خطأ في التحميل.";
-		searchPrice.placeholder = "خطأ في التحميل";
+		currentPriceDisplay.textContent = "خطأ, إعادة التحميل.";
+		searchPrice.placeholder = "خطأ, إعادة التحميل";
 		if (priceUpdateInterval) clearInterval(priceUpdateInterval);
+		console.log("3awd wla");
+
+		rfrsh++;
+		if (rfrsh < 5) {
+			fetchTradingPairs(exchangeId);
+		}
 	}
 }
 
@@ -375,22 +424,27 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				apiUrl = `${urlCrpts}&symbole=${symbol}`;
 				response = await fetch(apiUrl);
 				data = await response.json();
-
 				// إذا كانت البيانات تحتوي على رمز السعر
 				if (data.code === "200000" && data.data && data.data.price) {
 					price = parseFloat(data.data.price);
+					rfrsh = 0;
 				} else {
 					console.error(
 						`خطأ من KuCoin API (ticker):`,
 						data.msg || JSON.stringify(data)
 					);
+					rfrsh++;
+					console.log("rah f kucoin");
+
+					if (rfrsh < 5) {
+						fetchTradingPairs(exchangeId);
+					}
 				}
 				break;
 			case "coingecko":
 				apiUrl = `${exchange.tickerPriceUrl}?ids=${symbol}&vs_currencies=usd`;
 				response = await fetch(apiUrl).then(res => res.json());
-				data = response;
-				price = data[symbol].usd;
+				price = response[symbol].usd;
 				break;
 			case "okx":
 				price = allPrices.find(obj => obj.instId == symbol).last;
@@ -416,7 +470,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				price = allPrices.find(obj => obj.symbol == symbol).close;
 				break;
 			case "lbank":
-				price = allPrices.find(obj => obj.symbol == symbol).ticker.latest;
+				price = await allPrices.find(obj => obj.symbol == symbol).ticker.latest;
 				break;
 			case "kraken":
 				//apiUrl = ;
@@ -427,7 +481,6 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				} else {
 					const pairKey = Object.keys(data.result)[0];
 					price = parseFloat(data.result[pairKey].c[0]); // السعر الحالي (close field)
-					
 				}
 				break;
 			case "coinbase":
@@ -435,6 +488,20 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				response = await fetch(urll);
 				data = await response.json();
 				price = data.price;
+				break;
+			case "nasdaq":
+				response = await fetch(exchange.tickerPriceUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "getPrice", smbl: symbol }),
+				});
+				price = await response.json();
+				break;
+			case "nyse":
+				response = await fetch(exchange.tickerPriceUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "getPrice", smbl: symbol }),
+				});
+				price = await response.json();
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
@@ -450,17 +517,24 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 					.querySelectorAll(".prcTrgt")
 					.forEach(el => (el.innerHTML = currentPrice));
 			}
+			rfrsh = 0;
 			checkForBrowserAlerts(); // فحص تنبيهات المتصفح عند تحديث السعر
 			return currentPrice;
 		} else {
 			currentPriceDisplay.textContent = "السعر غير متاح.";
 			currentPrice = null;
+			rfrsh = 0;
 			return null;
 		}
 	} catch (error) {
 		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
 		currentPriceDisplay.textContent = "خطأ في جلب السعر.";
 		currentPrice = null;
+		rfrsh++;
+		if (rfrsh < 5) {
+			console.log("3awd wla rfrsh : " + rfrsh);
+			fetchCurrentPrice(exchangeId, symbol, isPriceUpdate);
+		}
 		return null;
 	}
 }
@@ -476,7 +550,7 @@ function startPriceUpdates() {
 			EXCHANGES[currentExchangeId].intervalData
 		);
 	} else {
-		currentPriceDisplay.textContent = "--.-- USDT";
+		currentPriceDisplay.textContent = "--.--";
 		currentPrice = null;
 	}
 }
@@ -605,7 +679,7 @@ async function manageAlertOnAppsScript(action, alertData = null) {
 // --- معالجات الأحداث ---
 
 exchangeSelect.addEventListener("change", () => {
-	currentPriceDisplay.textContent = "--.-- USDT";
+	currentPriceDisplay.textContent = "--.--";
 	currentExchangeId = exchangeSelect.value;
 	searchPrice.value = "";
 	fetchTradingPairs(currentExchangeId);
@@ -748,10 +822,9 @@ requestNotificationPermission(); // طلب إذن الإشعارات للمتص�
 
 if (localStorage.getItem("idChat")) {
 	telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
-	alertsList.innerHTML =
-		'<li class="no-alerts-message">جار التحميل...</li>' ;
+	alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
-	// 
+	//
 } else {
 	telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
 	gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
@@ -806,7 +879,7 @@ function createDiv(symbol) {
 	div.onclick = () => {
 		searchPrice.value = symbol;
 		selectedSymbol = symbol;
-		currentPriceDisplay.textContent = "--.-- USDT"; // إعادة تعيين السعر الحالي
+		currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 		dropdownList.style.display = "none";
 		startPriceUpdates();
 	};
@@ -835,8 +908,6 @@ window.addEventListener("beforeinstallprompt", e => {
 	// Update UI notify the user they can install the PWA
 
 	gebi("dvdw").style.display = "block";
-
-
 });
 
 let buttonInstall = gebi("dvdw");
@@ -853,76 +924,66 @@ buttonInstall.addEventListener("click", async () => {
 	deferredPrompt = null;
 });
 
-document.querySelectorAll('.crbtBtn').forEach(btn => {
-	btn.addEventListener('click', () => {
-		gebi('searchPrice').value = btn.textContent;
-		filterList()
+document.querySelectorAll(".crbtBtn").forEach(btn => {
+	btn.addEventListener("click", () => {
+		gebi("searchPrice").value = btn.textContent;
+		filterList();
 	});
 });
 
-
 /*  */
 
-
-async function loadStockSymbols() {
-  const nasdaqUrl = "../csvdata/nasdaq-listed.csv";
-  const nyseUrl = "../csvdata/nyse-listed.csv";
-
-  const [nasdaqRes, nyseRes] = await Promise.all([
-    fetch(nasdaqUrl),
-    fetch(nyseUrl)
-  ]);
-
-  const [nasdaqCsv, nyseCsv] = await Promise.all([
-    nasdaqRes.text(),
-    nyseRes.text()
-  ]);
-
-  const nasdaqData = Papa.parse(nasdaqCsv, { header: true }).data;
-  const nyseData = Papa.parse(nyseCsv, { header: true }).data;
-
-  const nasdaqSymbols = nasdaqData.map(r => r.Symbol).filter(Boolean);
-  const nyseSymbols = nyseData.map(r => r.Symbol).filter(Boolean);
-
-  // دمج القوائم بدون تكرار
-  const allSymbols = Array.from(new Set([...nasdaqSymbols, ...nyseSymbols]));
-
-  console.log("عدد الأسهم الإجمالي:", allSymbols.length);
-  return allSymbols;
+async function getCandles(symbol) {
+	let data;
+	try {
+		let getPriceUrlStock =
+			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec";
+		let response = await fetch(getPriceUrlStock, {
+			method: "POST",
+			body: JSON.stringify({ action: "getPrice", smbl: symbol }),
+		});
+		data = await response.json();
+		rfrsh = 0;
+		return data;
+	} catch (e) {
+		console.log(e);
+		rfrsh++;
+		if (rfrsh < 5) {
+			getCandles(symbol);
+			console.log("3awd wla");
+		}
+	}
 }
 
-// مثال: استخدمها
-loadStockSymbols().then(symbols => {
-  console.log(symbols/* .slice(0, 20) */); // أول 20 سهم فقط
-});
+/* async function getMultiplePrices() {
+ 
+  let results = [];
 
+  
+    
+    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=AAPL`;
+    const res = await fetch(url);
+    const data = await res.json();
 
+    results = results.concat(data.quoteResponse.result.map(r => ({
+      symbol: r.symbol,
+      name: r.shortName || r.longName || "",
+      price: r.regularMarketPrice || null,
+      currency: r.currency || ""
+    })));
+  
 
-
-
-
-async function getCandles(symbol, interval = "5m", range = "1h") {
-	const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-//const targetUrl = 'https://query1.finance.yahoo.com/v8/finance/chart/AAPL?interval=5m&range=1d';
-
-  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=${interval}&range=${range}`;
-  const response = await fetch(url);
-  const json = await response.json();
-  const result = json.chart.result[0];
-
-  const timestamps = result.timestamp;
-  const q = result.indicators.quote[0];
-
-  return timestamps.map((t, i) => ({
-    time: new Date(t * 1000),
-    open: q.open[i],
-    high: q.high[i],
-    low: q.low[i],
-    close: q.close[i],
-  }));
+  return results;
 }
 
-// مثال:
-getCandles("AAPL").then(console.log);
+// مثال كامل
 
+  getMultiplePrices() */
 
+async function searchSymbols(query) {
+	const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=20`;
+	const res = await fetch(url);
+	const data = await res.json();
+	console.log(data.quotes);
+}
+//searchSymbols("apple");

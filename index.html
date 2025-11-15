@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <script>
-console.log('here');</script>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     
     <meta charset="UTF-8">
@@ -35,16 +33,21 @@ console.log('here');</script>
                 <option value="lbank">Lbank</option>
                 <option value="kraken">Kraken</option>
                 <option value="coinbase">Coinbase</option>
+                <option value="nasdaq" >NASDAQ</option>
+                <option value="nyse" >NYSE</option>
             </select>
         </div>
 
         <div class="currency-selection">
             <!--<label for="searchPrice">اختر العملة:</label>-->
-            <button class="crbtBtn" >USD</button>
-            <button class="crbtBtn" >USDT</button>
-            <button class="crbtBtn" >USDC</button>
-            <button class="crbtBtn" >BNB</button>
-            <button class="crbtBtn" >BTC</button>
+            <div id="crptChos">
+                <button class="crbtBtn" >USD</button>
+                <button class="crbtBtn" >USDT</button>
+                <button class="crbtBtn" >USDC</button>
+                <button class="crbtBtn" >BNB</button>
+                <button class="crbtBtn" >BTC</button>
+            </div>
+            
             <div class="dropdown-container" >
                 <input type="text" id="searchPrice" onfocus="showDropdown()" oninput="filterList()"
                     placeholder="ابحث عن عملة (مثال: BTC, ETH, ADA)" style="text-align: center;">
@@ -55,7 +58,9 @@ console.log('here');</script>
 
         <div class="price-display">
             <h2>السعر الحالي:</h2>
-            <p id="currentPrice">--.-- </p>
+            <p id="usdDsply" class="currentPrice">$</p>
+            <p class="currentPrice" id="currentPrice">--.-- </p>
+            
         </div>
  
  
