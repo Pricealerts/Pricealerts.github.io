@@ -26,8 +26,7 @@ exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
   const reply =
     `أهلاً بك! ${username} معرف دردشتك (Chat ID) هو:\n` +
     `<code>${chatId}</code>\n\n` +
-    `لإضافة تنبيه سعر عملة رقمية، استخدم تطبيق ` +
-    `<a href='https://pricealerts.github.io?id=${chatId}'>تنبيهات الأسعار</a>` ;
+   ` إظعط عليه لنسخه وضعه في حقل "معرف دردشة تيليجرام" في تطبيق تنبيهات الأسعار. ` ;
 
   try {
     await fetch(TELEGRAM_API, {

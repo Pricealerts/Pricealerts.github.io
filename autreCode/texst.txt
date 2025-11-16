@@ -48,3 +48,6 @@ case "bybit":
 
 gcloud config set project pricealert-31787
 gcloud config set account raki.chai3i@gmail.com
+
+https://telegramwebhook-3wzofmiqgq-uc.a.run.app
+https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://telegramwebhook-3wzofmiqgq-uc.a.run.app
