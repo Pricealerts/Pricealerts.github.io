@@ -116,7 +116,7 @@ const EXCHANGES = {
 	nasdaq: {
 		name: "NASDAQ",
 		exchangeInfoUrl:
-			"https://script.google.com/macros/s/AKfycbwdxG-b1ou27_3QKpeALag3_gA-CHS2iyni2GvJcPu87BEGnXr_9qfMBgBkdklVBPV2pA/exec",
+			"https://script.google.com/macros/s/AKfycbxJ_ubBP6QFQXW-CJNj4HNpAAlf7Q-o76oY7vEJg6zIY6fgv7QeXxYG0FRfTiH2M_mG/exec",
 		tickerPriceUrl:
 			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
 		usdtSuffix: "-USDT",
@@ -125,7 +125,7 @@ const EXCHANGES = {
 	nyse: {
 		name: "NYSE",
 		exchangeInfoUrl:
-			"https://script.google.com/macros/s/AKfycbwdxG-b1ou27_3QKpeALag3_gA-CHS2iyni2GvJcPu87BEGnXr_9qfMBgBkdklVBPV2pA/exec",
+			"https://script.google.com/macros/s/AKfycbxJ_ubBP6QFQXW-CJNj4HNpAAlf7Q-o76oY7vEJg6zIY6fgv7QeXxYG0FRfTiH2M_mG/exec",
 		tickerPriceUrl:
 			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
 		usdtSuffix: "-USDT",
@@ -763,13 +763,7 @@ setAlertButton.addEventListener("click", async () => {
 
 	// التعامل مع تنبيه تيليجرام عبر Apps Script
 	if (isTelegramAlert) {
-		// التحقق من العدد الأقصى لتنبيهات تيليجرام المخزنة في Apps Script
-		// هذا يتطلب جلب التنبيهات مرة أخرى من Apps Script أو تتبعها محليًا بدقة
-		// للتبسيط، سنعتمد على أن Apps Script سيتعامل مع هذا الحد.
-		// لكي يكون هذا التحقق دقيقًا هنا، يجب أن نجلب activeAlerts من Apps Script أولاً
-		// (أو يمكن أن يتم التحكم في هذا الحد على جانب Apps Script فقط).
-		// حاليًا، هذا الحد يتعلق فقط بما يتم عرضه في الواجهة الأمامية وليس العدد الفعلي في الشيت
-		// (لأن AlertsList يعرض فقط تنبيهات تيليجرام النشطة).
+		
 		if (localStorage.idChat !== telegramChatId) {
 			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
 		}
@@ -955,30 +949,7 @@ async function getCandles(symbol) {
 	}
 }
 
-/* async function getMultiplePrices() {
- 
-  let results = [];
 
-  
-    
-    const url = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=AAPL`;
-    const res = await fetch(url);
-    const data = await res.json();
-
-    results = results.concat(data.quoteResponse.result.map(r => ({
-      symbol: r.symbol,
-      name: r.shortName || r.longName || "",
-      price: r.regularMarketPrice || null,
-      currency: r.currency || ""
-    })));
-  
-
-  return results;
-}
-
-// مثال كامل
-
-  getMultiplePrices() */
 
 async function searchSymbols(query) {
 	const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=20`;

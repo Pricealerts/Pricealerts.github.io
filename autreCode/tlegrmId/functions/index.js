@@ -1,5 +1,9 @@
 const functions = require("firebase-functions");
 const fetch = require("node-fetch"); // تأكد أنك ثبّتته في package.json
+// nta3 query1.finance.yahoo.com
+const { onRequest } = require("firebase-functions/v2/https");
+const logger = require("firebase-functions/logger");
+const axios = require("axios");
 
 // ضع توكن البوت هنا
 const BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE";
@@ -45,3 +49,5 @@ exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
     res.status(500).send("Failed to send message");
   }
 });
+
+

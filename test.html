@@ -2,23 +2,167 @@
 <html>
 <head>
   <title>Call Firebase Function</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    #suggestions {
+    background: #222;
+    color: white;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 6px;
+}
+
+.suggestion-item {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background: #333;
+}
+
+  </style>
 </head>
 <body>
-  <button onclick="callFunction()">Call Function</button>
-  <pre id="output"></pre>
+  <input id="searchInput" placeholder="اكتب اسم السهم أو العملة..." />
+<div id="suggestions"></div>
+
 
   <script>
-    async function callFunction() {
-      const url = "https://europe-west1-alertprice-c0176.cloudfunctions.net/helloWorld";
+   const input = document.getElementById("searchInput");
+const suggestionsBox = document.getElementById("suggestions");
 
-      try {
-        const response = await fetch(url); // طلب GET
-        const data = await response.json();
-        document.getElementById("output").textContent = JSON.stringify(data, null, 2);
-      } catch (err) {
-        document.getElementById("output").textContent = "Error2: " + err.message;
-      }
+input.addEventListener("input", async () => {
+    let querySmbl = input.value.trim();
+
+    if (querySmbl.length < 2) {
+        suggestionsBox.innerHTML = "";
+        return;
+    }else{
+      //querySmbl = encodeURIComponent(querySmbl)
     }
+
+    // Yahoo Finance Search API
+    const url = `https://script.google.com/macros/s/AKfycbwYkc8WIQT-sS5sLRG90gOhCIlKLgQ9S4J2M-DDzR4OVnG3Gs4leVFf-cS6nq5JBgEl4g/exec`;
+
+    try {
+      const req = {action: "srch", querySmble: querySmbl}
+        const response = await fetch(url,
+          {
+            method: 'POST',
+            body: JSON.stringify(req)
+          }
+        )
+          let symbols =  await response.json();
+       
+				
+      /*   
+        const data =  response;
+         
+            const results = data ; */
+            console.log(symbols);
+            
+          
+        
+
+       /*  suggestionsBox.innerHTML = results
+            .map(item => `
+                <div class="suggestion-item">
+                    <strong>${item.symbol}</strong> — ${item.shortname || item.longname || "No Name"}  
+                    <span style="color:gray">(${item.quoteType})</span>
+                </div>
+            `)
+            .join(""); */
+
+    } catch (err) {
+        console.error("Search error:", err);
+    }
+});
+
+/* 
+respns.quotes[0].fo
+{ explains: [],
+  count: 7,
+  quotes: 
+   [ { exchange: 'NGM',
+       shortname: 'GraniteShares 1.25x Long TSLA D',
+       quoteType: 'ETF',
+       symbol: 'TSL',
+       index: 'quotes',
+       score: 10000500,
+       typeDisp: 'ETF',
+       longname: 'GraniteShares 1.25x Long Tsla Daily ETF',
+       exchDisp: 'NASDAQ',
+       isYahooFinance: true },
+     { exchange: 'NMS',
+       shortname: 'Tesla, Inc.',
+       quoteType: 'EQUITY',
+       symbol: 'TSLA',
+       index: 'quotes',
+       score: 32791,
+       typeDisp: 'Equity',
+       longname: 'Tesla, Inc.',
+       exchDisp: 'NASDAQ',
+       sector: 'Consumer Cyclical',
+       sectorDisp: 'Consumer Cyclical',
+       industry: 'Auto Manufacturers',
+       industryDisp: 'Auto Manufacturers',
+       isYahooFinance: true },
+     { exchange: 'NGM',
+       shortname: 'Direxion Daily TSLA Bull 2X Sha',
+       quoteType: 'ETF',
+       symbol: 'TSLL',
+       index: 'quotes',
+       score: 20117,
+       typeDisp: 'ETF',
+       longname: 'Direxion Daily TSLA Bull 2X Shares',
+       exchDisp: 'NASDAQ',
+       isYahooFinance: true },
+     { exchange: 'NGM',
+       shortname: 'Tradr 2X Short TSLA Daily ETF',
+       quoteType: 'ETF',
+       symbol: 'TSLQ',
+       index: 'quotes',
+       score: 20028,
+       typeDisp: 'ETF',
+       longname: 'Tradr 2X Short TSLA Daily ETF',
+       exchDisp: 'NASDAQ',
+       isYahooFinance: true },
+     { exchange: 'NGM',
+       shortname: 'GraniteShares 2x Short TSLA Dai',
+       quoteType: 'ETF',
+       symbol: 'TSDD',
+       index: 'quotes',
+       score: 20021,
+       typeDisp: 'ETF',
+       longname: 'Graniteshares 2x Short TSLA Daily ETF',
+       exchDisp: 'NASDAQ',
+       isYahooFinance: true },
+     { exchange: 'PCX',
+       shortname: 'Tidal ETF Trust II YieldMax TSL',
+       quoteType: 'ETF',
+       symbol: 'TSLY',
+       index: 'quotes',
+       score: 20019,
+       typeDisp: 'ETF',
+       longname: 'YieldMax TSLA Option Income Strategy ETF',
+       exchDisp: 'NYSEArca',
+       isYahooFinance: true },
+     { exchange: 'NYQ',
+       shortname: 'Sixth Street Specialty Lending,',
+       quoteType: 'EQUITY',
+       symbol: 'TSLX',
+       index: 'quotes',
+       score: 20013,
+       typeDisp: 'Equity',
+       longname: 'Sixth Street Specialty Lending, Inc.',
+       exchDisp: 'NYSE',
+       sector: 'Financial Services',
+       sectorDisp: 'Financial Services',
+       industry: 'Asset Management',
+       industryDisp: 'Asset Management',
+       isYahooFinance: true } ],} */
   </script>
 </body>
 </html>

@@ -4,7 +4,8 @@ rd /s /q node_modules
 
 npm install
 
-cd C:\Users\hp\Documents\progects\Pricealerts\autreCode\alertsPrice
+cd C:\Users\hp\Documents\progects\Pricealerts\autreCode\priceAlert
+
 firebase deploy --only functions
 
 firebase functions:config:set telegram.token="8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"
