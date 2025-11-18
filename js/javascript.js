@@ -131,6 +131,16 @@ const EXCHANGES = {
 		usdtSuffix: "-USDT",
 		intervalData: 600000,
 	},
+	other:{
+		name : "other",
+		exchangeInfoUrl:
+			"https://proxyrequest-zzdsz5x2ea-ew.a.run.app",
+		tickerPriceUrl:
+			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
+		usdtSuffix: "USD",
+		intervalData: 600000,
+
+	}
 };
 
 let currentExchangeId = exchangeSelect.value;
@@ -361,6 +371,15 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.exchangeInfoUrl, {
 					method: "POST",
 					body: JSON.stringify({ action: "allStocks", exchange: "nyse" }),
+				});
+				symbols = await response.json();
+				break;
+			case "other":
+				gebi("crptChos").style.display = "none";
+				gebi("usdDsply").style.display = "inline-block";
+				response = await fetch(exchange.exchangeInfoUrl, {
+					method: "POST",
+					body: JSON.stringify({ action: "allStocks", exchange: "other" }),
 				});
 				symbols = await response.json();
 				break;

@@ -25,11 +25,12 @@
   </style>
 </head>
 <body>
-  <input id="searchInput" placeholder="اكتب اسم السهم أو العملة..." />
+  <input id="searchInput" placeholder="اكتب اسم السهم أو العملة..." autofocus />
 <div id="suggestions"></div>
 
 
   <script>
+
    const input = document.getElementById("searchInput");
 const suggestionsBox = document.getElementById("suggestions");
 
@@ -40,40 +41,46 @@ input.addEventListener("input", async () => {
         suggestionsBox.innerHTML = "";
         return;
     }else{
-      //querySmbl = encodeURIComponent(querySmbl)
+      querySmbl = encodeURIComponent('AAPL')
     }
 
     // Yahoo Finance Search API
-    const url = `https://script.google.com/macros/s/AKfycbwYkc8WIQT-sS5sLRG90gOhCIlKLgQ9S4J2M-DDzR4OVnG3Gs4leVFf-cS6nq5JBgEl4g/exec`;
-
+    const url = `https://proxyrequest-nkipfwe2qq-ew.a.run.app`;
+    //console.log(querySmbl);
+    
     try {
-      const req = {action: "srch", querySmble: querySmbl}
-        const response = await fetch(url,
-          {
-            method: 'POST',
-            body: JSON.stringify(req)
-          }
-        )
-          let symbols =  await response.json();
+      const payload = {
+    action: "srch",
+    querySmble: querySmbl,
+    datas: "price",
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { 
+      "Content-Type": "application/json" 
+    },
+    body: JSON.stringify(payload),
+  });
+           
+          let results =  await response.json();
        
 				
-      /*   
-        const data =  response;
-         
-            const results = data ; */
-            console.log(symbols);
+           const dadi = JSON.parse(results);
+           
+            console.log(dadi);
             
           
         
 
-       /*  suggestionsBox.innerHTML = results
+        suggestionsBox.innerHTML = dadi
             .map(item => `
                 <div class="suggestion-item">
                     <strong>${item.symbol}</strong> — ${item.shortname || item.longname || "No Name"}  
-                    <span style="color:gray">(${item.quoteType})</span>
+                    <span style="color:gray">(${item.quoteType})</span> <span style="color:gray">(${item.exchDisp})</span>
                 </div>
             `)
-            .join(""); */
+            .join("");
 
     } catch (err) {
         console.error("Search error:", err);

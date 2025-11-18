@@ -33,28 +33,27 @@ exports.proxyRequest = onRequest(
                 res.send("rah  " + tabelAlert);
                 return null;
             }
-
+            let repond;
+            const querySmbl = req.method === "POST" ? req.body.querySmble : req.query.querySmble;
             if (tabelAlert == "smbls") {
-                const rpnd = await srchSmbls(req);
-                //res.send("cbn ldakhl");
-                res.status(200).json(rpnd);
-                return null;
+                repond = await srchSmbls(querySmbl);
+               // return null;
             } else if (tabelAlert == "price") {
-               const repond= await price(req.query.smbl)
-                res.status(200).json(repond);
-                res.send("cbn");
+              repond= await price(querySmbl);
             }
+            const stRpnd = JSON.stringify(repond);
+            res.status(200).json(stRpnd);
 
-            checkAndSendAlerts(tabelAlert);
-            /*  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
-  res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`); */
+           return null;
         } catch (error) {
             return res.status(500).json({
-                error: "Failed to fetch data",
+                error: "Failed to fetch data 0",
                 details: error.message,
             });
         }
-    }
+    }   
+
+
 );
 
 /* 
@@ -64,15 +63,12 @@ exports.proxyRequest = onRequest(
     nta3 query1.finance.yahoo.com
 */
 
-async function srchSmbls(req) {
-    const querySmble = req.body.querySmble;
+async function srchSmbls(querySmble) {
     const apiUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${querySmble}`;
     let responseFnl = [];
-    let repond;
 
     try {
-        repond = (await axios.get(apiUrl)).data;
-        let rslt = repond.quotes;
+        let rslt = (await axios.get(apiUrl)).data.quotes;
         for (const quote of rslt) {
             const estCandle = {
                 symbol: quote.symbol,
@@ -82,42 +78,54 @@ async function srchSmbls(req) {
             };
             responseFnl.push(estCandle);
         }
-        //responseFnl =rslt
+
     } catch (error) {
         logger.error("Axios error:", error.message);
-        return JSON.stringify({
-            error: "Failed to fetch data",
+        return {
+            error: "Failed to fetch data1",
             details: error.message,
-        });
+        };
     }
 
-    return JSON.stringify(responseFnl);
+    return responseFnl;
 
-    /* response =JSON.stringify(responseFnl)
-  
-
-  return ContentService.createTextOutput(response) */
 }
+
+//get pice of symbole
 async function price(smbl) {
-    urlPrice = `https://query1.finance.yahoo.com/v7/finance/quote?symbols=${smbl}`;
-    let repondPrice;
+    const urlPrice =`https://query1.finance.yahoo.com/v8/finance/chart/${smbl}?interval=5m&range=10m`;
+
     try {
-        repondPrice = (await axios.get(urlPrice)).data;
-        let rslt = repondPrice.quoteResponse.result[0].map((quote) => {
+        const response = await axios.get(urlPrice);
+        const result = response.data.chart.result[0];
+
+        if (!result || result.length === 0) {
+             return { error: "Symbol not found", smbl };
+        }
+
+        const meta = result.meta;
+        const quoteData = result.indicators.quote[0];
+
+        if (quoteData && quoteData.close && quoteData.close.length > 0) {
+            const lastPrice = quoteData.close[quoteData.close.length - 1]; 
+            
             return {
-                regularMarketPrice: quote.regularMarketPrice,
-                currency: quote.currency,
-                marketState: quote.marketState,
+              //  symbol: smbl,
+                price: lastPrice,
+                currency: meta.currency
             };
-        });
-       
-    return JSON.stringify(rslt);
+        } else {
+            return {
+                error: "No valid price data found",
+                smbl
+            };
+        }
 
     } catch (error) {
-        logger.error("Axios error:", error.message);
-        return JSON.stringify({
-            error: "Failed to fetch data",
+        console.error("Axios error:", error.message);
+        return {
+            error: "Failed to fetch data 2",
             details: error.message,
-        });
+        };
     }
 }

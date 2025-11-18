@@ -22,27 +22,43 @@ exports.proxyRequest = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
 
-         res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.set('Access-Control-Allow-Headers', '*');
+		// تعيين رؤوس CORS
+		const origin = req.headers.origin;
+		const allowedOrigins = [APPS_SCRIPT_WEB_APP_URL,
+		//"https://site2.com",
+		"http://127.0.0.1:4808",
+		];
+
+		if (allowedOrigins.includes(origin)) {
+		res.set("Access-Control-Allow-Origin", origin);
+		} else {
+		return res.status(403).send("Forbidden");
+		}
+		res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+		res.set("Access-Control-Allow-Headers", "Content-Type");
+		// تعيين رؤوس CORS end
 
 		const tabelAlert = req.method === "POST" ? req.body.datas : req.query.datas;
 		try {
-			if (tabelAlert == "smbls") {
-				const datas = await srchSmbls(req, res);
-				res.status(200).json(datas);
-				return null;
-			}
+			
 			if (!tabelAlert) {
+				res.send("rah  " + tabelAlert);
 				return null;
 			}
-            
-		res.send("cbn");
+
+			if (tabelAlert == "smbls") {
+				const rpnd = await srchSmbls(req);
+				//res.send("cbn ldakhl");
+				res.status(200).json(rpnd);
+				return null;
+			} else {
+				res.send("cbn");
+			}
+
 			checkAndSendAlerts(tabelAlert);
 			/*  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
   res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`); */
 		} catch (error) {
-			logger.error("Axios error:", error.message);
 			return res.status(500).json({
 				error: "Failed to fetch data",
 				details: error.message,
@@ -440,7 +456,7 @@ async function checkAndSendAlerts(data) {
 				dltRwApp.push(iPls);
 
 				// بما أننا حذفنا الصف، يجب أن نقلل الفهرس لتجنب تخطي صفوف
-				inpt.splice(i, 1); // إزالة الصف المحذوف من مصفوفة البيانات المحلية أيضًا
+				inpt.slice(i, 1); // إزالة الصف المحذوف من مصفوفة البيانات المحلية أيضًا
 			} else {
 				// إذا فشل الإرسال، لا تحذف التنبيه حتى يمكن المحاولة مرة أخرى لاحقًا
 				console.error(
@@ -484,15 +500,11 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 	// لحساب وقت البدء لطلب الشمعة الأخيرة
 	const intervalMs = parseIntervalToMilliseconds(interval);
 	// نحدد وقت البدء لضمان الحصول على الشموع المطلوبة بالضبط
-	// مثلاً: لو طلبنا 3 شموع 1m، نريد 3 دقائق من البيانات.
 	const startTimeMs = endTimeMs - intervalMs * limit;
 
 	try {
-		let response, datas;
+		let datas;
 		let mappedInterval = exchange.intervalMap[interval];
-		console.log("interval is : ");
-		console.log(interval);
-		console.log("mappedInterval is : " + mappedInterval);
 
 		switch (exchangeId) {
 			case "binance":
@@ -508,8 +520,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 
 			case "okx":
 				apiUrl = `${exchange.candlestickUrl}?instId=${symbol}&bar=${mappedInterval}&limit=${limit}`;
-				/* https://www.okx.com/api/v5/market/candles?instId=1INCH-USDT&bar=1m&limit=1
-                &before=${endTimeMs}&after=${startTimeMs} */
+				
 				break;
 
 			case "coingecko":
@@ -519,7 +530,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 					days: "1", // هذا يعيد بيانات محدثة كل 5 دقائق تقريبا
 				});
 				apiUrl = `${url}?${params}`;
-
 				break;
 
 			case "coincap":
@@ -539,11 +549,8 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 			case "kraken":
 				apiUrl = `${exchange.tickerPriceUrl}?pair=${symbol}&interval=1`;
 				break;
-			/* case "gateio":
-                apiUrl = `${exchange.candlestickUrl}?currency_pair=${symbol}${exchange.usdtSuffix}&interval=${mappedInterval}&limit=${limit}`;
-                break; */
 
-			case "coinbase" /* https://api.exchange.coinbase.com/products/BTC-USD/candles?start=2025-08-03T19:00:00Z&end=2025-08-03T20:00:00Z&granularity=300 */:
+			case "coinbase" :
 				let ndt = new Date();
 				const startDate =
 					new Date(ndt.getTime() - 60 * 120 * 1000)
@@ -558,15 +565,12 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				return null;
 		}
 
-		console.log(`apiUrl   is :${apiUrl}`);
 		datas = (await axios.get(apiUrl)).data;
 
 		let candles = [];
 
 		if (exchangeId === "binance") {
 			candles = datas.map(exchange.parseCandle);
-			/* console.log(`candles  is :`);
-            console.log(candles); */
 		} else if (exchangeId === "kucoin") {
 			if (datas.code === "200000") {
 				let data2 = datas.data.map(exchange.parseCandle);
@@ -590,17 +594,12 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 			}
 		} else if (exchangeId === "bybit") {
 			candles = datas.result.list.map(exchange.parseCandle);
-			/* console.log(candles); */
 		} else if (exchangeId === "bitget") {
 			candles = datas.data.map(exchange.parseCandle);
-			/* console.log('datas.result.list'); */
 
-			/* console.log(candles); */
 		} else if (exchangeId === "lbank") {
 			candles = [datas.data[0].ticker].map(exchange.parseCandle);
-			console.log("datas talya :");
 
-			console.log(candles);
 		} else if (exchangeId === "coincap") {
 			if (datas.ret_code === 0 && datas.result) {
 				candles = datas.result.map(exchange.parseCandle);
@@ -631,11 +630,8 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		} else if (exchangeId === "kraken") {
 			let lmtSlc = mappedInterval * limit;
 			let dtSlc = datas.result[symbol].slice(0, lmtSlc);
-			console.log("dtSlc is :" + dtSlc);
 
 			candles = dtSlc.map(exchange.parseCandle);
-			console.log("candles talya is :");
-			console.log(candles);
 		} else if (exchangeId === "coinbase") {
 			if (datas) {
 				let lastTim = 0;
@@ -668,11 +664,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		// للتأكد من الحصول على أحدث الشموع وحتى العدد المحدد.
 		// غالبًا ما يتم إرجاعها بترتيب زمني تصاعدي (الأقدم أولاً).
 		// إذا كان كذلك، نأخذ آخر 'limit' من الشموع.
-		console.log("candles is : ");
-		console.log(candles);
 		let candles2 = candles.slice(-limit);
-		console.log("candles2 is : ");
-		console.log(candles2);
 		return candles2;
 	} catch (error) {
 		console.error(
@@ -685,11 +677,9 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 }
 
 async function callFirebaseWithPost() {
-	console.log("fat mna");
 	if (dltRwApp.length == 0) {
 		return "walo";
 	}
-	console.log("fast mnhak dltRwApp : " + dltRwApp);
 
 	try {
 		//const response = await axios.post(APPS_SCRIPT_WEB_APP_URL, options);
@@ -773,20 +763,37 @@ async function sendTelegramMessage(chatId, messageText) {
     nta3 query1.finance.yahoo.com
 */
 
-async function srchSmbls(req, res) {
-	let datas;
-
-	const querySmbl = req.body.querySmbl;
-	const apiUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${querySmbl}`;
+async function srchSmbls(req) {
+	const querySmble = req.body.querySmble;
+	const apiUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${querySmble}`;
+	let responseFnl = [];
+	let repond;
 
 	try {
-		datas = await axios.get(apiUrl);
-		return datas;
+		repond = (await axios.get(apiUrl)).data;
+		let rslt = repond.quotes;
+		for (const quote of rslt) {
+			const estCandle = {
+				symbol: quote.symbol,
+				exchDisp: quote.exchDisp,
+				shortname: quote.shortname,
+				quoteType: quote.quoteType,
+			};
+			responseFnl.push(estCandle);
+		}
+		//responseFnl =rslt
 	} catch (error) {
 		logger.error("Axios error:", error.message);
-		return json({
+		return JSON.stringify({
 			error: "Failed to fetch data",
 			details: error.message,
 		});
 	}
+
+	return JSON.stringify(responseFnl);
+
+	/* response =JSON.stringify(responseFnl)
+  
+
+  return ContentService.createTextOutput(response) */
 }

@@ -45,10 +45,29 @@ case "bybit":
 				break;
 
 
-    gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+   
 
 gcloud config set project pricealert-31787
-gcloud config set account raki.chai3i@gmail.com
+
 
 https://telegramwebhook-3wzofmiqgq-uc.a.run.app
 https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://telegramwebhook-3wzofmiqgq-uc.a.run.app
+
+
+bach t3awd npm install
+cd functions
+del package-lock.json  
+rmdir /s /q node_modules   // Windows
+npm install
+
+باش نعرف واشمن بروجي راني فيه 
+gcloud config get-value project
+
+باش نبدل لبروجي
+gcloud config set project PROJECT_ID
+
+باش نبدل الكونت 
+gcloud config set account raki.chai3i@gmail.com
+
+باش نبدلالقبول 
+ gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
