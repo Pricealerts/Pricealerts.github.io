@@ -248,6 +248,7 @@ button:active {
 
 .alert-info {
     flex-grow: 1;
+    text-align: right;
 }
 
 .alert-info strong {

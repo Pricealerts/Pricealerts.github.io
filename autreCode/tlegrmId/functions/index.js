@@ -1,15 +1,17 @@
-const functions = require("firebase-functions");
-const fetch = require("node-fetch"); // تأكد أنك ثبّتته في package.json
-// nta3 query1.finance.yahoo.com
-const { onRequest } = require("firebase-functions/v2/https");
-const logger = require("firebase-functions/logger");
-const axios = require("axios");
+
+import fetch from "node-fetch"; // تأكد أنك ثبّتته في package.json
+
+import { onRequest } from "firebase-functions/v2/https";
 
 // ضع توكن البوت هنا
 const BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE";
 const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
 
-exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
+
+export const telegramWebhook = onRequest(   
+	{ region: "europe-west1" },
+	async (req, res) => {
+  
   if (req.method !== "POST") {
     return res.status(405).send("Method Not Allowed");
   }
@@ -33,6 +35,7 @@ exports.telegramWebhook = functions.https.onRequest(async (req, res) => {
    ` إظعط عليه لنسخه وضعه في حقل "معرف دردشة تيليجرام" في تطبيق تنبيهات الأسعار. ` ;
 
   try {
+    
     await fetch(TELEGRAM_API, {
       method: "POST",
       headers: {"Content-Type": "application/json"},

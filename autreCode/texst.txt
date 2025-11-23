@@ -1,12 +1,44 @@
-
-
-rd /s /q node_modules
-
+باش نمحي npm ونعاود نأنستاليه
+cd functions
+del package-lock.json  
+rmdir /s /q node_modules   
 npm install
+firebase deploy --only functions
+
+رفع الملف functions
+firebase deploy --only functions
+
+رفع الملف hosting
+firebase deploy --only hosting 
+
+باش نعرف واشمن بروجي راني فيه 
+gcloud config get-value project
+
+باش نبدل لبروجي
+gcloud config set project hostsite-80e14
+
+باش نبدل الكونت 
+gcloud config set account raki.chai3i@gmail.com
+
+باش نبدل القبول 
+ gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+
+id my progects 
+hostsite-80e14
+srch-price
+pricealert-31787
+telegramid-6540e
+
+
+
+
+gcloud config set project 
+
+
 
 cd C:\Users\hp\Documents\progects\Pricealerts\autreCode\priceAlert
 
-firebase deploy --only functions
+
 
 firebase functions:config:set telegram.token="8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE"
 
@@ -19,55 +51,15 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ||
 });
 
 /* nta3 firebase */
-case "bybit":
-				const payload = {
-					action : 'getSmbls',
-					datas: exchange.exchangeInfoUrl,
-				};
 
-				const options = {
-					method: "post",
-					contentType: "application/json",
-					payload: JSON.stringify(payload),
-					muteHttpExceptions: true,
-				};
-
-				const url = "https://proxyrequest-kuwu5xovza-ew.a.run.app";
-				 response = await fetch(url, options);
-				console.log(response);
-				 data = await response.data;
-				console.log(data);
-					symbols = data.result
-						.filter(
-							s => s.quote_currency === "USDT" && s.status === "Trading"
-						)
-						.map(s => s.name);
-				break;
 
 
    
 
-gcloud config set project pricealert-31787
 
 
 https://telegramwebhook-3wzofmiqgq-uc.a.run.app
-https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://telegramwebhook-3wzofmiqgq-uc.a.run.app
+https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://europe-west1-telegramid-6540e.cloudfunctions.net/telegramWebhook
 
 
-bach t3awd npm install
-cd functions
-del package-lock.json  
-rmdir /s /q node_modules   // Windows
-npm install
 
-باش نعرف واشمن بروجي راني فيه 
-gcloud config get-value project
-
-باش نبدل لبروجي
-gcloud config set project PROJECT_ID
-
-باش نبدل الكونت 
-gcloud config set account raki.chai3i@gmail.com
-
-باش نبدلالقبول 
- gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"

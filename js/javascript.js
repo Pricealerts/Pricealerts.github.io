@@ -5,6 +5,7 @@ const currentPriceDisplay = gebi("currentPrice");
 const targetPriceInput = gebi("targetPrice");
 const searchPrice = gebi("searchPrice");
 const dropdownList = gebi("dropdownList");
+const usdDsply = gebi("usdDsply");
 let allCrpto = [];
 let allPrices = [];
 let rfrsh = 0;
@@ -24,676 +25,12 @@ const setAlertButton = gebi("setAlertButton");
 const alertStatus = gebi("alertStatus");
 const alertsList = gebi("alertsList");
 
-// *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
-let getPriceUrl =
-	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
-const APPS_SCRIPT_WEB_APP_URL =
-	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
-
-const MAX_ALERTS = 5; // يمكن تغيير هذا الحد الأقصى للتنبيهات
-
-// تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
-const EXCHANGES = {
-	binance: {
-		name: "Binance",
-		exchangeInfoUrl: "https://api.binance.com/api/v3/exchangeInfo",
-		tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
-		usdtSuffix: "USDT",
-		intervalData: 5000,
-	},
-	mexc: {
-		name: "MEXC",
-		exchangeInfoUrl: "https://api.mexc.com/api/v3/ticker/price",
-		tickerPriceUrl: "https://api.mexc.com/api/v3/ticker/price",
-		usdtSuffix: "USDT",
-		intervalData: 60000,
-	},
-	kucoin: {
-		name: "KuCoin",
-		exchangeInfoUrl: "https://api.kucoin.com/api/v1/symbols",
-		tickerPriceUrl: "https://api.kucoin.com/api/v1/market/orderbook/level1",
-		usdtSuffix: "USDT",
-		intervalData: 60000,
-	},
-	coingecko: {
-		name: "CoinGecko",
-		exchangeInfoUrl: "https://api.coingecko.com/api/v3/coins/list",
-		tickerPriceUrl: "https://api.coingecko.com/api/v3/simple/price",
-		usdtSuffix: "USD",
-		intervalData: 60000,
-	},
-	okx: {
-		name: "OKX",
-		exchangeInfoUrl:
-			"https://www.okx.com/api/v5/public/instruments?instType=SPOT",
-		tickerPriceUrl: "https://www.okx.com/api/v5/market/tickers?instType=SPOT",
-		usdtSuffix: "-USDT",
-		intervalData: 60000,
-	},
-	bybit: {
-		name: "Bybit",
-		exchangeInfoUrl: "https://api.bybit.com/v5/market/tickers?category=spot",
-		tickerPriceUrl: "https://api.bybit.com/v2/public/tickers",
-		usdtSuffix: "USDT",
-		intervalData: 60000,
-	},
-	bitget: {
-		name: "Bitget",
-		exchangeInfoUrl: "https://api.bitget.com/api/spot/v1/public/products",
-		tickerPriceUrl: "https://api.bitget.com/api/spot/v1/market/tickers",
-		usdtSuffix: "USDT_SPBL",
-		intervalData: 60000,
-	},
-	lbank: {
-		name: "LBank",
-		exchangeInfoUrl: "https://api.lbkex.com/v2/ticker.do?symbol=all", // ترجع جميع الرموز والأسعار
-		tickerPriceUrl: "https://api.lbkex.com/v2/ticker.do?symbol=", // يتبعها رمز العملة
-		usdtSuffix: "usdt", // الأحرف كلها صغيرة
-		intervalData: 60000,
-	},
-	coincap: {
-		name: "CoinCap",
-		exchangeInfoUrl:
-			"https://cors-anywhere.herokuapp.com/https://api.coincap.io/v2/assets",
-		tickerPriceUrl: "https://api.coincap.io/v2/assets?symbol=bitcoin", // يحتاج فلترة حسب الرمز
-		usdtSuffix: "USDT",
-		intervalData: 60000,
-	},
-	kraken: {
-		name: "Kraken",
-		exchangeInfoUrl: "https://api.kraken.com/0/public/AssetPairs",
-		tickerPriceUrl: "https://api.kraken.com/0/public/Ticker",
-		usdtSuffix: "USDT", // في Kraken يتم تسعير USDT مقابل الدولار فعليًا
-		intervalData: 60000,
-	},
-	coinbase: {
-		name: "Coinbase",
-		exchangeInfoUrl: "https://api.exchange.coinbase.com/products",
-		tickerPriceUrl: "https://api.exchange.coinbase.com/products", // + /<symbol>/ticker
-		usdtSuffix: "-USDT",
-		intervalData: 60000,
-	},
-	nasdaq: {
-		name: "NASDAQ",
-		exchangeInfoUrl:
-			"https://script.google.com/macros/s/AKfycbxJ_ubBP6QFQXW-CJNj4HNpAAlf7Q-o76oY7vEJg6zIY6fgv7QeXxYG0FRfTiH2M_mG/exec",
-		tickerPriceUrl:
-			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
-		usdtSuffix: "-USDT",
-		intervalData: 600000,
-	},
-	nyse: {
-		name: "NYSE",
-		exchangeInfoUrl:
-			"https://script.google.com/macros/s/AKfycbxJ_ubBP6QFQXW-CJNj4HNpAAlf7Q-o76oY7vEJg6zIY6fgv7QeXxYG0FRfTiH2M_mG/exec",
-		tickerPriceUrl:
-			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
-		usdtSuffix: "-USDT",
-		intervalData: 600000,
-	},
-	other:{
-		name : "other",
-		exchangeInfoUrl:
-			"https://proxyrequest-zzdsz5x2ea-ew.a.run.app",
-		tickerPriceUrl:
-			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec",
-		usdtSuffix: "USD",
-		intervalData: 600000,
-
-	}
-};
-
+let telegramChatId ;
 let currentExchangeId = exchangeSelect.value;
 let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
 let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
-
-// --- وظائف مساعدة ---
-
-async function loadUserAlertsDisplay() {
-	const apScrptAndId =
-		APPS_SCRIPT_WEB_APP_URL +
-		"?action=getId&idChat=" +
-		telegramChatIdInput.value;
-	try {
-		const res = await fetch(apScrptAndId)
-			.then(res => res.json())
-			.then(rslt => {
-				renderAlerts(rslt.alerts);
-			});
-	} catch (err) {
-		console.error("خطأ في تحميل التنبيهات:", err.message);
-		const alertsList = gebi("alertsList");
-		alertsList.innerHTML =
-			'<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات.</li>';
-	}
-}
-
-function renderAlerts(alerts) {
-	const alertsList = gebi("alertsList");
-	alertsList.innerHTML = "";
-
-	if (!alerts || alerts.length === 0) {
-		alertsList.innerHTML = "<li>لا توجد تنبيهات حالياً.</li>";
-		return;
-	}
-
-	alerts.forEach(alert => {
-		const li = document.createElement("li");
-		li.textContent = `${alert.symbol} - ${alert.price} (${alert.condition})`;
-		alertsList.appendChild(li);
-	});
-}
-
-function renderAlerts(alerts) {
-	alertsList.innerHTML = "";
-	if (!alerts || alerts.length === 0) {
-		alertsList.innerHTML =
-			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
-		return;
-	}
-
-	alerts.forEach(alert => {
-		let conditionText = "";
-		if (alert.alertCondition === "less_than_or_equal") {
-			conditionText = "عندما يصبح السعر أصغر أو يساوي";
-		} else if (alert.alertCondition === "greater_than_or_equal") {
-			conditionText = "عندما يصبح السعر أكبر أو يساوي";
-		}
-
-		const listItem = document.createElement("li");
-		listItem.innerHTML = `
-			<span class="alert-info">
-				<strong>${EXCHANGES[alert.exchangeId].name} - ${alert.symbol}</strong>
-				${conditionText} ${alert.targetPrice} 
-				(النوع: تيليجرام)
-				<br>المعرف: ${alert.telegramChatId}
-			</span>
-			<button class="delete-button" data-alert-id="${alert.id}">حذف</button>
-		`;
-		alertsList.appendChild(listItem);
-	});
-
-	document.querySelectorAll(".delete-button").forEach(button => {
-		button.addEventListener("click", event => {
-			const alertIdToDelete = event.target.dataset.alertId;
-			deleteAlert(alertIdToDelete);
-		});
-	});
-}
-
-// --- وظائف جلب البيانات وتحديث الأسعار ---
-
-///// https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec?action=getCryptoSymbols&urlSmbls=https://api.bybit.com/v2/public/symbols
-
-// https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec?action=getCryptoSymbols&urlSmbls=https://api.kucoin.com/api/v1/symbols
-
-async function fetchTradingPairs(exchangeId) {
-	const exchange = EXCHANGES[exchangeId];
-	gebi("usdDsply").style.display = "none";
-	if (!exchange) {
-		currentPriceDisplay.textContent = "منصة غير متاحة.";
-		searchPrice.placeholder = "الرجاء اختيار منصة صحيحة";
-		return;
-	}
-
-	try {
-		let symbols = [];
-		let urlCrpts =
-			getPriceUrl +
-			"?action=getCryptoSymbols&urlSmbls=" +
-			exchange.exchangeInfoUrl;
-		let response, data;
-		switch (exchangeId) {
-			case "binance":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(exchange.tickerPriceUrl);
-				allPrices = await response.json();
-				symbols = allPrices
-					//.filter(s => s.symbol.includes("USDT"))
-					.map(s => s.symbol);
-				break;
-			case "mexc":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(urlCrpts);
-				allPrices = await response.json();
-
-				symbols = allPrices
-					.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
-					.map(s => s.symbol);
-				break;
-
-			case "kucoin":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(urlCrpts);
-				data = await response.json();
-				if (data.code == "200000" && data.data) {
-					symbols = data.data
-						.filter(
-							s => s.symbol.endsWith(exchange.usdtSuffix) && s.enableTrading
-						)
-						.map(s => s.symbol);
-				} else {
-					console.error("حدث خطأ في البيانات:", data);
-				}
-				break;
-			case "coingecko":
-				gebi("crptChos").style.display = "none";
-				gebi("usdDsply").style.display = "inline-block";
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				//console.log(data);
-
-				// coingecko doesn't return symbol symbols, it returns coin IDs
-				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
-				break;
-			case "okx":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(exchange.tickerPriceUrl);
-				allPrices = await response.json();
-				allPrices = allPrices.data;
-				symbols = allPrices
-					/* .filter(
-						s => s.instType === "SPOT" && s.instId.endsWith(exchange.usdtSuffix)
-					) */
-					.map(s => s.instId /* .replace("-", "") */);
-				break;
-
-			case "bybit":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				allPrices = data.result.list;
-				//.filter(s => s.symbol.includes("USDT") );
-				symbols = allPrices.map(s => s.symbol);
-				break;
-			case "bitget":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(exchange.tickerPriceUrl);
-				data = await response.json();
-				allPrices = data.data;
-				symbols = allPrices.map(s => s.symbol);
-				break;
-			case "lbank":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(urlCrpts);
-				data = await response.json();
-				allPrices = await data.data;
-				console.log(allPrices);
-
-				symbols = await allPrices.map(s => s.symbol);
-
-				break;
-
-			case "coincap":
-				response = await fetch(exchange.tickerPriceUrl);
-
-				data = await response.json();
-				symbols = data.data.filter(s => s.symbol && s.symbol.length <= 10); // تصفية تقريبية
-				break;
-			case "coinmarketcap":
-				response = await fetch(getPriceUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "symbols" }),
-				});
-				data = await response.json();
-
-				symbols = data.smbls.map(s => s.symbol);
-
-				break;
-			case "kraken":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				let aa = data.result; //.map(s => s.altname);
-				let bb = Object.entries(aa);
-				symbols = bb.map(s => s[0]);
-				break;
-			case "coinbase":
-				gebi("crptChos").style.display = "block";
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				symbols = data.filter(s => !s.trading_disabled).map(s => s.id);
-				break;
-			case "nasdaq":
-				gebi("crptChos").style.display = "none";
-				gebi("usdDsply").style.display = "inline-block";
-				response = await fetch(exchange.exchangeInfoUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "allStocks", exchange: "nasdaq" }),
-				});
-				symbols = await response.json();
-				break;
-			case "nyse":
-				gebi("crptChos").style.display = "none";
-				gebi("usdDsply").style.display = "inline-block";
-				response = await fetch(exchange.exchangeInfoUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "allStocks", exchange: "nyse" }),
-				});
-				symbols = await response.json();
-				break;
-			case "other":
-				gebi("crptChos").style.display = "none";
-				gebi("usdDsply").style.display = "inline-block";
-				response = await fetch(exchange.exchangeInfoUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "allStocks", exchange: "other" }),
-				});
-				symbols = await response.json();
-				break;
-			default:
-				console.warn(`Exchange info parsing not implemented for ${exchangeId}`);
-				return [];
-		}
-
-		dropdownList.innerHTML = "";
-		if (symbols.length > 0) {
-			symbols.sort();
-			allCrpto = symbols; // حفظ جميع العملات في متغير عام
-
-			symbols.forEach(symbol => {
-				const div = createDiv(symbol);
-				dropdownList.appendChild(div);
-			});
-			selectedSymbol = symbols[0];
-			searchPrice.value = selectedSymbol;
-			setTimeout(() => {
-				startPriceUpdates();
-			}, 100);
-		} else {
-			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
-			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
-		}
-		rfrsh = 0;
-	} catch (error) {
-		//console.error(`حدث خطأ في جلب أزواج العملات من ${exchange.name}:`, error);
-		currentPriceDisplay.textContent = "خطأ, إعادة التحميل.";
-		searchPrice.placeholder = "خطأ, إعادة التحميل";
-		if (priceUpdateInterval) clearInterval(priceUpdateInterval);
-		console.log("3awd wla");
-
-		rfrsh++;
-		if (rfrsh < 5) {
-			fetchTradingPairs(exchangeId);
-		}
-	}
-}
-
-async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
-	const exchange = EXCHANGES[exchangeId];
-	if (!exchange) return null;
-
-	try {
-		let urlCrpts =
-			getPriceUrl + "?action=getPrice&urlSmbl=" + exchange.tickerPriceUrl;
-		let apiUrl = "";
-		let price = null;
-		let response, data;
-
-		switch (exchangeId) {
-			case "binance":
-				price = allPrices.find(obj => obj.symbol == symbol).price;
-				break;
-			case "mexc":
-				price = allPrices.find(obj => obj.symbol == symbol).price;
-				break;
-			case "kucoin":
-				apiUrl = `${urlCrpts}&symbole=${symbol}`;
-				response = await fetch(apiUrl);
-				data = await response.json();
-				// إذا كانت البيانات تحتوي على رمز السعر
-				if (data.code === "200000" && data.data && data.data.price) {
-					price = parseFloat(data.data.price);
-					rfrsh = 0;
-				} else {
-					console.error(
-						`خطأ من KuCoin API (ticker):`,
-						data.msg || JSON.stringify(data)
-					);
-					rfrsh++;
-					console.log("rah f kucoin");
-
-					if (rfrsh < 5) {
-						fetchTradingPairs(exchangeId);
-					}
-				}
-				break;
-			case "coingecko":
-				apiUrl = `${exchange.tickerPriceUrl}?ids=${symbol}&vs_currencies=usd`;
-				response = await fetch(apiUrl).then(res => res.json());
-				price = response[symbol].usd;
-				break;
-			case "okx":
-				price = allPrices.find(obj => obj.instId == symbol).last;
-
-				/* if (
-					data.code === "0" &&
-					data.data &&
-					data.data.length > 0 &&
-					data.data[0].last
-				) {
-					price = parseFloat(data.data[0].last);
-				} else {
-					console.error(
-						`خطأ من OKX API (ticker):`,
-						data.msg || JSON.stringify(data)
-					);
-				} */
-				break;
-			case "bybit":
-				price = allPrices.find(obj => obj.symbol == symbol).lastPrice;
-				break;
-			case "bitget":
-				price = allPrices.find(obj => obj.symbol == symbol).close;
-				break;
-			case "lbank":
-				price = await allPrices.find(obj => obj.symbol == symbol).ticker.latest;
-				break;
-			case "kraken":
-				//apiUrl = ;
-				response = await fetch(`${exchange.tickerPriceUrl}?pair=${symbol}`);
-				data = await response.json();
-				if (data.error && data.error.length > 0) {
-					console.error("Kraken API Error:", data.error);
-				} else {
-					const pairKey = Object.keys(data.result)[0];
-					price = parseFloat(data.result[pairKey].c[0]); // السعر الحالي (close field)
-				}
-				break;
-			case "coinbase":
-				let urll = `https://api.exchange.coinbase.com/products/${symbol}/ticker`;
-				response = await fetch(urll);
-				data = await response.json();
-				price = data.price;
-				break;
-			case "nasdaq":
-				response = await fetch(exchange.tickerPriceUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "getPrice", smbl: symbol }),
-				});
-				price = await response.json();
-				break;
-			case "nyse":
-				response = await fetch(exchange.tickerPriceUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "getPrice", smbl: symbol }),
-				});
-				price = await response.json();
-				break;
-			default:
-				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
-				break;
-		}
-
-		if (price !== null) {
-			currentPrice = price;
-			currentPriceDisplay.textContent = `${currentPrice} `;
-			if (isPriceUpdate) {
-				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
-				document
-					.querySelectorAll(".prcTrgt")
-					.forEach(el => (el.innerHTML = currentPrice));
-			}
-			rfrsh = 0;
-			checkForBrowserAlerts(); // فحص تنبيهات المتصفح عند تحديث السعر
-			return currentPrice;
-		} else {
-			currentPriceDisplay.textContent = "السعر غير متاح.";
-			currentPrice = null;
-			rfrsh = 0;
-			return null;
-		}
-	} catch (error) {
-		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
-		currentPriceDisplay.textContent = "خطأ في جلب السعر.";
-		currentPrice = null;
-		rfrsh++;
-		if (rfrsh < 5) {
-			console.log("3awd wla rfrsh : " + rfrsh);
-			fetchCurrentPrice(exchangeId, symbol, isPriceUpdate);
-		}
-		return null;
-	}
-}
-
-function startPriceUpdates() {
-	if (priceUpdateInterval) {
-		clearInterval(priceUpdateInterval);
-	}
-	if (selectedSymbol && currentExchangeId) {
-		fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
-		priceUpdateInterval = setInterval(
-			() => fetchCurrentPrice(currentExchangeId, selectedSymbol),
-			EXCHANGES[currentExchangeId].intervalData
-		);
-	} else {
-		currentPriceDisplay.textContent = "--.--";
-		currentPrice = null;
-	}
-}
-
-// --- وظائف التنبيهات (تم تبسيطها) ---
-
-function requestNotificationPermission() {
-	if (!("Notification" in window)) {
-		// alert("هذا المتصفح لا يدعم إشعارات سطح المكتب.");
-	} else if (Notification.permission === "default") {
-		Notification.requestPermission().then(permission => {
-			if (permission === "granted") {
-				console.log("تم منح إذن الإشعارات.");
-			} else {
-				console.warn("لم يتم منح إذن الإشعارات.");
-			}
-		});
-	}
-}
-
-function showBrowserNotification(symbol, price, targetPrice, condition) {
-	let conditionText = "";
-	if (condition === "less_than_or_equal") {
-		conditionText = `أصبح ≥ ${targetPrice} USDT`;
-	} else if (condition === "greater_than_or_equal") {
-		conditionText = `أصبح ≤ ${targetPrice} USDT`;
-	}
-
-	if (Notification.permission === "granted") {
-		new Notification(`تنبيه سعر ${symbol}!`, {
-			body: `وصل السعر إلى ${price} USDT. ${conditionText}`, //https://www.google.com/s2/favicons?domain=binance.com
-			icon: "../imgs/web/icon-512.png", // يمكنك تغيير الأيقونة حسب المنصة
-		});
-	} else if (Notification.permission === "default") {
-		requestNotificationPermission();
-	}
-}
-
-function checkForBrowserAlerts() {
-	if (currentPrice === null) return;
-
-	activeBrowserAlerts
-		.filter(alert => alert.status === "Active")
-		.forEach(alert => {
-			if (
-				alert.symbol === selectedSymbol &&
-				alert.exchangeId === currentExchangeId
-			) {
-				let shouldTrigger = false;
-				if (
-					alert.alertCondition === "less_than_or_equal" &&
-					currentPrice <= alert.targetPrice
-				) {
-					shouldTrigger = true;
-				} else if (
-					alert.alertCondition === "greater_than_or_equal" &&
-					currentPrice >= alert.targetPrice
-				) {
-					shouldTrigger = true;
-				}
-
-				if (shouldTrigger) {
-					showBrowserNotification(
-						alert.symbol,
-						currentPrice,
-						alert.targetPrice,
-						alert.alertCondition
-					);
-					alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
-					alertStatus.textContent = `تم إرسال تنبيه المتصفح لـ ${alert.symbol}.`;
-					alertStatus.style.color = "green";
-				}
-			}
-		});
-}
-// دالة لتعيين/حذف التنبيهات على Apps Script
-async function manageAlertOnAppsScript(action, alertData = null) {
-	let data = {};
-	alertStatus.textContent = `جاري ${
-		action === "setAlert" ? "تعيين" : "حذف"
-	} التنبيه...`;
-	alertStatus.style.color = "#007bff";
-
-	try {
-		const response = await fetch(APPS_SCRIPT_WEB_APP_URL, {
-			method: "POST" /* 
-			headers: {
-				'Content-Type': 'application/json',
-			}, */,
-			body: JSON.stringify({
-				action: action,
-				...alertData,
-			}),
-		})
-			.then(res => res.json())
-			.then(dt => {
-				data = dt;
-			});
-
-		if (data.status === "success") {
-			alertStatus.textContent = `${
-				action === "setAlert" ? "تم تعيين" : "تم حذف"
-			} التنبيه بنجاح.`;
-			alertStatus.style.color = "green";
-			loadUserAlertsDisplay(); // تحديث قائمة التنبيهات بعد كل عملية
-			setTimeout(() => {
-				alertStatus.textContent = "";
-			}, 3000);
-			return true;
-		} else {
-			alertStatus.textContent = `فشل ${
-				action === "setAlert" ? "تعيين" : "حذف"
-			} التنبيه: ${data.message || "خطأ غير معروف."}`;
-			alertStatus.style.color = "red";
-			console.error("خطأ في استجابة Apps Script:", data);
-			return false;
-		}
-	} catch (error) {
-		alertStatus.textContent = `حدث خطأ في الاتصال بخدمة التنبيهات: ${error.message}`;
-		alertStatus.style.color = "red";
-		console.error("خطأ في إرسال طلب Apps Script:", error);
-		return false;
-	}
-}
 
 // --- معالجات الأحداث ---
 
@@ -705,11 +42,12 @@ exchangeSelect.addEventListener("change", () => {
 	alertStatus.textContent = "";
 });
 
-/* searchPrice.addEventListener("change", () => {
-	selectedSymbol = searchPrice.value;
+searchPrice.addEventListener("change", () => {
+	//selectedSymbol = searchPrice.value;
+
 	startPriceUpdates();
 	alertStatus.textContent = "";
-}); */
+});
 
 // إظهار/إخفاء حقل Chat ID بناءً على اختيار تيليجرام
 alertTypeTelegramCheckbox.addEventListener("change", () => {
@@ -745,7 +83,7 @@ setAlertButton.addEventListener("click", async () => {
 	const alertCondition = document.querySelector(
 		'input[name="alertCondition"]:checked'
 	).value;
-	let telegramChatId = telegramChatIdInput.value.trim();
+	 telegramChatId = telegramChatIdInput.value.trim();
 
 	if (isNaN(targetPrice) || targetPrice <= 0) {
 		alertStatus.textContent = "الرجاء إدخال سعر مستهدف صحيح.";
@@ -782,7 +120,6 @@ setAlertButton.addEventListener("click", async () => {
 
 	// التعامل مع تنبيه تيليجرام عبر Apps Script
 	if (isTelegramAlert) {
-		
 		if (localStorage.idChat !== telegramChatId) {
 			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
 		}
@@ -794,23 +131,22 @@ setAlertButton.addEventListener("click", async () => {
 			id: alertId,
 			exchangeId: currentExchangeId,
 			symbol: selectedSymbol,
+			currenci :usdDsply.value,
 			targetPrice: targetPrice,
 			alertCondition: alertCondition,
 			alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
 			telegramChatId: telegramChatId,
 		};
 
-		const success = await manageAlertOnAppsScript("setAlert", newTelegramAlert);
+		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
 		if (success) {
 			alertStatus.textContent +=
 				(isBrowserAlert ? " و" : "") +
 				`تم تعيين تنبيه تيليجرام لـ ${selectedSymbol}.`;
 			alertStatus.style.color = "green";
-			targetPriceInput.value = "";
+			//targetPriceInput.value = "";
 			// لا نمسح telegramChatIdInput إذا تم تعيين تنبيه تيليجرام بنجاح
-		} else {
-			// إذا فشل تنبيه تيليجرام، قد لا نرغب في مسح حقل Chat ID
-		}
+		} 
 	}
 
 	if (!isTelegramAlert && isBrowserAlert) {
@@ -819,12 +155,13 @@ setAlertButton.addEventListener("click", async () => {
 	}
 });
 
-async function deleteAlert(alertId) {
-	const success = await manageAlertOnAppsScript("deleteAlert", {
-		id: alertId,
+async function deleteAlert(alert) {
+	const success = await manageAlertOnFirebase("dltAlrt", {
+		id: alert.alertId,
+		telegramChatId : alert.telegramChatId 
 	});
 	if (success) {
-		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnAppsScript عند النجاح
+		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnFirebase عند النجاح
 	}
 }
 
@@ -835,6 +172,7 @@ requestNotificationPermission(); // طلب إذن الإشعارات للمتص�
 
 if (localStorage.getItem("idChat")) {
 	telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
+	telegramChatId = localStorage.getItem("idChat")
 	alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
 	//
@@ -873,31 +211,67 @@ function populateList(items) {
 	});
 }
 
-function filterList() {
+async function filterList() {
 	const query = searchPrice.value.toLowerCase();
+	if (exchangeSelect.value !== 'other') {
 	const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
 	populateList(filtered);
+	}else{
+		 let querySmbl = query.trim();
+ if (querySmbl.length < 2) { dropdownList.innerHTML = ""; return;
+    }else{
+      querySmbl = encodeURIComponent(querySmbl)
+    }
+	const url = `https://proxyrequest-nkipfwe2qq-ew.a.run.app`;
+    try {
+
+  const response = await fetch(url, {method: "POST",
+	headers: {  "Content-Type": "application/json" },
+    body: JSON.stringify({querySmble: querySmbl,datas: "smbls",}),
+  });
+           
+          let results =  await response.json();
+		const dadi = JSON.parse(results);
+		
+        dropdownList.innerHTML = dadi.map(item => `
+                <div class="suggestion-item" onclick = "gtPrcOfOther('${item.symbol}')">
+                    <strong>${item.symbol}</strong> — ${item.shortname || item.longname || "No Name"}  
+                    <span style="color:gray">(${item.quoteType})</span> <span style="color:gray">(${item.exchDisp})</span>
+                </div>
+            `).join("");
+
+    } catch (err) { console.error("Search error:", err); }
+
+	}	
 }
 
+
+
+
+function createDiv(symbol) {
+	const div = document.createElement("div");
+	div.textContent = symbol;
+	div.onclick = () => gtPrcOfOther(symbol);
+	return div;
+}
+function gtPrcOfOther(symbol) {
+	
+	
+	searchPrice.value = symbol;
+	selectedSymbol = symbol;
+	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
+	dropdownList.style.display = "none";
+	//usdDsply.value = currency;
+	setTimeout(() => {
+	startPriceUpdates();
+	}, 100);
+}
 // Hide dropdown when clicking outside
 document.addEventListener("click", function (e) {
 	if (!document.querySelector(".dropdown-container").contains(e.target)) {
 		hideDropdown();
 	}
 });
-
-function createDiv(symbol) {
-	const div = document.createElement("div");
-	div.textContent = symbol;
-	div.onclick = () => {
-		searchPrice.value = symbol;
-		selectedSymbol = symbol;
-		currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
-		dropdownList.style.display = "none";
-		startPriceUpdates();
-	};
-	return div;
-}
 function updateTargetPrice() {
 	const targetPrice = targetPriceInput.value;
 	if (targetPrice) {
@@ -911,13 +285,44 @@ function updateTargetPrice() {
 	}
 }
 
+
+usdDsply.addEventListener("change", async () => {
+	let priceCurrencyFtch = 1;
+	let url = EXCHANGES.nasdaq.exchangeInfoUrl;
+	if (currencyFtch !== "USD") {
+		let smbl = currencyFtch + "USD=X";
+		response = await fetch(url, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ datas: "price", querySmble: smbl }),
+		});
+		data = await response.json();
+		let rslt = JSON.parse(data);
+		 priceCurrencyFtch = rslt.close;
+	}
+
+	let priceNewCrncy=1;
+	let smbl2 = usdDsply.value + "USD=X";
+	response = await fetch(url, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ datas: "price", querySmble: smbl2 }),
+	});
+	data = await response.json();
+	let rslt = JSON.parse(data);
+	priceNewCrncy = rslt.close;
+currentPriceDisplay.textContent = priceFtch * priceCurrencyFtch / priceNewCrncy;
+
+
+});
+
+
 /* instalation app */
 let deferredPrompt;
 
 window.addEventListener("beforeinstallprompt", e => {
 	e.preventDefault();
 	deferredPrompt = e;
-
 	// Update UI notify the user they can install the PWA
 
 	gebi("dvdw").style.display = "block";
@@ -944,36 +349,5 @@ document.querySelectorAll(".crbtBtn").forEach(btn => {
 	});
 });
 
-/*  */
-
-async function getCandles(symbol) {
-	let data;
-	try {
-		let getPriceUrlStock =
-			"https://script.google.com/macros/s/AKfycbw6WQdbR_23XjdHT-ESwFHhOYsgUN-tzym2S-pl5xnvLpKtPBikVTS_Jxn1W3nkucPt/exec";
-		let response = await fetch(getPriceUrlStock, {
-			method: "POST",
-			body: JSON.stringify({ action: "getPrice", smbl: symbol }),
-		});
-		data = await response.json();
-		rfrsh = 0;
-		return data;
-	} catch (e) {
-		console.log(e);
-		rfrsh++;
-		if (rfrsh < 5) {
-			getCandles(symbol);
-			console.log("3awd wla");
-		}
-	}
-}
 
 
-
-async function searchSymbols(query) {
-	const url = `https://query1.finance.yahoo.com/v1/finance/search?q=${query}&quotesCount=20`;
-	const res = await fetch(url);
-	const data = await res.json();
-	console.log(data.quotes);
-}
-//searchSymbols("apple");

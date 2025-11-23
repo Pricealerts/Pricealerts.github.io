@@ -41,7 +41,7 @@ input.addEventListener("input", async () => {
         suggestionsBox.innerHTML = "";
         return;
     }else{
-      querySmbl = encodeURIComponent('AAPL')
+      querySmbl = encodeURIComponent(querySmbl)
     }
 
     // Yahoo Finance Search API
@@ -52,14 +52,12 @@ input.addEventListener("input", async () => {
       const payload = {
     action: "srch",
     querySmble: querySmbl,
-    datas: "price",
+    datas: "smbls",
   };
 
   const response = await fetch(url, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json" 
-    },
+    headers: {  "Content-Type": "application/json" },
     body: JSON.stringify(payload),
   });
            
@@ -73,7 +71,7 @@ input.addEventListener("input", async () => {
           
         
 
-        suggestionsBox.innerHTML = dadi
+        suggestionsBox.textContent = dadi
             .map(item => `
                 <div class="suggestion-item">
                     <strong>${item.symbol}</strong> — ${item.shortname || item.longname || "No Name"}  

@@ -1,0 +1,298 @@
+// تعريف المنصات المدعومة وواجهات برمجة العملات الخاصة بها للجانب الخلفي (Apps Script)
+const EXCHANGES_CONFIG = {
+    binance: {
+        name: "Binance",
+        tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
+        candlestickUrl: "https://api.binance.com/api/v3/klines", // نقطة نهاية الشموع
+        usdtSuffix: "USDT",
+        parseCandle: c => ({
+            //time: parseInt(c[0]),
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1h" },
+    },
+    mexc: {
+        name: "MEXC",
+        tickerPriceUrl: "https://api.mexc.com/api/v3/ticker/price",
+        candlestickUrl: "https://api.mexc.com/api/v3/klines",
+        usdtSuffix: "USDT",
+        parseCandle: c => ({
+            //time: parseInt(c[0]),
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1h" },
+    },
+    kucoin: {
+        name: "KuCoin",
+        tickerPriceUrl: "https://api.kucoin.com/api/v1/market/orderbook/level1",
+        candlestickUrl: "https://api.kucoin.com/api/v1/market/candles",
+        usdtSuffix: "USDT",
+        parseCandle: c => ({
+            //time: parseInt(c[0]) * 1000,
+            open: parseFloat(c[1]),
+            close: parseFloat(c[2]),
+            high: parseFloat(c[3]),
+            low: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "1min", "5m": "5min", "15m": "15min", "1h": "1hour" },
+    },
+    coincap: {
+        name: "CoinCap",
+        tickerPriceUrl: "https://api.coincap.io/v2/public/tickers",
+        candlestickUrl: "https://api.coincap.io/v2/public/kline",
+        usdtSuffix: "USDT",
+        parseCandle: c => ({
+            //time: parseInt(c.open_time) * 1000,
+            open: parseFloat(c.open),
+            high: parseFloat(c.high),
+            low: parseFloat(c.low),
+            close: parseFloat(c.close),
+            volume: parseFloat(c.volume),
+        }),
+        intervalMap: { "1m": "1", "5m": "5", "15m": "15", "1h": "60" },
+    },
+    coingecko: {
+        name: "CoinGecko",
+        tickerPriceUrl: "https://api.coingecko.com/api/v3/coins/",
+        candlestickUrl: "https://api.coingecko.com/api/v3/coins/",
+        usdtSuffix: "USD",
+        parseCandle: c => ({
+            //time: c[0],
+            open: c[1],
+            high: c[2],
+            low: c[3],
+            close: c[4],
+        }),
+        intervalMap: { "1m": "1", "5m": "5", "15m": "15", "1h": "60" },
+    },
+    okx: {
+        name: "OKX",
+        tickerPriceUrl: "https://www.okx.com/api/v5/market/tickers",
+        candlestickUrl: "https://www.okx.com/api/v5/market/candles",
+        usdtSuffix: "-USDT",
+        parseCandle: c => ({
+            //time: parseInt(c[0]),
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[6]),
+        }),
+        intervalMap: { "1m": "1m", "5m": "5m", "15m": "15m", "1h": "1H" },
+    },
+    bybit: {
+        name: "Bybit",
+        tickerPriceUrl: "https://api.bybit.com/v2/public/tickers",
+        candlestickUrl: "https://api.bybit.com/v5/market/kline?category=linear",
+        usdtSuffix: "USDT",
+        parseCandle: c => ({
+            //time: parseInt(c[0]),
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "1", "5m": "5", "15m": "15", "1h": "60" },
+    },
+    bitget: {
+        name: "Bitget",
+        tickerPriceUrl: "https://api.bitget.com/api/spot/v1/market/tickers",
+        candlestickUrl: "https://api.bitget.com/api/v2/spot/market/candles",
+        usdtSuffix: "USDT_SPBL",
+        parseCandle: c => ({
+            //time: parseInt(c[0]),
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "1min", "5m": "5min", "15m": "15min", "1h": "1H" },
+    },
+    lbank: {
+        name: "LBank",
+        tickerPriceUrl: "https://api.lbkex.com/v2/ticker.do", // للحصول على السعر الحالي
+        candlestickUrl: "https://api.lbkex.com/v2/kline.do", // رابط الشموع
+        usdtSuffix: "_usdt", // لاحظ استخدام (_) بدل من (USDT)
+        parseCandle: c => ({
+            //time: parseInt(c.timestamp), // timestamp in ms
+            high: parseFloat(c.high),
+            low: parseFloat(c.low),
+            close: parseFloat(c.latest),
+            volume: parseFloat(c.vol),
+        }),
+        intervalMap: { "1m": "1min", "5m": "5min", "15m": "15min", "1h": "1hour" },
+    },
+    kraken: {
+        name: "Kraken",
+        tickerPriceUrl: "https://api.kraken.com/0/public/OHLC",
+        candlestickUrl: "https://api.kraken.com/0/public/Ticker",
+        usdtSuffix: "USDT", // في Kraken يتم تسعير USDT مقابل الدولار فعليًا
+        parseCandle: c => ({
+            //time: new Date(c[0] * 1000),
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: {
+            "1m": 1,
+            "5m": 5,
+            "15m": 15,
+            "30m": 30,
+            "1h": 60,
+            "4h": 240,
+            "1d": 1440,
+            "1w": 10080,
+            "15d": 21600,
+        },
+    },
+    gateio: {
+        name: "Gate.io",
+        tickerPriceUrl: "https://api.gate.io/api/v4/spot/tickers",
+        candlestickUrl: "https://api.gate.io/api/v4/spot/candlesticks",
+        usdtSuffix: "_USDT",
+        parseCandle: c => ({
+            time: parseInt(c[0]) * 1000,
+            open: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            low: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "60", "5m": "300", "15m": "900", "1h": "3600" },
+    },
+    coinbase: {
+        name: "Coinbase",
+        tickerPriceUrl: "https://api.exchange.coinbase.com/products/",
+        candlestickUrl:
+            "https://api.exchange.coinbase.com/products/{symbol}/candles",
+        usdtSuffix: "-USDT",
+        parseCandle: c => ({
+            time: c[0] * 1000,
+            low: parseFloat(c[1]),
+            high: parseFloat(c[2]),
+            open: parseFloat(c[3]),
+            close: parseFloat(c[4]),
+            volume: parseFloat(c[5]),
+        }),
+        intervalMap: { "1m": "60", "5m": "300", "15m": "900", "1h": "3600" },
+    },
+    nasdaq: {
+        name: "NASDAQ",
+        tickerPriceUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
+        candlestickUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
+        usdtSuffix: "", // لا يوجد USDT في الأسهم
+        parseCandle: (c, timestamp) => ({
+            time: timestamp * 1000,
+            open: c.open,
+            high: c.high,
+            low: c.low,
+            close: c.close,
+            volume: c.volume,
+        }),
+        intervalMap: {
+            "1m": "1m",
+            "5m": "5m",
+            "15m": "15m",
+            "1h": "60m",
+            "1d": "1d",
+        },
+    },
+    nyse: {
+        name: "NYSE",
+        tickerPriceUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
+        candlestickUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
+        usdtSuffix: "", // لا يوجد USDT
+        parseCandle: (c, timestamp) => ({
+            time: timestamp * 1000,
+            open: c.open,
+            high: c.high,
+            low: c.low,
+            close: c.close,
+            volume: c.volume,
+        }),
+        intervalMap: {
+            "1m": "1m",
+            "5m": "5m",
+            "15m": "15m",
+            "1h": "60m",
+            "1d": "1d",
+        },
+    },
+};
+function gtapiUrl(exchangeId, symbol, mappedInterval, limit) {
+    const exchange = EXCHANGES_CONFIG[exchangeId]
+    let apiUrl;
+		switch (exchangeId) {
+			case "binance":
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
+				break;
+			case "mexc":
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
+				break;
+
+			case "kucoin":
+				apiUrl = `${exchange.candlestickUrl}?type=${mappedInterval}&symbol=${symbol}&limit=${limit}`;
+				break;
+
+			case "okx":
+				apiUrl = `${exchange.candlestickUrl}?instId=${symbol}&bar=${mappedInterval}&limit=${limit}`;
+
+				break;
+
+			case "coingecko":
+				const url = exchange.candlestickUrl + symbol + "/market_chart";
+				const params = new URLSearchParams({
+					vs_currency: "usd",
+					days: "1", // هذا يعيد بيانات محدثة كل 5 دقائق تقريبا
+				});
+				apiUrl = `${url}?${params}`;
+				break;
+
+			case "coincap":
+				apiUrl = `${exchange.candlestickUrl}?exchange=${symbol}&interval=${mappedInterval}&baseSymbol=${symbol}&quoteSymbol=USDT`;
+				break;
+
+			case "bybit":
+				apiUrl = `${exchange.candlestickUrl}&symbol=${symbol}&interval=${mappedInterval}&limit=${limit}`;
+				break;
+
+			case "bitget":
+				apiUrl = `${exchange.candlestickUrl}?symbol=${symbol}&granularity=${mappedInterval}&limit=${limit}`;
+				break;
+			case "lbank":
+				apiUrl = `${exchange.tickerPriceUrl}?symbol=${symbol}&size=${limit}&type=${mappedInterval}`;
+				break;
+			case "kraken":
+				apiUrl = `${exchange.tickerPriceUrl}?pair=${symbol}&interval=1`;
+				break;
+
+			case "coinbase":
+				let ndt = new Date();
+				const startDate =
+					new Date(ndt.getTime() - 60 * 120 * 1000)
+						.toISOString()
+						.split(".")[0] + "Z";
+				const endDate = new Date().toISOString().split(".")[0] + "Z";
+				apiUrl = `${exchange.tickerPriceUrl}${symbol}/candles?start=${startDate}&end=${endDate}&granularity=300`;
+				break;
+
+			default:
+				console.warn(`Exchange "${exchangeId}" not handled.`);
+				return null;
+		}
+        return apiUrl
+	}
+export {EXCHANGES_CONFIG ,gtapiUrl}
