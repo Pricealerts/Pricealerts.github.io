@@ -14,9 +14,9 @@ export const proxyRequestV2 = onRequest(
 		// تعيين رؤوس CORS
 		const origin = req.headers.origin;
 		const allowedOrigins = [
-			"https://pricealerts.github.io/",
-			"https://hostsite-80e14.web.app/",
-			"https://pricealerts.web.app/",
+			"https://pricealerts.github.io",
+			"https://hostsite-80e14.web.app",
+			"https://pricealerts.web.app",
 			"http://127.0.0.1:4808",
 		];
 		if (allowedOrigins.includes(origin)) {

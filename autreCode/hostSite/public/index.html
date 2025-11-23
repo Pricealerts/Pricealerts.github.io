@@ -83,6 +83,9 @@
  
  
         <div class="alert-section">
+          <button id="installBtn" style="display:none;">
+    📲 Add to Home Screen
+</button>
             <h2>إعداد التنبيه </h2>
             <!-- <p class="note">
                 <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر <strong>تيليجرام</strong> فقط (وتُحذف تلقائيًا بعد التفعيل). تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
@@ -159,13 +162,46 @@
 
 
 
+<script>
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+
+        document.getElementById('installBtn').style.display = 'block';
+
+        document.getElementById('installBtn').addEventListener('click', () => {
+            document.getElementById('installBtn').style.display = 'none';
+            deferredPrompt.prompt();
+
+            deferredPrompt.userChoice.then((choiceResult) => {
+                deferredPrompt = null;
+            });
+        });
+    });
+</script>
+
+
     
 <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js')
-            });
-        }
+   self.addEventListener('fetch', event => {
+  event.respondWith(
+    fetch(event.request)
+      .catch(() => {
+        return caches.match(event.request)
+          .then(response => {
+            if (response) {
+              return response;
+            }
+            // لو الملف غير موجود في الكاش (مثل API)
+            return caches.match('/offline.html');
+          });
+      })
+  );
+});
+
+
     </script>
     
 

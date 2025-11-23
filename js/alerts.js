@@ -1,5 +1,5 @@
 // --- وظائف مساعدة ---
-let conter = 1;
+
 async function loadUserAlertsDisplay() {
 	const apScrptAndId = APPS_SCRIPT_WEB_APP_URL;
 
@@ -14,7 +14,7 @@ async function loadUserAlertsDisplay() {
 				let aryRslt = JSON.parse(rslt);
 				aryRslt = Object.entries(aryRslt);
 
-				conter++;
+				
 				renderAlerts(aryRslt);
 			});
 	} catch (err) {
@@ -165,7 +165,6 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			.then(res => res.json())
 			.then(dt => {
 				data = JSON.parse(dt);
-				console.log(data);
 			});
 
 		if (data.status === "success") {
@@ -173,7 +172,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 				action === "setAlert" ? "تم تعيين" : "تم حذف"
 			} التنبيه بنجاح.`;
 			alertStatus.style.color = "green";
-			loadUserAlertsDisplay(); // تحديث قائمة التنبيهات بعد كل عملية
+			await loadUserAlertsDisplay(); // تحديث قائمة التنبيهات بعد كل عملية
 			setTimeout(() => {
 				alertStatus.textContent = "";
 			}, 3000);

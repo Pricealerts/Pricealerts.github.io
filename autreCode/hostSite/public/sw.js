@@ -1,18 +1,16 @@
+// Cache name
+const cacheName = 'pwa-cache-v2.1';
 
-// Set up a cache name
-const cacheName = 'pwa-cache-v1.9';
-
-// Set up a list of files to be cached
+// Files to cache
 const filesToCache = [
   '/',
-  'index.html',
-  '/js/javascript.js',
-  '/style/style.css'
+  '/index.html',
+  '/js.min.js',
+  '/style/style.css',
+  '/offline.html'
 ];
 
-
-
-// When the service worker is installed, cache all the files
+// Install
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(cacheName)
@@ -21,33 +19,28 @@ self.addEventListener('install', event => {
   );
 });
 
-// When a fetch event is triggered, return the cached response if it exists, otherwise fetch the response from the network
+// Fetch with offline fallback
 self.addEventListener('fetch', event => {
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
+    fetch(event.request)
+      .catch(async () => {
+        const response = await caches.match(event.request);
+        return response || caches.match('/offline.html');
       })
   );
 });
 
-
-
-// When a new service worker is activated, delete any old caches
+// Activate
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(cacheNames => {
+    caches.keys().then(keys => {
       return Promise.all(
-        cacheNames.map(cache => {
-          if (cache !== cacheName) {
-            return caches.delete(cache);
+        keys.map(key => {
+          if (key !== cacheName) {
+            return caches.delete(key);
           }
         })
       );
-    })
-      .then(() => self.clients.claim())
+    }).then(() => self.clients.claim())
   );
 });
