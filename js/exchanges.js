@@ -102,8 +102,8 @@ const EXCHANGES = {
 	},
 	nasdaq: {
 		name: "NASDAQ",
-		exchangeInfoUrl: "https://proxyrequest-nkipfwe2qq-ew.a.run.app",
-		tickerPriceUrl: "https://proxyrequest-nkipfwe2qq-ew.a.run.app",
+		exchangeInfoUrl: "https://europe-west1-srch-price.cloudfunctions.net/proxyRequestV2",
+		tickerPriceUrl: "https://europe-west1-srch-price.cloudfunctions.net/proxyRequestV2",
 		usdtSuffix: "-USDT",
 		intervalData: 6000000,
 		crptChos: "none",
@@ -111,8 +111,8 @@ const EXCHANGES = {
 	},
 	nyse: {
 		name: "NYSE",
-		exchangeInfoUrl: "https://proxyrequest-nkipfwe2qq-ew.a.run.app",
-		tickerPriceUrl: "https://proxyrequest-nkipfwe2qq-ew.a.run.app",
+		exchangeInfoUrl: "https://europe-west1-srch-price.cloudfunctions.net/proxyRequestV2",
+		tickerPriceUrl: "https://europe-west1-srch-price.cloudfunctions.net/proxyRequestV2",
 		usdtSuffix: "-USDT",
 		intervalData: 6000000,
 		crptChos: "none",
@@ -120,8 +120,8 @@ const EXCHANGES = {
 	},
 	other: {
 		name: "other",
-		exchangeInfoUrl: "https://proxyrequest-nkipfwe2qq-ew.a.run.app",
-		tickerPriceUrl: "https://proxyrequest-nkipfwe2qq-ew.a.run.app",
+		exchangeInfoUrl: "https://europe-west1-srch-price.cloudfunctions.net/proxyRequestV2",
+		tickerPriceUrl: "https://europe-west1-srch-price.cloudfunctions.net/proxyRequestV2",
 		usdtSuffix: "USD",
 		intervalData: 6000000,
 		crptChos: "none",
