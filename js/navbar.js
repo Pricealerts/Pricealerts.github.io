@@ -4,12 +4,17 @@ const sidebar = document.createElement('div');
 sidebar.className = 'sidebar';
 sidebar.innerHTML=`<!-- Sidebar (LEFT) -->
 			<h3>القائمة</h3>
-			<a href="#">الرئيسية</a>
-			<a href="#">عنّا</a>
-			<a href="#">المنتجات</a>
-			<a href="#">الخدمات</a>
-			<a href="#">المدونة</a>
-			<a href="#">اتصل بنا</a>
+			<a href="https://pricealerts.web.app/">الرئيسية</a>
+			<a href="https://pricealerts.web.app/about.html">
+            من نحن</a>
+		<!--
+        	<a href="#">المنتجات</a>
+			<a href="#">الخدمات</a> 
+             -->
+			<a href="https://pricealerts.web.app/privacy.html">
+            سياسة الخصوصية</a>
+			<a href="https://pricealerts.web.app/contact.html">
+            اتصل بنا</a>
 		
 
 
