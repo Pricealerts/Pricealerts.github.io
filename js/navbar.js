@@ -5,15 +5,15 @@ sidebar.className = 'sidebar';
 sidebar.innerHTML=`<!-- Sidebar (LEFT) -->
 			<h3>القائمة</h3>
 			<a href="https://pricealerts.web.app/">الرئيسية</a>
-			<a href="https://pricealerts.web.app/about.html">
+			<a href="https://pricealerts.web.app/otherPage/about.html">
             من نحن</a>
 		<!--
         	<a href="#">المنتجات</a>
 			<a href="#">الخدمات</a> 
              -->
-			<a href="https://pricealerts.web.app/privacy.html">
+			<a href="https://pricealerts.web.app/otherPage/privacy.html">
             سياسة الخصوصية</a>
-			<a href="https://pricealerts.web.app/contact.html">
+			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا</a>
 		
 
