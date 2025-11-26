@@ -1,0 +1,122 @@
+:root {
+	--primary: #0f62fe;
+	--bg: #f5f7fa;
+	--white: #ffffff;
+	--text: #111;
+	--sidebar-width: 260px;
+}
+
+/*------------------------------------------------------
+  Navbar
+------------------------------------------------------*/
+.navbar {
+	height: 60px;
+	background: var(--white);
+	border-bottom: 1px solid #ddd;
+	display: flex;
+	align-items: center;
+	padding: 0 16px;
+	justify-content: space-between;
+	position: sticky;
+	top: 0;
+    margin-bottom: 10px;
+	z-index: 100;
+}
+
+.nav-title {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+/* زر القائمة */
+.menu-btn {
+    width: auto;
+    margin: 0px;
+	font-size: 24px;
+	padding: 4px 10px 6px;
+	border-radius: 8px;
+	border: none;
+	background: #bbb;
+	cursor: pointer;
+}
+.imgNavbar{
+    height:  100%;
+}
+
+/*------------------------------------------------------
+  Sidebar (LEFT side)
+------------------------------------------------------*/
+.sidebar {
+	position: fixed;
+	top: 0;
+	left: 0; /* ← التعديل المهم */
+	height: 100vh;
+	width: var(--sidebar-width);
+	background: var(--white);
+	border-right: 1px solid #ddd; /* بدل left */
+	transform: translateX(-100%); /* ← مخفي من اليسار */
+	transition: 0.3s ease;
+	z-index: 200;
+	padding: 20px;
+}
+
+.sidebar.open {
+	transform: translateX(0); /* يظهر */
+}
+
+.sidebar h3 {
+	margin-top: 0;
+}
+
+.sidebar a {
+	display: block;
+	padding: 12px 10px;
+	color: var(--text);
+	text-decoration: none;
+	border-radius: 6px;
+	margin: 6px 0;
+}
+
+.sidebar a:hover {
+	background: #f0f0f0;
+}
+
+/* Overlay */
+.overlay {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 0;
+	bottom: 0;
+	background: rgba(0, 0, 0, 0.4);
+	z-index: 150;
+	display: none;
+}
+
+.overlay.show {
+	display: block;
+}
+
+/*------------------------------------------------------
+  المحتوى
+------------------------------------------------------*/
+.container {
+	padding: 20px;
+}
+
+.content-box {
+	background: var(--white);
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* تحسين الهاتف */
+@media (max-width: 600px) {
+	.nav-title {
+		font-size: 18px;
+	}
+}

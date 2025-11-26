@@ -12,8 +12,12 @@ const MAX_ALERTS = 5; // يمكن تغيير هذا الحد الأقصى للت
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
 // --- وظائف جلب البيانات وتحديث الأسعار ---
 
+
+
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
+	console.log(exchangeId);
+
 	gebi("usdDsply").style.display = "none";
 	if (!exchange) {
 		currentPriceDisplay.textContent = "منصة غير متاحة.";
@@ -30,7 +34,7 @@ async function fetchTradingPairs(exchangeId) {
 		gebi("crptChos").style.display = exchange.crptChos;
 		gebi("usdDsply").style.display = exchange.usdDsply;
 		gebi("noteYahoo").style.display = exchange.usdDsply;
-		
+
 		let response, data;
 		switch (exchangeId) {
 			case "binance":
@@ -131,34 +135,51 @@ async function fetchTradingPairs(exchangeId) {
 				symbols = data.filter(s => !s.trading_disabled).map(s => s.id);
 				break;
 			case "nasdaq":
-				/* response = await fetch(exchange.exchangeInfoUrl, {
-					method: "POST",
-                    headers: {  "Content-Type": "application/json" },
-				body: JSON.stringify({ datas: "stocksExchange", querySmble: "nasdaq" }),
-				});
-				data = await response.json()
-				symbols = JSON.parse(data);
-				console.log(symbols); */
-				symbols = nasdaqStocks;
-
-				break;
 			case "nyse":
-				/* response = await fetch(exchange.exchangeInfoUrl, {
-					method: "POST",
-                    headers: {  "Content-Type": "application/json" },
-				body: JSON.stringify({ datas: "stocksExchange", querySmble: "nyse" }),
-				});
-				data = await response.json()
-				symbols = JSON.parse(data);
-				console.log(symbols); */
-				symbols = nyseStocks;
+			case "xetra":
+			case "lse":
+			case "TSE":
+			case "HKSE":
+			case "NSE":
+				let nmbrDays = 10;
+				let localExSmbls = localStorage.getItem(exchangeId);
+				const today = new Date();
+
+				if (localExSmbls) {
+					localExSmbls = JSON.parse(localExSmbls);
+					const locaTim = new Date(localExSmbls.time);
+					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
+				}
+
+				if (nmbrDays < 8) {
+					symbols =JSON.parse(localExSmbls.symbols) ;
+				} else {
+					response = await fetch(exchange.exchangeInfoUrl, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							action: "stocksExchange",
+							querySmble: exchangeId, //.toUpperCase(),
+						}),
+					});
+					data = await response.json();
+
+					// storage data
+					const tolclStrg = { symbols: data, time: today };
+					localStorage[exchangeId] = JSON.stringify(tolclStrg);
+					
+					symbols = JSON.parse(data);
+				}
+
+				//console.log(symbols);
+				/* symbols = nasdaqStocks; */
 
 				break;
 			case "other":
 				/* response = await fetch(exchange.exchangeInfoUrl, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ datas: "allStocks", querySmble: "other" }),
+					body: JSON.stringify({ action: "stocksExchange", querySmble: "other" }),
 				});
 				symbols = await response.json(); */
 				symbols = otherPrpos;
@@ -192,7 +213,7 @@ async function fetchTradingPairs(exchangeId) {
 		currentPriceDisplay.textContent = "خطأ, إعادة التحميل.";
 		searchPrice.placeholder = "خطأ, إعادة التحميل";
 		if (priceUpdateInterval) clearInterval(priceUpdateInterval);
-		console.log("3awd wla");
+		console.log("3awd wla " + err);
 
 		rfrsh++;
 		if (rfrsh < 5) {
@@ -209,7 +230,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 			getPriceUrl + "?action=getPrice&urlSmbl=" + exchange.tickerPriceUrl;
 		let apiUrl = "";
 		let price = null;
-		let response, data , rslt;
+		let response, data, rslt;
 
 		switch (exchangeId) {
 			case "binance":
@@ -274,10 +295,17 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				price = data.price;
 				break;
 			case "nasdaq":
+			case "nyse":
+			case "xetra":
+			case "lse":
+			case "TSE":
+			case "HKSE":
+			case "NSE":
+			case "other":
 				response = await fetch(exchange.tickerPriceUrl, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ datas: "price", querySmble: symbol }),
+					body: JSON.stringify({ action: "price", querySmble: symbol }),
 				});
 				data = await response.json();
 				rslt = JSON.parse(data);
@@ -286,44 +314,32 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				priceFtch = price;
 
 				break;
-			case "nyse":
+			/* case "other":
 				response = await fetch(exchange.tickerPriceUrl, {
 					method: "POST",
 					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ datas: "price", querySmble: symbol }),
+					body: JSON.stringify({ action: "price", querySmble: symbol }),
 				});
 				data = await response.json();
 				rslt = JSON.parse(data);
 				currencyFtch = rslt.currency;
 				price = rslt.close;
 				priceFtch = price;
-				break;
-			case "other":
-				response = await fetch(exchange.tickerPriceUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ datas: "price", querySmble: symbol }),
-				});
-				data = await response.json();
-				rslt = JSON.parse(data);
-				currencyFtch = rslt.currency;
-				price = rslt.close;
-				priceFtch = price;
-				break;
+				break;  */
 			//querySmbl = encodeURIComponent('BMW.DE')
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
 				break;
 		}
 		//console.log(data);
-		
+
 		usdDsply.value = currencyFtch;
-		
+
 		if (price !== null) {
 			currentPrice = price;
 			currentPriceDisplay.textContent = `${currentPrice} `;
 			if (isPriceUpdate) {
-				targetPriceInput.value =  currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
+				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
 				document
 					.querySelectorAll(".prcTrgt")
 					.forEach(el => (el.innerHTML = currentPrice));

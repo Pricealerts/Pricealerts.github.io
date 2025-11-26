@@ -25,13 +25,12 @@ const setAlertButton = gebi("setAlertButton");
 const alertStatus = gebi("alertStatus");
 const alertsList = gebi("alertsList");
 
-let telegramChatId ;
+let telegramChatId;
 let currentExchangeId = exchangeSelect.value;
 let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
 let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
-
 // --- معالجات الأحداث ---
 
 exchangeSelect.addEventListener("change", () => {
@@ -83,7 +82,7 @@ setAlertButton.addEventListener("click", async () => {
 	const alertCondition = document.querySelector(
 		'input[name="alertCondition"]:checked'
 	).value;
-	 telegramChatId = telegramChatIdInput.value.trim();
+	telegramChatId = telegramChatIdInput.value.trim();
 
 	if (isNaN(targetPrice) || targetPrice <= 0) {
 		alertStatus.textContent = "الرجاء إدخال سعر مستهدف صحيح.";
@@ -131,7 +130,7 @@ setAlertButton.addEventListener("click", async () => {
 			id: alertId,
 			exchangeId: currentExchangeId,
 			symbol: selectedSymbol,
-			currenci :usdDsply.value,
+			currenci: usdDsply.value,
 			targetPrice: targetPrice,
 			alertCondition: alertCondition,
 			alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
@@ -146,7 +145,7 @@ setAlertButton.addEventListener("click", async () => {
 			alertStatus.style.color = "green";
 			//targetPriceInput.value = "";
 			// لا نمسح telegramChatIdInput إذا تم تعيين تنبيه تيليجرام بنجاح
-		} 
+		}
 	}
 
 	if (!isTelegramAlert && isBrowserAlert) {
@@ -158,7 +157,7 @@ setAlertButton.addEventListener("click", async () => {
 async function deleteAlert(alert) {
 	const success = await manageAlertOnFirebase("dltAlrt", {
 		id: alert.alertId,
-		telegramChatId : alert.telegramChatId 
+		telegramChatId: alert.telegramChatId,
 	});
 	if (success) {
 		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnFirebase عند النجاح
@@ -172,7 +171,7 @@ requestNotificationPermission(); // طلب إذن الإشعارات للمتص�
 
 if (localStorage.getItem("idChat")) {
 	telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
-	telegramChatId = localStorage.getItem("idChat")
+	telegramChatId = localStorage.getItem("idChat");
 	alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
 	//
@@ -213,40 +212,49 @@ function populateList(items) {
 
 async function filterList() {
 	const query = searchPrice.value.toLowerCase();
-	if (exchangeSelect.value !== 'other') {
-	const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
-	populateList(filtered);
-	}else{
-		 let querySmbl = query.trim();
- if (querySmbl.length < 2) { dropdownList.innerHTML = ""; return;
-    }else{
-      querySmbl = encodeURIComponent(querySmbl)
-    }
-	const url = `https://proxyrequest-nkipfwe2qq-ew.a.run.app`;
-    try {
+	if (exchangeSelect.value !== "other") {
+		const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
+		populateList(filtered);
+	} else {
+		let querySmbl = query.trim();
+		if (querySmbl.length < 2) {
+			dropdownList.innerHTML = "";
+			return;
+		} else {
+			querySmbl = encodeURIComponent(querySmbl);
+		}
+		const url = `https://proxyrequest-nkipfwe2qq-ew.a.run.app`;
+		try {
+			const response = await fetch(url, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ querySmble: querySmbl, datas: "smbls" }),
+			});
 
-  const response = await fetch(url, {method: "POST",
-	headers: {  "Content-Type": "application/json" },
-    body: JSON.stringify({querySmble: querySmbl,datas: "smbls",}),
-  });
-           
-          let results =  await response.json();
-		const dadi = JSON.parse(results);
-		
-        dropdownList.innerHTML = dadi.map(item => `
-                <div class="suggestion-item" onclick = "gtPrcOfOther('${item.symbol}')">
-                    <strong>${item.symbol}</strong> — ${item.shortname || item.longname || "No Name"}  
-                    <span style="color:gray">(${item.quoteType})</span> <span style="color:gray">(${item.exchDisp})</span>
+			let results = await response.json();
+			const dadi = JSON.parse(results);
+
+			dropdownList.innerHTML = dadi
+				.map(
+					item => `
+                <div class="suggestion-item" onclick = "gtPrcOfOther('${
+									item.symbol
+								}')">
+                    <strong>${item.symbol}</strong> — ${
+						item.shortname || item.longname || "No Name"
+					}  
+                    <span style="color:gray">(${
+											item.quoteType
+										})</span> <span style="color:gray">(${item.exchDisp})</span>
                 </div>
-            `).join("");
-
-    } catch (err) { console.error("Search error:", err); }
-
-	}	
+            `
+				)
+				.join("");
+		} catch (err) {
+			console.error("Search error:", err);
+		}
+	}
 }
-
-
-
 
 function createDiv(symbol) {
 	const div = document.createElement("div");
@@ -255,15 +263,13 @@ function createDiv(symbol) {
 	return div;
 }
 function gtPrcOfOther(symbol) {
-	
-	
 	searchPrice.value = symbol;
 	selectedSymbol = symbol;
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
 	//usdDsply.value = currency;
 	setTimeout(() => {
-	startPriceUpdates();
+		startPriceUpdates();
 	}, 100);
 }
 // Hide dropdown when clicking outside
@@ -285,7 +291,6 @@ function updateTargetPrice() {
 	}
 }
 
-
 usdDsply.addEventListener("change", async () => {
 	let priceCurrencyFtch = 1;
 	let url = EXCHANGES.nasdaq.exchangeInfoUrl;
@@ -298,10 +303,10 @@ usdDsply.addEventListener("change", async () => {
 		});
 		data = await response.json();
 		let rslt = JSON.parse(data);
-		 priceCurrencyFtch = rslt.close;
+		priceCurrencyFtch = rslt.close;
 	}
 
-	let priceNewCrncy=1;
+	let priceNewCrncy = 1;
 	let smbl2 = usdDsply.value + "USD=X";
 	response = await fetch(url, {
 		method: "POST",
@@ -311,11 +316,9 @@ usdDsply.addEventListener("change", async () => {
 	data = await response.json();
 	let rslt = JSON.parse(data);
 	priceNewCrncy = rslt.close;
-currentPriceDisplay.textContent = priceFtch * priceCurrencyFtch / priceNewCrncy;
-
-
+	currentPriceDisplay.textContent =
+		(priceFtch * priceCurrencyFtch) / priceNewCrncy;
 });
-
 
 /* instalation app */
 let deferredPrompt;

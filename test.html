@@ -1,173 +1,199 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Call Firebase Function</title>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    #suggestions {
-    background: #222;
-    color: white;
-    padding: 10px;
-    margin-top: 5px;
-    border-radius: 6px;
-}
+<html lang="ar" dir="rtl">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>صفحة مع شريط جانبي</title>
 
-.suggestion-item {
-    padding: 5px;
-    cursor: pointer;
-}
+		<style>
+			/* ألوان */
+			:root {
+				--primary: #0f62fe;
+				--bg: #f5f7fa;
+				--white: #ffffff;
+				--text: #111;
+				--sidebar-width: 260px;
+			}
 
-.suggestion-item:hover {
-    background: #333;
-}
+			body {
+				margin: 0;
+				background: var(--bg);
+				font-family: "Noto Sans Arabic", sans-serif;
+			}
 
-  </style>
-</head>
-<body>
-  <input id="searchInput" placeholder="اكتب اسم السهم أو العملة..." autofocus />
-<div id="suggestions"></div>
+			/*------------------------------------------------------
+  Navbar
+------------------------------------------------------*/
+			.navbar {
+				height: 60px;
+				background: var(--white);
+				border-bottom: 1px solid #ddd;
+				display: flex;
+				align-items: center;
+				padding: 0 16px;
+				justify-content: space-between;
+				position: sticky;
+				top: 0;
+				z-index: 100;
+			}
 
+			.nav-title {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				font-size: 20px;
+				font-weight: bold;
+			}
 
-  <script>
+			/* زر القائمة */
+			.menu-btn {
+				font-size: 24px;
+				padding: 6px 10px;
+				border-radius: 8px;
+				border: none;
+				background: #eee;
+				cursor: pointer;
+			}
 
-   const input = document.getElementById("searchInput");
-const suggestionsBox = document.getElementById("suggestions");
+			/*------------------------------------------------------
+  Sidebar (LEFT side)
+------------------------------------------------------*/
+			.sidebar {
+				position: fixed;
+				top: 0;
+				left: 0; /* ← التعديل المهم */
+				height: 100vh;
+				width: var(--sidebar-width);
+				background: var(--white);
+				border-right: 1px solid #ddd; /* بدل left */
+				transform: translateX(-100%); /* ← مخفي من اليسار */
+				transition: 0.3s ease;
+				z-index: 200;
+				padding: 20px;
+			}
 
-input.addEventListener("input", async () => {
-    let querySmbl = input.value.trim();
+			.sidebar.open {
+				transform: translateX(0); /* يظهر */
+			}
 
-    if (querySmbl.length < 2) {
-        suggestionsBox.innerHTML = "";
-        return;
-    }else{
-      querySmbl = encodeURIComponent(querySmbl)
-    }
+			.sidebar h3 {
+				margin-top: 0;
+			}
 
-    // Yahoo Finance Search API
-    const url = `https://proxyrequest-nkipfwe2qq-ew.a.run.app`;
-    //console.log(querySmbl);
-    
-    try {
-      const payload = {
-    action: "srch",
-    querySmble: querySmbl,
-    datas: "smbls",
-  };
+			.sidebar a {
+				display: block;
+				padding: 12px 10px;
+				color: var(--text);
+				text-decoration: none;
+				border-radius: 6px;
+				margin: 6px 0;
+			}
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: {  "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-           
-          let results =  await response.json();
-       
-				
-           const dadi = JSON.parse(results);
-           
-            console.log(dadi);
-            
-          
-        
+			.sidebar a:hover {
+				background: #f0f0f0;
+			}
 
-        suggestionsBox.textContent = dadi
-            .map(item => `
-                <div class="suggestion-item">
-                    <strong>${item.symbol}</strong> — ${item.shortname || item.longname || "No Name"}  
-                    <span style="color:gray">(${item.quoteType})</span> <span style="color:gray">(${item.exchDisp})</span>
-                </div>
-            `)
-            .join("");
+			/* Overlay */
+			.overlay {
+				position: fixed;
+				top: 0;
+				right: 0;
+				left: 0;
+				bottom: 0;
+				background: rgba(0, 0, 0, 0.4);
+				z-index: 150;
+				display: none;
+			}
 
-    } catch (err) {
-        console.error("Search error:", err);
-    }
-});
+			.overlay.show {
+				display: block;
+			}
 
-/* 
-respns.quotes[0].fo
-{ explains: [],
-  count: 7,
-  quotes: 
-   [ { exchange: 'NGM',
-       shortname: 'GraniteShares 1.25x Long TSLA D',
-       quoteType: 'ETF',
-       symbol: 'TSL',
-       index: 'quotes',
-       score: 10000500,
-       typeDisp: 'ETF',
-       longname: 'GraniteShares 1.25x Long Tsla Daily ETF',
-       exchDisp: 'NASDAQ',
-       isYahooFinance: true },
-     { exchange: 'NMS',
-       shortname: 'Tesla, Inc.',
-       quoteType: 'EQUITY',
-       symbol: 'TSLA',
-       index: 'quotes',
-       score: 32791,
-       typeDisp: 'Equity',
-       longname: 'Tesla, Inc.',
-       exchDisp: 'NASDAQ',
-       sector: 'Consumer Cyclical',
-       sectorDisp: 'Consumer Cyclical',
-       industry: 'Auto Manufacturers',
-       industryDisp: 'Auto Manufacturers',
-       isYahooFinance: true },
-     { exchange: 'NGM',
-       shortname: 'Direxion Daily TSLA Bull 2X Sha',
-       quoteType: 'ETF',
-       symbol: 'TSLL',
-       index: 'quotes',
-       score: 20117,
-       typeDisp: 'ETF',
-       longname: 'Direxion Daily TSLA Bull 2X Shares',
-       exchDisp: 'NASDAQ',
-       isYahooFinance: true },
-     { exchange: 'NGM',
-       shortname: 'Tradr 2X Short TSLA Daily ETF',
-       quoteType: 'ETF',
-       symbol: 'TSLQ',
-       index: 'quotes',
-       score: 20028,
-       typeDisp: 'ETF',
-       longname: 'Tradr 2X Short TSLA Daily ETF',
-       exchDisp: 'NASDAQ',
-       isYahooFinance: true },
-     { exchange: 'NGM',
-       shortname: 'GraniteShares 2x Short TSLA Dai',
-       quoteType: 'ETF',
-       symbol: 'TSDD',
-       index: 'quotes',
-       score: 20021,
-       typeDisp: 'ETF',
-       longname: 'Graniteshares 2x Short TSLA Daily ETF',
-       exchDisp: 'NASDAQ',
-       isYahooFinance: true },
-     { exchange: 'PCX',
-       shortname: 'Tidal ETF Trust II YieldMax TSL',
-       quoteType: 'ETF',
-       symbol: 'TSLY',
-       index: 'quotes',
-       score: 20019,
-       typeDisp: 'ETF',
-       longname: 'YieldMax TSLA Option Income Strategy ETF',
-       exchDisp: 'NYSEArca',
-       isYahooFinance: true },
-     { exchange: 'NYQ',
-       shortname: 'Sixth Street Specialty Lending,',
-       quoteType: 'EQUITY',
-       symbol: 'TSLX',
-       index: 'quotes',
-       score: 20013,
-       typeDisp: 'Equity',
-       longname: 'Sixth Street Specialty Lending, Inc.',
-       exchDisp: 'NYSE',
-       sector: 'Financial Services',
-       sectorDisp: 'Financial Services',
-       industry: 'Asset Management',
-       industryDisp: 'Asset Management',
-       isYahooFinance: true } ],} */
-  </script>
-</body>
+			/*------------------------------------------------------
+  المحتوى
+------------------------------------------------------*/
+			.container {
+				padding: 20px;
+			}
+
+			.content-box {
+				background: var(--white);
+				padding: 20px;
+				border-radius: 10px;
+				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+			}
+
+			/* تحسين الهاتف */
+			@media (max-width: 600px) {
+				.nav-title {
+					font-size: 18px;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<!-- Overlay -->
+		<div id="overlay" class="overlay"></div>
+
+		<!-- Navbar -->
+		<div class="navbar">
+			<button class="menu-btn" id="openSidebar">☰</button>
+
+			<div class="nav-title">
+				<div
+					style="
+						background: var(--primary);
+						color: white;
+						width: 34px;
+						height: 34px;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+						border-radius: 8px;
+					"
+				>
+					س
+				</div>
+				<span>اسم الموقع</span>
+			</div>
+		</div>
+
+		<!-- Sidebar (LEFT) -->
+		<div class="sidebar" id="sidebar">
+			<h3>القائمة</h3>
+			<a href="#">الرئيسية</a>
+			<a href="#">عنّا</a>
+			<a href="#">المنتجات</a>
+			<a href="#">الخدمات</a>
+			<a href="#">المدونة</a>
+			<a href="#">اتصل بنا</a>
+		</div>
+
+		<!-- Content -->
+		<div class="container">
+			<div class="content-box">
+				<h2>مرحبًا</h2>
+				<p>
+					تم تعديل السايدبار ليظهر من اليسار — مع دعم RTL بالكامل وبنفس الأناقة.
+				</p>
+			</div>
+		</div>
+
+		<script>
+			const sidebar = document.getElementById("sidebar");
+			const overlay = document.getElementById("overlay");
+			const openBtn = document.getElementById("openSidebar");
+
+			openBtn.onclick = () => {
+				sidebar.classList.add("open");
+				overlay.classList.add("show");
+			};
+
+			overlay.onclick = () => {
+				sidebar.classList.remove("open");
+				overlay.classList.remove("show");
+			};
+		</script>
+	</body>
 </html>

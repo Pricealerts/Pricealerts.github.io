@@ -29,6 +29,7 @@ async function cAllDatabase(data) {
 }
 
 
+
 ///////////// function gat alert
 async function gtAlerts(data) {
 	let dtRspns;
