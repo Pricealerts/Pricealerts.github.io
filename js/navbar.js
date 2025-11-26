@@ -47,7 +47,7 @@ navbar.innerHTML = `
 
 `
 //document.body.prepend(navbar)
-document.getElementById('pirantCntynr').prepend(navbar)
+document.querySelector('.pirantCntynr').prepend(navbar)
 
 
 
