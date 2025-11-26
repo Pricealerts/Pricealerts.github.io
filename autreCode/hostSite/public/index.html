@@ -20,134 +20,189 @@
 
 
 <body>
-    <div class="container">
-        <h1>تنبيه أسعار العملات</h1>
+    <div id="pirantCntynr" class="container">
 
-<div id="dadi"></div>
-        <div class="exchange-selection">
-            <label for="exchangeSelect">اختر منصة التداول:</label>
-            <select id="exchangeSelect">
-                <option value="binance">Binance</option>
-                <option value="mexc">mexc</option>
-                <option value="kucoin">KuCoin</option>
-                <option value="coingecko">CoinGecko</option>
-                <option value="okx">OKX</option>
-                <option value="bybit">Bybit</option>
-                <option value="bitget">Bitget</option>
-                <option value="lbank">Lbank</option>
-                <option value="kraken">Kraken</option>
-                <option value="coinbase">Coinbase</option>
-                <option value="nasdaq" >NASDAQ</option>
-                <option value="nyse" >NYSE</option>
-                <option value="other" >أخرى</option>
-                
-            </select>
-        </div>
+			<div id="dadi"></div>
+			<div class="exchange-selection">
+				<label for="exchangeSelect">اختر منصة التداول:</label>
+				<select id="exchangeSelect">
+					<option value="binance">Binance</option>
+					<option value="mexc">mexc</option>
+					<option value="kucoin">KuCoin</option>
+					<option value="coingecko">CoinGecko</option>
+					<option value="okx">OKX</option>
+					<option value="bybit">Bybit</option>
+					<option value="bitget">Bitget</option>
+					<option value="lbank">Lbank</option>
+					<option value="kraken">Kraken</option>
+					<option value="coinbase">Coinbase</option>
+					<option value="nasdaq">NASDAQ</option>
+					<option value="nyse">NYSE</option>
+					<option value="other">أخرى</option>
+				</select>
+			</div>
 
-        <div class="currency-selection">
-            <!--<label for="searchPrice">اختر العملة:</label>-->
-            <div id="crptChos">
-                <button class="crbtBtn" >USD</button>
-                <button class="crbtBtn" >USDT</button>
-                <button class="crbtBtn" >USDC</button>
-                <button class="crbtBtn" >BNB</button>
-                <button class="crbtBtn" >BTC</button>
-            </div>
-            <p id="noteYahoo" style="color: #1d87f9; display: none;">
-                <strong>ملاحظة:</strong> تم تحميل البيانات من موقع Yahoo Finance 
-            </p> 
-            <div class="dropdown-container" >
-                <input type="text" id="searchPrice" onfocus="showDropdown()" oninput="filterList()"
-                    placeholder="ابحث " style="text-align: center;">
-                <div class="dropdown-list" id="dropdownList"></div>
-                <select id="dsf" ></select>
-            </div>
-        </div>
+			<div class="currency-selection">
+				<!--<label for="searchPrice">اختر العملة:</label>-->
+				<div id="crptChos">
+					<button class="crbtBtn">USD</button>
+					<button class="crbtBtn">USDT</button>
+					<button class="crbtBtn">USDC</button>
+					<button class="crbtBtn">BNB</button>
+					<button class="crbtBtn">BTC</button>
+				</div>
+				<p id="noteYahoo" style="color: #1d87f9; display: none">
+					<strong>ملاحظة:</strong> تم تحميل البيانات من موقع Yahoo Finance
+				</p>
+				<div class="dropdown-container">
+					<input
+						type="text"
+						id="searchPrice"
+						onfocus="showDropdown()"
+						oninput="filterList()"
+						placeholder="ابحث "
+						style="text-align: center"
+					/>
+					<div class="dropdown-list" id="dropdownList"></div>
+					<select id="dsf"></select>
+				</div>
+			</div>
 
-        <div class="price-display">
-            <h2>السعر الحالي:</h2>
-            <!-- <p id="usdDsply" >$</p> --> 
-            <select id="usdDsply" class="" style="width: fit-content;cursor: pointer; ">
-                <option value="USD">USD</option>
-                <option value="EUR">EUR</option>
-                <option value="DZD">DZD</option>
-                <option value="JPY">JPY</option>
-                <option value="EGP">EGP</option>
-                <option value="GBP">GBP</option>
-                <option value="RUB">RUB</option>
-                <option value="CNY">CNY</option>
-                <option value="KRW">KRW</option>
-            </select>
-            <p class="currentPrice" id="currentPrice">--.-- </p>
-            
-        </div>
- 
- 
-        <div class="alert-section">
-          <button id="installBtn" style="display:none;">
-    📲 Add to Home Screen
-</button>
-            <h2>إعداد التنبيه </h2>
-            <!-- <p class="note">
+			<div class="price-display">
+				<h2>السعر الحالي:</h2>
+				<!-- <p id="usdDsply" >$</p> -->
+				<select
+					id="usdDsply"
+					class=""
+					style="width: fit-content; cursor: pointer"
+				>
+					<option value="USD">USD</option>
+					<option value="EUR">EUR</option>
+					<option value="DZD">DZD</option>
+					<option value="JPY">JPY</option>
+					<option value="EGP">EGP</option>
+					<option value="GBP">GBP</option>
+					<option value="RUB">RUB</option>
+					<option value="CNY">CNY</option>
+					<option value="KRW">KRW</option>
+				</select>
+				<p class="currentPrice" id="currentPrice">--.--</p>
+			</div>
+
+			<div class="alert-section">
+				<h2>إعداد التنبيه</h2>
+				<!-- <p class="note">
                 <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر <strong>تيليجرام</strong> فقط (وتُحذف تلقائيًا بعد التفعيل). تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
             </p> -->
-            <label for="targetPrice">السعر المستهدف :</label>
-            <input type="number" id="targetPrice" placeholder="مثال: 0.50" step="any" oninput="updateTargetPrice()">
+				<label for="targetPrice">السعر المستهدف :</label>
+				<input
+					type="number"
+					id="targetPrice"
+					placeholder="مثال: 0.50"
+					step="any"
+					oninput="updateTargetPrice()"
+				/>
 
-            <div class="alert-condition-selection">
-                <label>تنبيه عندما يكون السعر:</label>
-                <div>
-                    <input type="radio" id="conditionGreaterThanOrEqual" name="alertCondition" value="greater_than_or_equal" >
-                    <label for="conditionGreaterThanOrEqual"> <img src="imgs/up-arrow-svgrepo-com (1).svg" alt="">أعلى من أو يساوي <span class="prcTrgt"></span> </label>
-                </div>
-                <div>
-                    <input type="radio" id="conditionLessThanOrEqual" name="alertCondition" value="less_than_or_equal" checked>
-                    <label for="conditionLessThanOrEqual"><img src="imgs/down-arrow-svgrepo-com (1).svg" alt="">أقل من أو يساوي <span class="prcTrgt"></span></label>
-                </div>
-            </div>
+				<div class="alert-condition-selection">
+					<label>تنبيه عندما يكون السعر:</label>
+					<div>
+						<input
+							type="radio"
+							id="conditionGreaterThanOrEqual"
+							name="alertCondition"
+							value="greater_than_or_equal"
+						/>
+						<label for="conditionGreaterThanOrEqual">
+							<img src="imgs/up-arrow-svgrepo-com (1).svg" alt="" />أعلى من أو
+							يساوي <span class="prcTrgt"></span>
+						</label>
+					</div>
+					<div>
+						<input
+							type="radio"
+							id="conditionLessThanOrEqual"
+							name="alertCondition"
+							value="less_than_or_equal"
+							checked
+						/>
+						<label for="conditionLessThanOrEqual"
+							><img src="imgs/down-arrow-svgrepo-com (1).svg" alt="" />أقل من أو
+							يساوي <span class="prcTrgt"></span
+						></label>
+					</div>
+				</div>
 
-            <div class="alert-type-selection">
-                <label>نوع التنبيه:</label>
-                <div>
-                    <input type="checkbox" id="alertTypeTelegram" name="alertTypeTelegram" value="telegram" checked>
-                    <label for="alertTypeTelegram">رسالة تيليجرام</label>
-                </div>
-                <div>
-                    <input type="checkbox" id="alertTypeBrowser" name="alertTypeBrowser" value="browser">
-                    <label for="alertTypeBrowser">إشعار المتصفح</label>
-                </div>
-            </div>
+				<div class="alert-type-selection">
+					<label>نوع التنبيه:</label>
+					<div>
+						<input
+							type="checkbox"
+							id="alertTypeTelegram"
+							name="alertTypeTelegram"
+							value="telegram"
+							checked
+						/>
+						<label for="alertTypeTelegram">رسالة تيليجرام</label>
+					</div>
+					<div>
+						<input
+							type="checkbox"
+							id="alertTypeBrowser"
+							name="alertTypeBrowser"
+							value="browser"
+						/>
+						<label for="alertTypeBrowser">إشعار المتصفح</label>
+					</div>
+				</div>
 
-            <div id="telegramChatIdContainer">
-                <p id="telegramChatIdNote" class="small-note" style="display: none;">
-                    <strong>ملاحظة:</strong> إذا لم يكن لديك معرف دردشة تيليجرام، 
-                    <a href="https://t.me/Crypto_prices_alerts_bot" target="_blank">أدخل الى هذا البوت</a>
-                    للحصول على معرف دردشتك. 
-                    <br>
-                </p>
-                <label for="telegramChatId">معرّف دردشة التيليجرام (Chat ID):</label>
-                <input type="text" id="telegramChatId" placeholder="أدخل معرّف دردشة تيليجرام">
-                
-            </div>
+				<div id="telegramChatIdContainer">
+					<p id="telegramChatIdNote" class="small-note" style="display: none">
+						<strong>ملاحظة:</strong> إذا لم يكن لديك معرف دردشة تيليجرام،
+						<a href="https://t.me/Crypto_prices_alerts_bot" target="_blank"
+							>أدخل الى هذا البوت</a
+						>
+						للحصول على معرف دردشتك.
+						<br />
+					</p>
+					<label for="telegramChatId">معرّف دردشة التيليجرام (Chat ID):</label>
+					<input
+						type="text"
+						id="telegramChatId"
+						placeholder="أدخل معرّف دردشة تيليجرام"
+					/>
+				</div>
 
-            <button id="setAlertButton">تعيين تنبيه</button>
-            <p id="alertStatus"></p>
-        </div>
+				<button id="setAlertButton">تعيين تنبيه</button>
+				<p id="alertStatus"></p>
+			</div>
 
-        <div class="active-alerts-section">
-            <h2>تنبيهاتي النشطة (تيليجرام)</h2>
-            <!-- <p class="small-note">التنبيهات التي تظهر هنا ستعمل في الخلفية وستُحذف تلقائيًا بعد إرسالها.</p>  --> 
-             <ul id="alertsList">
-                <li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>
-            </ul>
-        </div>
-        <div id="dvdw" style="display: none; cursor: pointer;">
-        <h3 style="text-align: center;color: var(--main-color); display: block;margin-bottom: 10px;">
-            تحميل التطبيق</h3>
-        <img id="dwnld" style="display: block; width: 70%;margin: auto; "  src="/imgs/anddw.png" alt="حمل التطبيق">
-    </div>
+			<div class="active-alerts-section">
+				<h2>تنبيهاتي النشطة (تيليجرام)</h2>
+				<!-- <p class="small-note">التنبيهات التي تظهر هنا ستعمل في الخلفية وستُحذف تلقائيًا بعد إرسالها.</p>  -->
+				<ul id="alertsList">
+					<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>
+				</ul>
+			</div>
+			<div id="dvdw" style="display: none; cursor: pointer">
+				<h3
+					style="
+						text-align: center;
+						color: var(--main-color);
+						display: block;
+						margin-bottom: 10px;
+					"
+				>
+					تحميل التطبيق
+				</h3>
+				<img
+					id="dwnld"
+					style="display: block; width: 70%; margin: auto"
+					src="/imgs/anddw.png"
+					alt="حمل التطبيق"
+				/>
+			</div>
 
-   <!--  <iframe id="ifrmTRdVw"
+			<!--  <iframe id="ifrmTRdVw"
   src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&style=1"
   width="100%" style="margin-top: 20px;"
   height="400"
@@ -157,31 +212,11 @@
 </iframe> 
 
 
-
 -->
-    </div>
+		</div>
 
 
 
-<script>
-   /*  let deferredPrompt;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-
-        document.getElementById('installBtn').style.display = 'block';
-
-        document.getElementById('installBtn').addEventListener('click', () => {
-            document.getElementById('installBtn').style.display = 'none';
-            deferredPrompt.prompt();
-
-            deferredPrompt.userChoice.then((choiceResult) => {
-                deferredPrompt = null;
-            });
-        });
-    }); */
-</script>
 
 
     
