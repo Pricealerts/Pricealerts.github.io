@@ -22,7 +22,11 @@
     margin-bottom: 10px;
 	z-index: 100;
 }
-
+.hTitel{
+	 color: #007bff; /* لون أزرق جذاب للعناوين */
+    text-align: center;
+    font-weight: 700;
+}
 .nav-title {
 	display: flex;
 	align-items: center;
