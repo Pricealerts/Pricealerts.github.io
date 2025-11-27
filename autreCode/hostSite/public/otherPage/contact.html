@@ -70,10 +70,12 @@
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 
     <script >
-     geBI(el)('sndMsg').addEventListener('submit', async ()=>{sndMsgs()} )
+     geBI(el)('sndMsg').addEventListener('submit', async (ev)=>{sndMsgs(ev)} )
 
 function geBI(el) {return document.getElementById(el)}
-     async function sndMsgs() {
+
+     async function sndMsgs(ev) {
+      ev.stopPropagation();
       const nameUser = geBI(el)('nameUser')
       const emailUser = geBI(el)('emailUser')
       const msageUser = geBI(el)('msageUser')
