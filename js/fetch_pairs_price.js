@@ -1,7 +1,7 @@
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl =
 	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
-const APPS_SCRIPT_WEB_APP_URL =
+const FIREBASE_WEB_ALERT_URL =
 	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
 let currencyFtch = "USD";
@@ -153,15 +153,8 @@ async function fetchTradingPairs(exchangeId) {
 				if (nmbrDays < 8) {
 					symbols =JSON.parse(localExSmbls.symbols) ;
 				} else {
-					response = await fetch(exchange.exchangeInfoUrl, {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							action: "stocksExchange",
-							querySmble: exchangeId, //.toUpperCase(),
-						}),
-					});
-					data = await response.json();
+					
+					data = await ftchFnctn(exchange.exchangeInfoUrl, {action: "stocksExchange",querySmble: exchangeId});
 
 					// storage data
 					const tolclStrg = { symbols: data, time: today };
@@ -301,12 +294,8 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 			case "HKSE":
 			case "NSE":
 			case "other":
-				response = await fetch(exchange.tickerPriceUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ action: "price", querySmble: symbol }),
-				});
-				data = await response.json();
+				data = await ftchFnctn(exchange.exchangeInfoUrl, { action: "price", querySmble: symbol });
+				
 				rslt = JSON.parse(data);
 				currencyFtch = rslt.currency;
 				price = rslt.close;

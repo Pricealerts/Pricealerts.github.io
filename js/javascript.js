@@ -32,40 +32,64 @@ let currentPrice = null;
 let priceUpdateInterval;
 let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
 // --- معالجات الأحداث ---
+ startPage()
+async function startPage() {
+	// --- التهيئة عند بدء التشغيل ---
+	await fetchTradingPairs(currentExchangeId);
 
-exchangeSelect.addEventListener("change", () => {
-	currentPriceDisplay.textContent = "--.--";
-	currentExchangeId = exchangeSelect.value;
-	searchPrice.value = "";
-	fetchTradingPairs(currentExchangeId);
-	alertStatus.textContent = "";
-});
-
-searchPrice.addEventListener("change", () => {
-	//selectedSymbol = searchPrice.value;
-
-	startPriceUpdates();
-	alertStatus.textContent = "";
-});
-
-// إظهار/إخفاء حقل Chat ID بناءً على اختيار تيليجرام
-alertTypeTelegramCheckbox.addEventListener("change", () => {
+	requestNotificationPermission(); // طلب إذن الإشعارات للمتصفح
+	if (localStorage.getItem("exchangeChoz")) {
+		exchangeSelect.value = localStorage.getItem("exchangeChoz");
+	}
+	if (localStorage.getItem("idChat")) {
+		telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
+		telegramChatId = localStorage.getItem("idChat");
+		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
+		loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
+		//
+	} else {
+		telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
+		gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
+	}
+	// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
 	if (alertTypeTelegramCheckbox.checked) {
 		telegramChatIdContainer.style.display = "block";
 	} else {
 		telegramChatIdContainer.style.display = "none";
-		telegramChatIdInput.value = ""; // مسح Chat ID إذا تم إلغاء تحديد تيليجرام
 	}
-	alertStatus.textContent = "";
-});
 
-// طلب إذن الإشعارات عند اختيار تنبيه المتصفح  "/imgs/web/icon-512.png"
-alertTypeBrowserCheckbox.addEventListener("change", () => {
-	if (alertTypeBrowserCheckbox.checked) {
-		requestNotificationPermission();
-	}
-	alertStatus.textContent = "";
-});
+	exchangeSelect.addEventListener("change", () => {
+		currentPriceDisplay.textContent = "--.--";
+		currentExchangeId = exchangeSelect.value;
+		searchPrice.value = "";
+		fetchTradingPairs(currentExchangeId);
+		alertStatus.textContent = "";
+	});
+
+	searchPrice.addEventListener("change", () => {
+		startPriceUpdates();
+		alertStatus.textContent = "";
+	});
+
+	// إظهار/إخفاء حقل Chat ID بناءً على اختيار تيليجرام
+	alertTypeTelegramCheckbox.addEventListener("change", () => {
+		if (alertTypeTelegramCheckbox.checked) {
+			telegramChatIdContainer.style.display = "block";
+		} else {
+			telegramChatIdContainer.style.display = "none";
+			telegramChatIdInput.value = ""; // مسح Chat ID إذا تم إلغاء تحديد تيليجرام
+		}
+		alertStatus.textContent = "";
+	});
+
+	// طلب إذن الإشعارات عند اختيار تنبيه المتصفح  "/imgs/web/icon-512.png"
+	alertTypeBrowserCheckbox.addEventListener("change", () => {
+		if (alertTypeBrowserCheckbox.checked) {
+			requestNotificationPermission();
+		}
+		alertStatus.textContent = "";
+	});
+}
 
 setAlertButton.addEventListener("click", async () => {
 	const isTelegramAlert = alertTypeTelegramCheckbox.checked;
@@ -101,7 +125,7 @@ setAlertButton.addEventListener("click", async () => {
 		alertStatus.style.color = "red";
 		return;
 	}
-
+	localStorage.setItem("exchangeChoz", currentExchangeId);
 	// التعامل مع تنبيه المتصفح محليًا
 	if (isBrowserAlert) {
 		activeBrowserAlerts.push({
@@ -135,7 +159,7 @@ setAlertButton.addEventListener("click", async () => {
 			alertCondition: alertCondition,
 			alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
 			telegramChatId: telegramChatId,
-			paidOrNo : false
+			paidOrNo: false,
 		};
 
 		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
@@ -163,28 +187,6 @@ async function deleteAlert(alert) {
 	if (success) {
 		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnFirebase عند النجاح
 	}
-}
-
-// --- التهيئة عند بدء التشغيل ---
-fetchTradingPairs(currentExchangeId);
-
-requestNotificationPermission(); // طلب إذن الإشعارات للمتصفح
-
-if (localStorage.getItem("idChat")) {
-	telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
-	telegramChatId = localStorage.getItem("idChat");
-	alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
-	loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
-	//
-} else {
-	telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
-	gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
-}
-// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
-if (alertTypeTelegramCheckbox.checked) {
-	telegramChatIdContainer.style.display = "block";
-} else {
-	telegramChatIdContainer.style.display = "none";
 }
 
 /*  May code */
@@ -224,18 +226,12 @@ async function filterList() {
 		} else {
 			querySmbl = encodeURIComponent(querySmbl);
 		}
-		const url = `https://proxyrequest-nkipfwe2qq-ew.a.run.app`;
+		const url = EXCHANGES.other.exchangeInfoUrl;
 		try {
-			const response = await fetch(url, {
-				method: "POST",
-				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ querySmble: querySmbl, datas: "smbls" }),
-			});
+			const data = await ftchFnctn(url, { querySmble: querySmbl, action: "smbls" });
+			const result = JSON.parse(data);
 
-			let results = await response.json();
-			const dadi = JSON.parse(results);
-
-			dropdownList.innerHTML = dadi
+			dropdownList.innerHTML = result
 				.map(
 					item => `
                 <div class="suggestion-item" onclick = "gtPrcOfOther('${
@@ -352,6 +348,3 @@ document.querySelectorAll(".crbtBtn").forEach(btn => {
 		filterList();
 	});
 });
-
-
-

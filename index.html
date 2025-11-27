@@ -22,26 +22,35 @@
 		<!-- end pour app -->
 	</head>
 	<body>
-
-		<div  class="container pirantCntynr">
-
+		<div class="container pirantCntynr">
 			<div id="dadi"></div>
 			<div class="exchange-selection">
 				<label for="exchangeSelect">اختر منصة التداول:</label>
-				<select id="exchangeSelect">
-					<option value="binance">Binance</option>
-					<option value="mexc">mexc</option>
-					<option value="kucoin">KuCoin</option>
-					<option value="coingecko">CoinGecko</option>
-					<option value="okx">OKX</option>
-					<option value="bybit">Bybit</option>
-					<option value="bitget">Bitget</option>
-					<option value="lbank">Lbank</option>
-					<option value="kraken">Kraken</option>
-					<option value="coinbase">Coinbase</option>
-					<option value="nasdaq">NASDAQ</option>
-					<option value="nyse">NYSE</option>
-					<option value="other">أخرى</option>
+				<select id="exchangeSelect" >
+					<optgroup label=" منصات العملات الرقمية">
+						<option value="binance">Binance</option>
+						<option value="mexc">mexc</option>
+						<option value="kucoin">KuCoin</option>
+						<option value="coingecko">CoinGecko</option>
+						<option value="okx">OKX</option>
+						<option value="bybit">Bybit</option>
+						<option value="bitget">Bitget</option>
+						<option value="lbank">Lbank</option>
+						<option value="kraken">Kraken</option>
+						<option value="coinbase">Coinbase</option>
+					</optgroup>
+					<optgroup label=" بورصات الأسهم">
+						<option value="nasdaq">NASDAQ</option>
+						<option value="xetra">XETRA</option>
+						<option value="lse">LSE</option>
+						<option value="TSE">TSE</option>
+						<option value="HKSE">HKSE</option>
+						<option value="NSE">NSE</option>
+						<option value="nyse">NYSE</option>
+					</optgroup>
+					<optgroup label=" الأسهم ,العملات ,الذهب , البترول وغيره">
+						<option value="other">أخرى</option>
+					</optgroup>
 				</select>
 			</div>
 

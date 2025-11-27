@@ -110,14 +110,13 @@ const EXCHANGES = {
 		usdDsply: "inline-block",
 	},
 };
-multiExchange()
+multiExchange();
 function multiExchange() {
-	const exchs = ['nyse','xetra','lse','TSE',"HKSE","NSE",'other']
-	exchs.forEach((ex) => {EXCHANGES[ex]=  { ...EXCHANGES.nasdaq };
-		EXCHANGES[ex].name = ex//.toLowerCase() 
-		
-		
-	})
+	const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other"];
+	exchs.forEach(ex => {
+		EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
+		EXCHANGES[ex].name = ex; //.toLowerCase()
+	});
 }
 
 /* function clone(obj) {
@@ -126,16 +125,28 @@ function multiExchange() {
 
 EXCHANGES.nyse  = clone(EXCHANGES.nasdaq); */
 
-		
-
-
-
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 
+const otherPrpos = [
+	/* 'BMW.DE', */ "XAUT-USD",
+	"XAGX-USD",
+	"CL=F",
+	"SI=F",
+	"HG=F",
+	"PL=F",
+	"PA=F",
+];
 
-const otherPrpos = [/* 'BMW.DE', */'XAUT-USD',
-	'XAGX-USD','CL=F','SI=F','HG=F','PL=F','PA=F'];
+async function ftchFnctn(url, body) {
+	const response = await fetch(url, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body),
+	});
+	const data = await response.json();
+	return data 
+}

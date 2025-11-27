@@ -1,22 +1,16 @@
 // --- وظائف مساعدة ---
 
 async function loadUserAlertsDisplay() {
-	const apScrptAndId = APPS_SCRIPT_WEB_APP_URL;
-
 	try {
-		await fetch(apScrptAndId, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ action: "gtAlerts", chid: telegramChatId }),
-		})
-			.then(res => res.json())
-			.then(rslt => {
-				let aryRslt = JSON.parse(rslt);
-				aryRslt = Object.entries(aryRslt);
+		await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
+			action: "gtAlerts",
+			chid: telegramChatId,
+		}).then(rslt => {
+			let aryRslt = JSON.parse(rslt);
+			aryRslt = Object.entries(aryRslt);
 
-				
-				renderAlerts(aryRslt);
-			});
+			renderAlerts(aryRslt);
+		});
 	} catch (err) {
 		console.error("خطأ في تحميل التنبيهات:", err.message);
 		const alertsList = gebi("alertsList");
@@ -152,22 +146,13 @@ async function manageAlertOnFirebase(action, alertData = null) {
 	alertStatus.style.color = "#007bff";
 
 	try {
-		const response = await fetch(APPS_SCRIPT_WEB_APP_URL, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				action: action,
-				...alertData,
-			}),
-		})
-			.then(res => res.json())
-			.then(dt => {
-				data = JSON.parse(dt);
-				console.log(data);
-				
-			});
+		await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
+			action: action,
+			...alertData,
+		}).then(dt => {
+			data = JSON.parse(dt);
+			console.log(data);
+		});
 
 		if (data.status === "success") {
 			alertStatus.textContent = `${
@@ -179,7 +164,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 				alertStatus.textContent = "";
 			}, 3000);
 			return true;
-		}else if (data.status == "notPaid") {
+		} else if (data.status == "notPaid") {
 			alertStatus.textContent =
 				"لقد تم ارسال اليك 5  تنبيهات ناجحة في النسخة المجانية عليك الاشتراك في النسخة المدفوعة لإكمال العملية";
 			alertStatus.style.color = "red";
