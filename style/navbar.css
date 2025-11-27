@@ -27,6 +27,17 @@
     text-align: center;
     font-weight: 700;
 }
+@media (max-width: 768px) {
+    hTitel {
+        font-size: 1.8em;
+    }
+}
+@media (max-width: 480px) {
+    hTitel {
+        font-size: 1.5em;
+    }
+
+}
 .nav-title {
 	display: flex;
 	align-items: center;
