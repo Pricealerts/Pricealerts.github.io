@@ -165,6 +165,8 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			.then(res => res.json())
 			.then(dt => {
 				data = JSON.parse(dt);
+				console.log(data);
+				
 			});
 
 		if (data.status === "success") {
@@ -177,6 +179,11 @@ async function manageAlertOnFirebase(action, alertData = null) {
 				alertStatus.textContent = "";
 			}, 3000);
 			return true;
+		}else if (data.status == "notPaid") {
+			alertStatus.textContent =
+				"لقد تم ارسال اليك 5  تنبيهات ناجحة في النسخة المجانية عليك الاشتراك في النسخة المدفوعة لإكمال العملية";
+			alertStatus.style.color = "red";
+			return false;
 		} else if (data.status == "notSuccess") {
 			alertStatus.textContent =
 				"فشل التأكد من معرّف دردشة التيليجرام (Chat ID) الخاص بك يرجى التأكد منه وإعادة المحاولة";

@@ -36,7 +36,7 @@ navbar.innerHTML = `
 		<!-- Navbar -->
 		<div class="navbar">
 			<img class="imgNavbar" src="/imgs/web/apple-touch-icon.png" alt="">
-				<h1>تنبيه أسعار العملات</h1>
+				<h1>منبه الأسعار </h1>
 
 			<div class="nav-title">
 				

@@ -3,7 +3,7 @@ import logger from "firebase-functions/logger";
 import axios from "axios";
 
 const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE";
-
+const chatIdAbdelhadi = "5399098591";
 let db;
 // ------------------------
 // جلب رموز بورصة واحدة من البورصات لخرين
@@ -35,8 +35,7 @@ async function getExchangeSymbols() {
 				//console.log(`exchanges for ${exchanges[i]} is ${rsltsPr[i].length}`);
 			} else {
 				const messageText = `slam 3likm Abdelhadi ${exchanges[i]} rah khawi 3awd chofah `;
-				const chatId = "5399098591";
-				await sendTelegramMessage(chatId, messageText);
+				await sendTelegramMessage(chatIdAbdelhadi, messageText);
 			}
 		}
 
@@ -167,10 +166,18 @@ async function srchSmbls(querySmble) {
 }
 
 /////// nta3 message
-async function sendMesage(messageText) {
+async function sendMesageFn(messageText) {
+	console.log('messageText is :');
+	console.log(messageText);
+	
+	
 	try {
-		const chatId = "5399098591";
-	await sendTelegramMessage("5399098591", messageText);
+		const msag = `عبدالهادي جائتك رسالة من ${messageText.nameUser } 
+ايميله : ${messageText.emailUser } 
+الرسالة : ${messageText.msageUser} 
+ `
+		
+	await sendTelegramMessage(chatIdAbdelhadi, msag);
 	return{statusMsge : 'ok'}
 	} catch (error) {
 		console.log('lmssage mafatch : '+ error);
@@ -254,4 +261,4 @@ async function price(smbl) {
 		};
 	}
 }
-export { srchSmbls, price, stocksExchange, getExchangeSymbols ,sendMesage };
+export { srchSmbls, price, stocksExchange, getExchangeSymbols ,sendMesageFn };

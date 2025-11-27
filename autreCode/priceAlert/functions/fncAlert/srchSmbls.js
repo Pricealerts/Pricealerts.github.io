@@ -137,7 +137,7 @@ async function checkAndSendAlerts() {
 
 			if (sendResult.success) {
 				let iPls = i + 2;
-				let dlt = {telegramChatId : telegramChatId , id :id}
+				let dlt = {telegramChatId : telegramChatId , id :id , alrtOk: true}
 				dltRwApp.push(dlt);
 
 				// بما أننا حذفنا الصف، يجب أن نقلل الفهرس لتجنب تخطي صفوف
@@ -373,4 +373,4 @@ async function sendTelegramMessage(chatId, messageText) {
 
 
 
-export { checkAndSendAlerts,sendTelegramMessage };
+export { checkAndSendAlerts, sendTelegramMessage };

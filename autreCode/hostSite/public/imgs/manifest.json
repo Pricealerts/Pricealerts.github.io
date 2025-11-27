@@ -6,7 +6,7 @@
   "theme_color": "#FFFFFF" ,
   "orientation": "portrait",
   "scope": "https://pricealerts.web.app/",
-  "start_url": "https://pricealerts.web.app/index.html",
+   "start_url": "/",
   "splash_pages": null,
   "icons": [
     { "src": "/imgs/web/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },

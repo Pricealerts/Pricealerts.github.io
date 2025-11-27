@@ -16,7 +16,6 @@ const MAX_ALERTS = 5; // يمكن تغيير هذا الحد الأقصى للت
 
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
-	console.log(exchangeId);
 
 	gebi("usdDsply").style.display = "none";
 	if (!exchange) {

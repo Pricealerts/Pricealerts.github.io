@@ -135,6 +135,7 @@ setAlertButton.addEventListener("click", async () => {
 			alertCondition: alertCondition,
 			alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
 			telegramChatId: telegramChatId,
+			paidOrNo : false
 		};
 
 		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
