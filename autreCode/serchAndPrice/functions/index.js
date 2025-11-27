@@ -6,7 +6,8 @@ import {
 	srchSmbls,
 	price,
 	stocksExchange,
-	getExchangeSymbols,/* 
+	getExchangeSymbols,
+	sendMesage,/* 
 	gtNasdaqNyseStocks */
 } from "./fnctns/fnctns.js";
 
@@ -80,6 +81,9 @@ export const proxyRequestV2 = onRequest(
 					break;
 				case "stocksExchange":
 					repond = await stocksExchange(querySmbl);
+					break;
+					case "sendMesage":
+					repond = await sendMesage(querySmbl);
 					break;
 				default:
 					console.error("منصة غير مدعومة لجلب السعر:", exchangeId);

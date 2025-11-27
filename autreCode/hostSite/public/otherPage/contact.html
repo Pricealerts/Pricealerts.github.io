@@ -54,19 +54,57 @@
 
 			<p>يسعدنا تواصلك معنا في حال وجود أي استفسار أو اقتراح.</p>
 
-			<form>
+			<form id="sndMsg">
 				<label>الاسم</label>
-				<input type="text" placeholder="اكتب اسمك" required />
+				<input id="nameUser" type="text" placeholder="اكتب اسمك" required />
 
 				<label>البريد الإلكتروني</label>
-				<input type="email" placeholder="example@mail.com" required />
+				<input id="emailUser" type="email" placeholder="example@mail.com" required />
 
 				<label>رسالتك</label>
-				<textarea rows="5" placeholder="اكتب رسالتك هنا" required></textarea>
-
+				<textarea id="msageUser" rows="5" placeholder="اكتب رسالتك هنا" required></textarea>
+        <p id="responsP"></p>
 				<button type="submit">إرسال</button>
 			</form>
 		</div>
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
+
+    <script >
+     geBI(el)('sndMsg').addEventListener('submit', async ()=>{sndMsgs()} )
+
+function geBI(el) {return document.getElementById(el)}
+     async function sndMsgs() {
+      const nameUser = geBI(el)('nameUser')
+      const emailUser = geBI(el)('emailUser')
+      const msageUser = geBI(el)('msageUser')
+      const responsP = geBI('responsP')
+      const allMesage={msageUser:msageUser,emailUser:emailUser , msageUser:msageUser}
+      try {
+        const url = "https://proxyrequestv2-nkipfwe2qq-ew.a.run.app";
+        const response = await fetch(url, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({
+							action: "sendMesage",
+							querySmble: allMesage, //.toUpperCase(),
+						}),
+					});
+					const data = await response.json();
+          if (JSON.parse(data).statusMsge =='ok') {
+            responsP.innerHTML = 'لقد تم ارسال رسالتكم بنجاح نشكركم على المشاركة';
+            responsP.style.color = '#008221'
+          }else{
+            responsP.innerHTML = 'لم يتم ارسال الرسالة يرجى إعادة المحاولة';
+            responsP.style.color = '#f30909'
+          }
+      } catch (error) {
+        console.error('حدث خطأ ' + error);
+        
+        responsP.innerHTML = 'لم يتم ارسال الرسالة يرجى إعادة المحاولة';
+            responsP.style.color = '#f30909'
+      }
+      
+     }
+    </script>
 	</body>
 </html>

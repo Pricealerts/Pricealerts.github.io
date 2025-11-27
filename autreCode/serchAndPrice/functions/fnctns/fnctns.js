@@ -1,9 +1,8 @@
-
 import { getDatabase } from "firebase-admin/database";
 import logger from "firebase-functions/logger";
 import axios from "axios";
 
-const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE";	
+const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE";
 
 let db;
 // ------------------------
@@ -12,10 +11,19 @@ let db;
 async function getExchangeSymbols() {
 	db = getDatabase();
 	//const exchanges = ["XETRA", "HKEX", "LSE", "TSE", "NSE","SIX","XSWX","MTAA","XPAR","XSHG","XSHE","XSES"];
-	const exchanges = [ "HKEX", "LSE",  "NSE","SIX","XSWX","XPAR","XSHG","XSHE","XSES"];
+	const exchanges = [
+		"HKEX",
+		"LSE",
+		"NSE",
+		"SIX",
+		"XSWX",
+		"XPAR",
+		"XSHG",
+		"XSHE",
+		"XSES",
+	];
 	try {
-		
-			const result = {};
+		const result = {};
 		const promises = [];
 		for (let i = 0; i < exchanges.length; i++) {
 			promises.push(exchangeSymbols(exchanges[i]));
@@ -25,27 +33,26 @@ async function getExchangeSymbols() {
 			if (rsltsPr[i].length > 5) {
 				result[exchanges[i]] = rsltsPr[i];
 				//console.log(`exchanges for ${exchanges[i]} is ${rsltsPr[i].length}`);
-				
-			}else{
+			} else {
 				const messageText = `slam 3likm Abdelhadi ${exchanges[i]} rah khawi 3awd chofah `;
-				const chatId = '5399098591';
+				const chatId = "5399098591";
 				await sendTelegramMessage(chatId, messageText);
 			}
-			
 		}
-		
+
 		const naNy = await gtNasdaqNyseStocks();
 		const allExch = { ...result, ...naNy };
 
-		let aryAllExch = Object.entries(allExch)
+		let aryAllExch = Object.entries(allExch);
 		const promisesDb = [];
-		
-		for (let i = 0; i <  aryAllExch.length; i++) {
+
+		for (let i = 0; i < aryAllExch.length; i++) {
 			const vl = aryAllExch[i][1];
 			if (vl.length > 5) {
-				promisesDb.push(db.ref("stockSymbols").child(`${aryAllExch[i][0]}`).set(vl));
+				promisesDb.push(
+					db.ref("stockSymbols").child(`${aryAllExch[i][0]}`).set(vl)
+				);
 			}
-			
 		}
 		await Promise.all(promisesDb);
 	} catch (error) {
@@ -70,7 +77,6 @@ async function exchangeSymbols(exchange) {
 }
 
 // ------------------------
-
 
 // ------------------------
 // جلب رموز   من البورصات nasdaq nyse
@@ -118,8 +124,6 @@ async function gtStocks(url) {
 }
 // ------------------------
 
-
-
 // ------------------------
 // nta3 database mn requer
 // ------------------------
@@ -162,15 +166,21 @@ async function srchSmbls(querySmble) {
 	return responseFnl;
 }
 
+/////// nta3 message
+async function sendMesage(messageText) {
+	try {
+		const chatId = "5399098591";
+	await sendTelegramMessage("5399098591", messageText);
+	return{statusMsge : 'ok'}
+	} catch (error) {
+		console.log('lmssage mafatch : '+ error);
+		return{statusMsge : 'no'}
+		
+	}
+	
+}
 
-
-
-
-
-
-
-
-/////// nta3 telegram 
+/////// nta3 telegram
 async function sendTelegramMessage(chatId, messageText) {
 	if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
 		console.error("TELEGRAM_BOT_TOKEN غير معرّف أو غير صالح في Apps Script.");
@@ -187,8 +197,8 @@ async function sendTelegramMessage(chatId, messageText) {
 
 	try {
 		const response = await axios.post(TELEGRAM_API_URL, payload);
-		
-		rspns= { success: true, response: response.data };
+
+		rspns = { success: true, response: response.data };
 	} catch (error) {
 		console.error(
 			"خطأ في إرسال رسالة تيليجرام:",
@@ -199,10 +209,8 @@ async function sendTelegramMessage(chatId, messageText) {
 			error: error.response ? error.response.data : error.message,
 		};
 	}
-	return rspns
+	return rspns;
 }
-
-
 
 //get pice of symbole
 async function price(smbl) {
@@ -246,4 +254,4 @@ async function price(smbl) {
 		};
 	}
 }
-export { srchSmbls, price, stocksExchange, getExchangeSymbols };
+export { srchSmbls, price, stocksExchange, getExchangeSymbols ,sendMesage };
