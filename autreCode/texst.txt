@@ -50,16 +50,10 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ||
   databaseURL: "https://alertprice-c0176.firebaseio.com"
 });
 
-/* nta3 firebase */
+/* nta3 telegram */
 
-
-
-   
-
-
-
-https://telegramwebhook-3wzofmiqgq-uc.a.run.app
-https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://europe-west1-telegramid-6540e.cloudfunctions.net/telegramWebhook
+https://telegramwebhook-3wzofmiqgq-ew.a.run.app
+https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://telegramwebhook-3wzofmiqgq-ew.a.run.app
 
 
 

@@ -166,7 +166,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			return true;
 		} else if (data.status == "notPaid") {
 			alertStatus.textContent =
-				"لقد تم ارسال اليك 5  تنبيهات ناجحة في النسخة المجانية عليك الاشتراك في النسخة المدفوعة لإكمال العملية";
+				"انتهت صلاحية الإشتراك في النسخة المجانية عليك الإشتراك في النسخة المدفوعة لمواصلة العملية";
 			alertStatus.style.color = "red";
 			return false;
 		} else if (data.status == "notSuccess") {

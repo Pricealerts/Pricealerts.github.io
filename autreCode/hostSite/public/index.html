@@ -46,7 +46,7 @@
 		<!-- Poure applecation -->
 		<link
 			rel="manifest"
-			href="https://pricealerts.github.io/imgs/manifest.json"
+			href="./manifest.json"
 		/>
 		<meta name="theme-color" content="#f0f2f5" />
 		<link
@@ -250,7 +250,7 @@
 						margin-bottom: 10px;
 					"
 				>
-					تحميل التطبيق
+				حمله كتطبيق 
 				</h3>
 				<img
 					id="dwnld"
@@ -272,22 +272,21 @@
 
 -->
 		</div>
-
-		<script>
-			self.addEventListener("fetch", event => {
-				event.respondWith(
-					fetch(event.request).catch(() => {
-						return caches.match(event.request).then(response => {
-							if (response) {
-								return response;
-							}
-							// لو الملف غير موجود في الكاش (مثل API)
-							return caches.match("/offline.html");
-						});
-					})
-				);
-			});
-		</script>
+ <script>
+        // هذا الكود هو المسؤول عن تشغيل ملف sw.js
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ تم تسجيل Service Worker بنجاح:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('❌ فشل تسجيل Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+		
 
 		<script src="https://pricealerts.github.io/js.min.js"></script>
 	</body>

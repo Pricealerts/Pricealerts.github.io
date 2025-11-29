@@ -35,25 +35,20 @@
         <h1>🚫 لا يوجد اتصال بالإنترنت</h1>
         <p>يرجى التحقق من اتصالك ثم إعادة المحاولة.</p>
     </div>
+
+     <script>
+        // هذا الكود هو المسؤول عن تشغيل ملف sw.js
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('✅ تم تسجيل Service Worker بنجاح:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('❌ فشل تسجيل Service Worker:', error);
+                    });
+            });
+        }
+    </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -3,7 +3,11 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="canonical" href="https://pricealerts.web.app/otherPage/contact.html">
+		
+		<link
+			rel="canonical"
+			href="https://pricealerts.web.app/otherPage/contact.html"
+		/>
 		<meta
 			name="description"
 			content="منصة Price Alerts لتنبيه أسعار العملات الرقمية والأسهم العالمية من عشر منصات تداول و 11 بورصة. تنبيهات فورية وسريعة."
@@ -31,74 +35,98 @@
 			content="https://pricealerts.web.app/imgs/web/apple-touch-icon.png"
 		/>
 		<!-- end Meta for Social shares   -->
-		<title>اتصل بنا | Price Alerts</title>
+		<title>اتصل بنا</title>
 		<link
 			rel="stylesheet"
 			href="https://pricealerts.github.io/style/navbar.css"
 		/>
-
 		<style>
 			body {
-				font-family: "Tahoma", sans-serif;
-				background: #f2f2f2;
-				margin: 0;
-				padding: 0;
+				font-family: Arial;
+				background: #fafafa;
+				padding: 20px;
+				line-height: 1.8;
 			}
 			.container {
-				max-width: 700px;
+				max-width: 800px;
 				margin: auto;
 				background: white;
-				padding: 20px;
-				margin-top: 30px;
+				padding: 25px;
 				border-radius: 8px;
+				box-shadow: 0 0 10px #ddd;
 			}
 			h1 {
 				text-align: center;
 			}
-			p {
-				font-size: 17px;
-				color: #333;
+			input,
+			textarea {
+				width: calc(100% - 22px);
+				padding: 10px;
+				margin: 10px 0;
+				border: 1px solid #ccc;
+				border-radius: 6px;
 			}
-			a {
-				color: #007bff;
-				text-decoration: none;
+			button {
+				background: #0284c7;
+				color: white;
+				padding: 12px 20px;
+				border: none;
+				border-radius: 6px;
+				cursor: pointer;
+			}
+			button:hover {
+				background: #0369a1;
 			}
 		</style>
 	</head>
-
 	<body>
 		<div class="container">
-			<div id="pirantCntynr" class=" pirantCntynr"></div>
+			<div id="pirantCntynr" class="pirantCntynr"></div>
 			<h1>اتصل بنا</h1>
 
-			<p>إذا كان لديك أي استفسار أو اقتراح، يسعدنا التواصل معك.</p>
+			<p>يسعدنا تواصلك معنا في حال وجود أي استفسار أو اقتراح.</p>
 
-			<p>يمكنك مراسلتنا عبر البريد الإلكتروني:</p>
+			<form id="sndMsg">
+				<label>الاسم</label>
+				<input id="nameUser" type="text" placeholder="اكتب اسمك" required />
 
-			<p>
-				📧
-				<a href="mailto:pricealerts.support@gmail.com">
-					pricealerts.support@gmail.com
-				</a>
-			</p>
+				<label>البريد الإلكتروني</label>
+				<input
+					id="emailUser"
+					type="email"
+					placeholder="example@mail.com"
+					required
+				/>
 
-			<p>
-				كما يمكنك مراسلتنا عبر النموذج داخل التطبيق أو عبر صفحاتنا الرسمية
-				مستقبلاً.
-			</p>
-
-			<p>سنقوم بالرد عليك في أقرب وقت ممكن.</p>
+				<label>رسالتك</label>
+				<textarea
+					id="msageUser"
+					rows="5"
+					placeholder="اكتب رسالتك هنا"
+					required
+				></textarea>
+				<p id="responsP"></p>
+				<button type="submit">إرسال</button>
+			</form>
 		</div>
+		
+		<footer
+			style="
+				text-align: center;
+				padding: 20px;
+				margin-top: 40px;
+				background: #f7f7f7;
+			"
+		>
+			<p>© Price Alerts <span id="dateId"> </span> — جميع الحقوق محفوظة</p>
+			<a href="./about.html">من نحن</a> |
+			<a href="./contact.html">اتصل بنا</a> |
+			<a href="./privacy.html">سياسة الخصوصية</a>
+		</footer>
 
-    <footer style="text-align:center; padding:20px; margin-top:40px; background:#f7f7f7;">
-    <p>©  Price Alerts <span id="dateId"> </span> — جميع الحقوق محفوظة</p>
-    <a href="./about.html">من نحن</a> |
-    <a href="./contact.html">اتصل بنا</a> |
-    <a href="./privacy.html">سياسة الخصوصية</a>
-</footer>
-
-<script>document.getElementById('dateId').innerHTML = new Date().getFullYear()</script>
-
+		<script>
+			document.getElementById("dateId").innerHTML = new Date().getFullYear();
+		</script>
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 
 		<script>

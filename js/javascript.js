@@ -125,7 +125,9 @@ setAlertButton.addEventListener("click", async () => {
 		alertStatus.style.color = "red";
 		return;
 	}
+
 	localStorage.setItem("exchangeChoz", currentExchangeId);
+
 	// التعامل مع تنبيه المتصفح محليًا
 	if (isBrowserAlert) {
 		activeBrowserAlerts.push({
@@ -145,6 +147,7 @@ setAlertButton.addEventListener("click", async () => {
 	if (isTelegramAlert) {
 		if (localStorage.idChat !== telegramChatId) {
 			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
+		gebi('telegramChatIdNote').style.display = 'none'
 		}
 
 		// إنشاء معرف فريد للتنبيه

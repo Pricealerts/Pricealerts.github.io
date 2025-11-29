@@ -1,14 +1,35 @@
 // Cache name
-const cacheName = 'pwa-cache-v2.6';
+const cacheName = 'pwa-cache-v2.8';
 
 // Files to cache
 const filesToCache = [
   '/',
   '/index.html',
   '/js.min.js',
-  '/style/style.css',
+  'https://pricealerts.github.io/style/style.css',
   '/offline.html'
 ];
+
+
+	self.addEventListener("fetch", event => {
+    event.respondWith(
+        fetch(event.request)
+            .catch(async() => {
+                // إذا فشل الاتصال بالإنترنت، نحاول البحث في الكاش
+                return caches.match(event.request).then(response => {
+                    if (response) {
+                        return response;
+                    }
+                    
+                    // إذا لم نجد الملف في الكاش، نتأكد هل الطلب هو "تصفح صفحة"؟
+                    // إذا نعم، نعيد صفحة عدم الاتصال. أما إذا كان صورة أو ملف آخر، فلا نعيد شيئاً
+                    if (event.request.mode === 'navigate') {
+                        return caches.match("/offline.html");
+                    }
+                });
+            })
+    );
+});
 
 // Install
 self.addEventListener('install', event => {
@@ -19,16 +40,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// Fetch with offline fallback
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    fetch(event.request)
-      .catch(async () => {
-        const response = await caches.match(event.request);
-        return response || caches.match('/offline.html');
-      })
-  );
-});
+
 
 // Activate
 self.addEventListener('activate', event => {
