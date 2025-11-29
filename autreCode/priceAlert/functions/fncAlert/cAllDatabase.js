@@ -179,7 +179,7 @@ async function contUser(data, alrtAdd) {
 
 		if ( gtChIdExixst.counter < 5  || gtChIdExixst.paid) {
 			rspns.okRspns = true;
-		} else if( gtChIdExixst.counter > 4 && !gtChIdExixst.paid)  {
+		} else if( gtChIdExixst.counter > 100 && !gtChIdExixst.paid)  {
 			rspns.status = "notPaid";
 			rspns.okRspns = false;
 		}else{rspns={okRspns : false , status : "errorNotfond" };
