@@ -31,7 +31,7 @@ export const telegramWebhook = onRequest(
   // parse_mode: "HTML" // يمكنك استخدام Markdown أو HTML حسب الحاجة
   const reply =
     `أهلاً بك! ${username} معرف دردشتك (Chat ID) هو:\n` +
-    `<code>${chatId}</code>\n\n` +
+    `<code>${chatId}</code>\n` +
    ` إظعط عليه لنسخه وضعه في حقل "معرف دردشة تيليجرام" في تطبيق تنبيهات الأسعار. ` ;
 
   try {

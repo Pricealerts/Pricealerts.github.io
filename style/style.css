@@ -324,6 +324,7 @@ button:active {
 
     .container {
         padding: 15px;
+        margin: 0;
     }
 
     .exchange-selection,

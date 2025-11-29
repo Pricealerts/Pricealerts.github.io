@@ -1,11 +1,11 @@
 // Cache name
-const cacheName = 'pwa-cache-v2.8';
+const cacheName = 'pwa-cache-v2.9';
 
 // Files to cache
 const filesToCache = [
   '/',
   '/index.html',
-  '/js.min.js',
+  'https://pricealerts.github.io/js.min.js',
   'https://pricealerts.github.io/style/style.css',
   '/offline.html'
 ];
