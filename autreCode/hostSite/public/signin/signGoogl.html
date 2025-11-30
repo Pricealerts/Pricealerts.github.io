@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+	<head>
+		<meta charset="UTF-8" />
+     <link rel="canonical" href="https://pricealerts.web.app/signin/index.html">
+		<meta
+			name="description"
+			content="منصة Price Alerts لتنبيه أسعار العملات الرقمية والأسهم العالمية من عشر منصات تداول و 11 بورصة. تنبيهات فورية وسريعة."
+		/>
+		<meta
+			name="keywords"
+			content="تنبيه أسعار, عملات رقمية, أسهم, بورصة, تنبيهات سعر, تداول, Binance, KuCoin, nasdaq,nyse, OKX"
+		/>
+		<meta name="author" content="Price Alerts" />
+		<meta name="robots" content="index, follow" />
+
+		<!-- OG Meta for Social shares -->
+		<meta
+			property="og:title"
+			content="Price Alerts - تنبيهات أسعار العملات الرقمية والأسهم"
+		/>
+		<meta
+			property="og:description"
+			content="تنبيهات سعرية فورية لـ 10 منصات تداول و 11 بورصة أسهم."
+		/>
+		<meta property="og:url" content="https://pricealerts.web.app/" />
+		<meta property="og:type" content="website" />
+		<meta
+			property="og:image"
+			content="https://pricealerts.web.app/imgs/web/apple-touch-icon.png"
+		/>
+		<title>تسجيل الدخول عبر جوجل</title>
+		<script src="https://accounts.google.com/gsi/client" async defer></script>
+          <link
+			rel="stylesheet"
+			href="https://pricealerts.github.io/style/navbar.css"
+		/>
+		<style>
+			.cntiner {
+				    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 300px;
+    margin: auto;
+    margin-top: 20px;
+    border: 2px solid #ddd;
+    background-color: #eee;
+    padding: 20px;
+    border-radius: 10px;
+			}
+            .rsltSignin{
+                display: none; 
+              justify-content: center;
+    align-items: center;
+    flex-direction: column; 
+    margin-top: 30px; 
+            }
+		</style>
+	</head>
+	<body>
+        <div id="pirantCntynr" class=" pirantCntynr"></div>
+        <div class="cntiner">
+<h2>تسجيل الدخول</h2>
+
+		<div id="buttonDiv"></div>
+
+		<div
+			id="userInfo"
+			class="rsltSignin"
+		>
+			<img
+				id="userImage"
+				src=""
+				alt="صورة المستخدم"
+				style=" border-radius: 50%; width: 100px"
+			/>
+			<h3 id="userName"></h3>
+			<p id="userEmail"></p>
+		</div>
+        </div>
+		
+<script src="https://pricealerts.github.io/js/navbar.js"></script>
+		<script>
+			// دالة لفك تشفير الـ JWT Token الذي ترجعه جوجل
+			// هذه الدالة ضرورية لأن جوجل ترسل البيانات مشفرة
+			function parseJwt(token) {
+				var base64Url = token.split(".")[1];
+				var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+				var jsonPayload = decodeURIComponent(
+					window
+						.atob(base64)
+						.split("")
+						.map(function (c) {
+							return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+						})
+						.join("")
+				);
+
+				return JSON.parse(jsonPayload);
+			}
+
+			// 2. دالة التعامل مع الاستجابة بعد التسجيل
+			function handleCredentialResponse(response) {
+				// response.credential هو التوكن المشفر
+
+				// نفك التشفير لاستخراج البيانات
+				const responsePayload = parseJwt(response.credential);
+
+				console.log("ID: " + responsePayload.sub);
+				console.log("Full Name: " + responsePayload.name);
+				console.log("Given Name: " + responsePayload.given_name);
+				console.log("Family Name: " + responsePayload.family_name);
+				console.log("Image URL: " + responsePayload.picture);
+				console.log("Email: " + responsePayload.email);
+
+				// عرض البيانات في الصفحة
+				document.getElementById("userInfo").style.display = "flex";
+				document.getElementById("userName").innerText = responsePayload.name;
+				document.getElementById("userEmail").innerText = responsePayload.email;
+				document.getElementById("userImage").src = responsePayload.picture;
+			}
+
+			// 3. تهيئة الزر عند تحميل الصفحة
+			window.onload = function () {
+				google.accounts.id.initialize({
+					// ⚠️ هام جداً: استبدل هذا بالكلاينت آيدي الخاص بك
+					client_id:
+						"200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com",
+					callback: handleCredentialResponse,
+				});
+
+				google.accounts.id.renderButton(
+					document.getElementById("buttonDiv"),
+					{ theme: "outline", size: "large" } // خصائص شكل الزر
+				);
+
+				// اختياري: إظهار نافذة التسجيل المنبثقة تلقائياً
+				google.accounts.id.prompt();
+			};
+		</script>
+	</body>
+</html>

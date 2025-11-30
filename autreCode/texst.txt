@@ -32,7 +32,8 @@ telegramid-6540e
 
 
 
-gcloud config set project 
+// id nta3 google oAuth
+200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com
 
 
 

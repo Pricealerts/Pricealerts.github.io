@@ -1,4 +1,20 @@
 
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////
+
+//nta3 navbar saide bar
+
 const sidebar = document.createElement('div');
 //sidebar.id = 'sidebar';
 sidebar.className = 'sidebar';
@@ -15,6 +31,8 @@ sidebar.innerHTML=`<!-- Sidebar (LEFT) -->
             سياسة الخصوصية</a>
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا</a>
+			<a href="https://pricealerts.web.app/signin/index.html">
+      تسجبل الدخول</a>
 		
 
 

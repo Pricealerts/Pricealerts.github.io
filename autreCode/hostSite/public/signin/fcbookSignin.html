@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>تسجيل الدخول عبر فيسبوك</title>
+</head>
+<body>
+
+    <h2>تسجيل الدخول عبر فيسبوك</h2>
+
+    <button onclick="checkLoginState()">
+        تسجيل الدخول باستخدام فيسبوك
+    </button>
+    
+    <div id="status" style="margin-top: 20px;"></div>
+
+    <script>
+        // ⚠️ الخطوة الأولى: تهيئة SDK لفيسبوك
+        window.fbAsyncInit = function() {
+            FB.init({
+                appId      : '790787097326484', // ⚠️ استبدل هذا بمعرف تطبيقك
+                cookie     : true,                     // تمكين ملفات تعريف الارتباط لتحديد الجلسة
+                xfbml      : true,                     // تمكين تحليل علامات XFBML
+                version    : 'v19.0'                  // استخدام أحدث إصدار من Graph API
+            });
+
+            // اختياري: يمكنك التحقق من حالة تسجيل الدخول تلقائيًا
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+            });
+        };
+
+        // تحميل SDK بشكل غير متزامن
+        (function(d, s, id) {
+            var js, fjs = d.getElementsByTagName(s)[0];
+            if (d.getElementById(id)) return;
+            js = d.createElement(s); js.id = id;
+            js.src = "https://connect.facebook.net/en_US/sdk.js";
+            fjs.parentNode.insertBefore(js, fjs);
+        }(document, 'script', 'facebook-jssdk'));
+
+
+        // 2. دالة لجلب بيانات المستخدم عبر Graph API
+        function testAPI() {
+            FB.api('/me', {fields: 'name,email,picture.type(large)'}, function(response) {
+                
+                // التحقق مما إذا كان الإيميل متاحاً (قد يرفضه المستخدم أو لا يكون لديه إيميل أساسي)
+                const userEmail = response.email ? response.email : "البريد الإلكتروني غير متاح";
+                
+                // جلب رابط الصورة
+                const userPicture = response.picture.data.url;
+
+                console.log('بيانات المستخدم:', response);
+                
+                // عرض البيانات في الصفحة
+                const statusDiv = document.getElementById('status');
+                statusDiv.innerHTML = '<h3>تم تسجيل الدخول بنجاح!</h3>' +
+                                      '<img src="' + userPicture + '" style="border-radius: 50%; width: 100px;">' +
+                                      '<p><strong>الاسم:</strong> ' + response.name + '</p>' +
+                                      '<p><strong>البريد الإلكتروني:</strong> ' + userEmail + '</p>';
+            });
+        }
+
+
+        // 3. دالة التحقق من حالة تسجيل الدخول بعد التفاعل مع الزر
+        function statusChangeCallback(response) {
+            if (response.status === 'connected') {
+                // المستخدم سجل الدخول ووافق على الصلاحيات
+                document.getElementById('status').innerText = 'يتم جلب البيانات...';
+                testAPI();
+            } else {
+                // المستخدم ليس مسجلاً للدخول أو لم يمنح الصلاحيات
+                document.getElementById('status').innerText = 'الرجاء تسجيل الدخول.';
+            }
+        }
+
+
+        // 4. الدالة التي يتم استدعاؤها عند الضغط على الزر
+        function checkLoginState() {
+            FB.login(function(response) {
+                statusChangeCallback(response);
+            }, {scope: 'public_profile,email'}); // 👈 طلب صلاحية الإيميل
+        }
+    </script>
+</body>
+</html>
