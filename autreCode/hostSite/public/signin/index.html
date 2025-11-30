@@ -424,11 +424,13 @@
 					<button>تسجيل</button>
 					<span>أو أنشئ حساب ب </span>
 					<div class="social-container">
-						<a href="#" class="social fb"><i class="fab fa-facebook-f"></i></a>
+                        
+						<div id="buttonSignUp" ></div>
+						<!-- <a href="#" class="social fb"><i class="fab fa-facebook-f"></i></a>
 						<a href="#" class="social google"><i class="fab fa-google"></i></a>
 						<a href="#" class="social twitter"
 							><i class="fab fa-twitter"></i
-						></a>
+						></a> -->
 					</div>
 
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
@@ -452,7 +454,7 @@
 					<button>دخول</button>
 					<span> أو سجل الدخول ب</span>
 					<div class="social-container">
-						<div id="buttonDiv"></div>
+						<div id="buttonSignIn" ></div>
 
 						<div id="userInfo" class="rsltSignin">
 							<img
@@ -549,14 +551,14 @@
 				console.log("Email: " + responsePayload.email);
 
 				// عرض البيانات في الصفحة
-				document.getElementById("userInfo").style.display = "flex";
+				//document.getElementById("userInfo").style.display = "flex";
                 localStorage.UserName = responsePayload.name;
                 localStorage.UserEmail = responsePayload.email;
                 localStorage.UserPicture = responsePayload.picture;
 				window.location.href = "https://pricealerts.web.app";
-				document.getElementById("userName").innerText = responsePayload.name;
+				/* document.getElementById("userName").innerText = responsePayload.name;
 				document.getElementById("userEmail").innerText = responsePayload.email;
-				document.getElementById("userImage").src = responsePayload.picture;
+				document.getElementById("userImage").src = responsePayload.picture; */
 			}
 
 			// 3. تهيئة الزر عند تحميل الصفحة
@@ -567,11 +569,15 @@
 						"200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com",
 					callback: handleCredentialResponse,
 				});
+                gogleRender("buttonSignUp");
+                gogleRender("buttonSignIn");
 
-				google.accounts.id.renderButton(
-					document.getElementById("buttonDiv"),
+                function gogleRender(btn) {
+                    google.accounts.id.renderButton(
+					document.getElementById(btn),
 					{ theme: "outline", size: "large" } // خصائص شكل الزر
 				);
+                }
 
 				// اختياري: إظهار نافذة التسجيل المنبثقة تلقائياً
 				google.accounts.id.prompt();

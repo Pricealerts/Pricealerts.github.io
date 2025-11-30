@@ -1,11 +1,17 @@
+let UserImage = "/imgs/web/apple-touch-icon.png";
+let enteEsc = " تسجبل الدخول";
+if (localStorage.UserPicture) {
+	UserImage = localStorage.UserPicture;
+	enteEsc = " تسجبل الخروج";
+}
 
-
-
-
-
-
-
-
+function exsit() {
+	if (localStorage.UserPicture) {
+		localStorage.UserName = "";
+		localStorage.UserEmail = "";
+		localStorage.UserPicture = "";
+	}
+}
 
 ///////////////////////////////////////////////////////////////
 
@@ -15,10 +21,10 @@
 
 //nta3 navbar saide bar
 
-const sidebar = document.createElement('div');
+const sidebar = document.createElement("div");
 //sidebar.id = 'sidebar';
-sidebar.className = 'sidebar';
-sidebar.innerHTML=`<!-- Sidebar (LEFT) -->
+sidebar.className = "sidebar";
+sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<h3>القائمة</h3>
 			<a href="https://pricealerts.web.app/">الرئيسية</a>
 			<a href="https://pricealerts.web.app/otherPage/about.html">
@@ -31,23 +37,18 @@ sidebar.innerHTML=`<!-- Sidebar (LEFT) -->
             سياسة الخصوصية</a>
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا</a>
-			<a href="https://pricealerts.web.app/signin/index.html">
-      تسجبل الدخول</a>
+			<a href="https://pricealerts.web.app/signin/index.html" enclick = exsit()>
+       ${enteEsc}</a>
 		
 
 
 
 
-`
+`;
 
 document.body.prepend(sidebar);
 
-let UserImage = "/imgs/web/apple-touch-icon.png";
-if (localStorage.UserPicture) {
-	UserImage = localStorage.UserPicture
-}
-
-const navbar = document.createElement('nav');
+const navbar = document.createElement("nav");
 navbar.innerHTML = `
 
 <!-- Overlay -->
@@ -66,13 +67,9 @@ navbar.innerHTML = `
 		</div>
 
 
-`
+`;
 //document.body.prepend(navbar)
-document.querySelector('.pirantCntynr').prepend(navbar)
-
-
-
-
+document.querySelector(".pirantCntynr").prepend(navbar);
 
 /* nta3 navbar */
 //const sidebar = document.getElementById("sidebar");
