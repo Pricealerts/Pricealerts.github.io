@@ -11,6 +11,7 @@ function exsit() {
 		localStorage.UserEmail = "";
 		localStorage.UserPicture = "";
 	}
+	window.location.href = "https://pricealerts.web.app/signin/index.html";
 }
 
 ///////////////////////////////////////////////////////////////
@@ -37,7 +38,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
             سياسة الخصوصية</a>
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا</a>
-			<a href="https://pricealerts.web.app/signin/index.html" enclick = exsit()>
+			<a style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
 		
 
