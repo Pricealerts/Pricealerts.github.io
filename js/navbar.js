@@ -42,8 +42,10 @@ sidebar.innerHTML=`<!-- Sidebar (LEFT) -->
 
 document.body.prepend(sidebar);
 
-
-
+let UserImage = "/imgs/web/apple-touch-icon.png";
+if (localStorage.UserPicture) {
+	UserImage = localStorage.UserPicture
+}
 
 const navbar = document.createElement('nav');
 navbar.innerHTML = `
@@ -53,7 +55,7 @@ navbar.innerHTML = `
 
 		<!-- Navbar -->
 		<div class="navbar">
-			<img class="imgNavbar" src="/imgs/web/apple-touch-icon.png" alt="">
+			<img class="imgNavbar" src="${UserImage}" alt="">
 				<h1 class="hTitel">
 				منبه الأسعار </h1 >
 
