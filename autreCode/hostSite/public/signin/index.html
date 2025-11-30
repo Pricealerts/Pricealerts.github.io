@@ -553,6 +553,7 @@
                 localStorage.UserName = responsePayload.name;
                 localStorage.UserEmail = responsePayload.email;
                 localStorage.UserPicture = responsePayload.picture;
+				window.location.href = "https://pricealerts.web.app";
 				document.getElementById("userName").innerText = responsePayload.name;
 				document.getElementById("userEmail").innerText = responsePayload.email;
 				document.getElementById("userImage").src = responsePayload.picture;

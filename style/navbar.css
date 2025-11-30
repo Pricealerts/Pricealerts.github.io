@@ -58,7 +58,8 @@
 	cursor: pointer;
 }
 .imgNavbar{
-    height:  100%;
+    height: 80%;
+    border-radius: 50%;
 }
 
 /*------------------------------------------------------
