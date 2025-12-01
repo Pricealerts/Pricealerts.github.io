@@ -2,198 +2,80 @@
 <html lang="ar" dir="rtl">
 	<head>
 		<meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, minimum-scale=0.1">
 		<meta name="viewport" content="width=device-width,initial-scale=1" />
 		<title>صفحة مع شريط جانبي</title>
 
-		<style>
-			/* ألوان */
-			:root {
-				--primary: #0f62fe;
-				--bg: #f5f7fa;
-				--white: #ffffff;
-				--text: #111;
-				--sidebar-width: 260px;
-			}
-
-			body {
-				margin: 0;
-				background: var(--bg);
-				font-family: "Noto Sans Arabic", sans-serif;
-			}
-
-			/*------------------------------------------------------
-  Navbar
-------------------------------------------------------*/
-			.navbar {
-				height: 60px;
-				background: var(--white);
-				border-bottom: 1px solid #ddd;
-				display: flex;
-				align-items: center;
-				padding: 0 16px;
-				justify-content: space-between;
-				position: sticky;
-				top: 0;
-				z-index: 100;
-			}
-
-			.nav-title {
-				display: flex;
-				align-items: center;
-				gap: 10px;
-				font-size: 20px;
-				font-weight: bold;
-			}
-
-			/* زر القائمة */
-			.menu-btn {
-				font-size: 24px;
-				padding: 6px 10px;
-				border-radius: 8px;
-				border: none;
-				background: #eee;
-				cursor: pointer;
-			}
-
-			/*------------------------------------------------------
-  Sidebar (LEFT side)
-------------------------------------------------------*/
-			.sidebar {
-				position: fixed;
-				top: 0;
-				left: 0; /* ← التعديل المهم */
-				height: 100vh;
-				width: var(--sidebar-width);
-				background: var(--white);
-				border-right: 1px solid #ddd; /* بدل left */
-				transform: translateX(-100%); /* ← مخفي من اليسار */
-				transition: 0.3s ease;
-				z-index: 200;
-				padding: 20px;
-			}
-
-			.sidebar.open {
-				transform: translateX(0); /* يظهر */
-			}
-
-			.sidebar h3 {
-				margin-top: 0;
-			}
-
-			.sidebar a {
-				display: block;
-				padding: 12px 10px;
-				color: var(--text);
-				text-decoration: none;
-				border-radius: 6px;
-				margin: 6px 0;
-			}
-
-			.sidebar a:hover {
-				background: #f0f0f0;
-			}
-
-			/* Overlay */
-			.overlay {
-				position: fixed;
-				top: 0;
-				right: 0;
-				left: 0;
-				bottom: 0;
-				background: rgba(0, 0, 0, 0.4);
-				z-index: 150;
-				display: none;
-			}
-
-			.overlay.show {
-				display: block;
-			}
-
-			/*------------------------------------------------------
-  المحتوى
-------------------------------------------------------*/
-			.container {
-				padding: 20px;
-			}
-
-			.content-box {
-				background: var(--white);
-				padding: 20px;
-				border-radius: 10px;
-				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-			}
-
-			/* تحسين الهاتف */
-			@media (max-width: 600px) {
-				.nav-title {
-					font-size: 18px;
-				}
-			}
-		</style>
+		
 	</head>
 
 	<body>
-		<!-- Overlay -->
-		<div id="overlay" class="overlay"></div>
+        <iframe src="https://drive.google.com/uc?export=view&id=1wUSuzYlwJY_-eA5ZODhPWX370zyhSMqk" frameborder="0"></iframe>
 
-		<!-- Navbar -->
-		<div class="navbar">
-			<button class="menu-btn" id="openSidebar">☰</button>
+<img style="display: block;-webkit-user-select: none;margin: auto;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="https://drive.usercontent.google.com/download?id=1wUSuzYlwJY_-eA5ZODhPWX370zyhSMqk&amp;export=view&amp;authuser=0">
 
-			<div class="nav-title">
-				<div
-					style="
-						background: var(--primary);
-						color: white;
-						width: 34px;
-						height: 34px;
-						display: flex;
-						align-items: center;
-						justify-content: center;
-						border-radius: 8px;
-					"
-				>
-					س
-				</div>
-				<span>اسم الموقع</span>
-			</div>
-		</div>
 
-		<!-- Sidebar (LEFT) -->
-		<div class="sidebar" id="sidebar">
-			<h3>القائمة</h3>
-			<a href="#">الرئيسية</a>
-			<a href="#">عنّا</a>
-			<a href="#">المنتجات</a>
-			<a href="#">الخدمات</a>
-			<a href="#">المدونة</a>
-			<a href="#">اتصل بنا</a>
-		</div>
+	<input type="file" id="inputFile">
+<img id="preview" width="200"/>
 
-		<!-- Content -->
-		<div class="container">
-			<div class="content-box">
-				<h2>مرحبًا</h2>
-				<p>
-					تم تعديل السايدبار ليظهر من اليسار — مع دعم RTL بالكامل وبنفس الأناقة.
-				</p>
-			</div>
-		</div>
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbQ2g5Rq3A2g51oTqBKqAu3LdAXXqWQ-KTGnjct0gENexQYt-p_Z5Ec1V-_ytZ6JDF/exec"; // رابط apps script
 
-		<script>
-			const sidebar = document.getElementById("sidebar");
-			const overlay = document.getElementById("overlay");
-			const openBtn = document.getElementById("openSidebar");
+document.getElementById("inputFile").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-			openBtn.onclick = () => {
-				sidebar.classList.add("open");
-				overlay.classList.add("show");
-			};
+    // 1 MB = 1,000,000 bytes (تقريبًا)
+    const MAX_SIZE = 1 * 1024 * 1024; // أو 1_000_000
 
-			overlay.onclick = () => {
-				sidebar.classList.remove("open");
-				overlay.classList.remove("show");
-			};
-		</script>
+    if (file.size > MAX_SIZE) {
+        alert("حجم الصورة يجب أن يكون أقل من 1 MB");
+        return;
+    }
+
+    // عرض الصورة في الصفحة
+    document.getElementById("preview").src = URL.createObjectURL(file);
+
+    // تحويل الصورة Base64
+    const base64 = await convertToBase64(file);
+const imgName = localStorage.UserId || 'cco'
+    // إرسال الصورة عبر fetch
+    const response = await fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            image: base64,         // بدون data:image/png;base64,
+            name:imgName
+        })/* ,
+        headers: {
+            "Content-Type": "application/json"
+        } */
+    });
+
+    const result = await response.json();
+
+    console.log(result);
+
+    if (result.status === "success") {
+        alert("تم رفع الصورة! File ID: " + result.url );
+    } else {
+        alert("Error: " + result.message);
+    }
+});
+
+function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+
+
+
+
+</script>
+
 	</body>
 </html>

@@ -1,6 +1,6 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
 let enteEsc = ` تسجبل الدخول
- <img src="./imgs/web/signin-svgrepo-com.svg" alt="">`;
+ <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
  let enteEsc2 = `
  حسابي
  <img src=${UserImage} alt="">
@@ -8,7 +8,7 @@ let enteEsc = ` تسجبل الدخول
 if (localStorage.UserPicture) {
 	UserImage = localStorage.UserPicture;
 	enteEsc = ` تسجبل الخروج
- <img src="./imgs/web/signout-svgrepo-com.svg" alt="">`;
+ <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 }
 
 function exsit() {
@@ -36,7 +36,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<h3>القائمة</h3>
 			<a href="https://pricealerts.web.app/">
 			الرئيسية
-			<img src="./imgs/web/home-alt-1-svgrepo-com.svg" alt="home"></a>
+			<img src="/imgs/web/home-alt-1-svgrepo-com.svg" alt="home"></a>
 			<a href="https://pricealerts.web.app/otherPage/about.html">
 			من نحن
              <img src="./imgs/web/info-circle-svgrepo-com.svg" alt="inf"></a>
@@ -47,10 +47,10 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
              -->
 			<a href="https://pricealerts.web.app/otherPage/privacy.html">
             سياسة الخصوصية
-			<img src="./imgs/web/privacy-svgrepo-com.svg" alt=""></a>
+			<img src="/imgs/web/privacy-svgrepo-com.svg" alt=""></a>
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا
-			<img src="./imgs/web/mail-svgrepo-com.svg" alt="home"></a>
+			<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
 			<a style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
 	   <a href="https://pricealerts.web.app/otherPage/contact.html"  style = "position: absolute; bottom:0;width: calc(100% - 40px);">

@@ -222,36 +222,87 @@
 				/>
 			</div>
 
-			<button class="saveBtn">حفظ التغيرات</button>
+			<button id="saveBtn" class="saveBtn">حفظ التغيرات</button>
 		</div>
 
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
-        <script type="module" src="./jsCode/uplodImage.js"></script>
+       <!--  <script type="module" src="./jsCode/uplodImage.js"></script> -->
         <script>
             
-          /*   function gebi(el) {return document.getElementById(el);}
-
-        gebi("uploadedImage").src = UserImage;
+            function gebi(el) {return document.getElementById(el);}//   https://drive.google.com/file/d/1jCfKYWrJP462N840a5juX-H8Uwj_HxCR/view
+		//	UserImage
+        gebi("uploadedImage").src = 'https://drive.google.com/uc?export=view&id=1wUSuzYlwJY_-eA5ZODhPWX370zyhSMqk';
             gebi('userNname').innerText  = localStorage.UserName || 'yor Name' ;
                gebi('uerEmail').innerText  = localStorage.UserEmail || 'yor email'
+
+
             const inputFile = gebi("input-file");
-inputFile.addEventListener("change", async e => {
-	const file = e.target.files[0];
+			let imgCntnt;
+			let file ;
+/* inputFile.addEventListener("change", async e => {
+	 file = e.target.files[0];
 
 	if (!file) {
 		gebi("errImg").style.display = "block";
 		return;
 	}
-	const imgCntnt = URL.createObjectURL(file);
+	 imgCntnt = URL.createObjectURL(file);
 	gebi("uploadedImage").src = imgCntnt;
-	gebi("contentToPdf").focus();
 });
+
  */
 
 
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbQ2g5Rq3A2g51oTqBKqAu3LdAXXqWQ-KTGnjct0gENexQYt-p_Z5Ec1V-_ytZ6JDF/exec"; // رابط apps script
 
+gebi('saveBtn').addEventListener("click", async (e) => {
 
+	/////////////////////////// jiht limage
+    const file = e.target.files[0];
+    if (!file) return;
 
+    // 1 MB = 1,000,000 bytes (تقريبًا)
+    const MAX_SIZE = 1 * 1024 * 1024; // أو 1_000_000
+
+    if (file.size > MAX_SIZE) {
+        alert("حجم الصورة يجب أن يكون أقل من 1 MB");
+        return;
+    }
+
+    // عرض الصورة في الصفحة
+    document.getElementById("preview").src = URL.createObjectURL(file);
+
+    // تحويل الصورة Base64
+    const base64 = await convertToBase64(file);
+const imgName = localStorage.UserId || 'dadi'
+    // إرسال الصورة عبر fetch
+    const response = await fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify({
+            image: base64,         // بدون data:image/png;base64,
+            name:imgName
+        })
+    });
+
+    const result = await response.json();
+
+    console.log(result);
+
+    if (result.status === "success") {
+        alert("تم رفع الصورة! File ID: " + result.fileId);
+    } else {
+        alert("Error: " + result.message);
+    }
+});
+
+function convertToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result.split(",")[1]);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
 
 
 
