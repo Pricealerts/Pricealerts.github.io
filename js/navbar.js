@@ -1,6 +1,10 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
 let enteEsc = ` تسجبل الدخول
  <img src="./imgs/web/signin-svgrepo-com.svg" alt="">`;
+ let enteEsc2 = `
+ حسابي
+ <img src=${UserImage} alt="">
+ `;
 if (localStorage.UserPicture) {
 	UserImage = localStorage.UserPicture;
 	enteEsc = ` تسجبل الخروج
@@ -49,6 +53,8 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<img src="./imgs/web/mail-svgrepo-com.svg" alt="home"></a>
 			<a style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
+	   <a href="https://pricealerts.web.app/otherPage/contact.html"  style = "position: absolute; bottom:0;width: calc(100% - 40px);">
+       ${enteEsc2}</a>
 		
 
 

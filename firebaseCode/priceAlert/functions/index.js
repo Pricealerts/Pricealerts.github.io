@@ -74,3 +74,71 @@ export const scheduledTask = onSchedule(
 		}
 	}
 );
+
+
+
+
+
+import { onObjectFinalized } from "firebase-functions/v2/storage";
+import { setGlobalOptions } from "firebase-functions/v2/options";
+import { getFirestore, FieldValue } from "firebase-admin/firestore";
+
+
+const db = getFirestore();
+
+// 2. إعداد المنطقة لجميع الدوال (اختياري، لكن يضمن أن كل شيء يعمل في europe-west1)
+setGlobalOptions({ region: "europe-west1" });
+
+/**
+ * دالة تعمل عند اكتمال رفع ملف في Storage (الجيل الثاني v2)
+ */
+export const updateUserProfileImage = onObjectFinalized(
+  {
+    region: "europe-west1", // تحديد المنطقة للدالة
+    // bucket: "your-bucket-name" // يمكنك تحديد اسم الـ bucket إذا كان لديك أكثر من واحد
+  },
+  async (event) => {
+    // في الإصدار v2، بيانات الملف موجودة داخل event.data
+    const fileData = event.data;
+
+    // الحصول على مسار الملف (مثل: users/USER_ID/profile.jpg)
+    const filePath = fileData.name;
+
+    // التحقق: هل الملف صورة؟
+    if (!fileData.contentType || !fileData.contentType.startsWith("image/")) {
+      console.log("هذا الملف ليس صورة.");
+      return;
+    }
+
+    // التحقق: هل الصورة داخل مجلد المستخدمين؟
+    if (!filePath.startsWith("users/")) {
+      console.log("الصورة ليست صورة بروفايل.");
+      return;
+    }
+
+    // استخراج معرف المستخدم (ID) من المسار
+    const parts = filePath.split("/");
+    const userId = parts[1]; // الرقم بعد كلمة users
+
+    // تجهيز رابط الصورة
+    // ملاحظة: الروابط العامة تتطلب إعدادات خاصة، هذا الرابط يعمل إذا كان الـ bucket عاماً أو باستخدام token
+    const bucketName = fileData.bucket;
+    const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(filePath)}?alt=media`;
+
+    try {
+      // تحديث وثيقة المستخدم في Firestore
+      await db.collection("users").doc(userId).set(
+        {
+          photoURL: fileUrl,
+          lastUpdated: FieldValue.serverTimestamp(),
+        },
+        { merge: true } // دمج البيانات (تحديث الحقول فقط دون حذف الباقي)
+      );
+
+      console.log(`تم تحديث صورة البروفايل للمستخدم: ${userId} في المنطقة europe-west1`);
+    } catch (error) {
+      console.error("فشل تحديث قاعدة البيانات:", error);
+    }
+  }
+);
+
