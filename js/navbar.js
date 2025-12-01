@@ -1,8 +1,10 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
-let enteEsc = " تسجبل الدخول";
+let enteEsc = ` تسجبل الدخول
+ <img src="./imgs/web/signin-svgrepo-com.svg" alt="">`;
 if (localStorage.UserPicture) {
 	UserImage = localStorage.UserPicture;
-	enteEsc = " تسجبل الخروج";
+	enteEsc = ` تسجبل الخروج
+ <img src="./imgs/web/signout-svgrepo-com.svg" alt="">`;
 }
 
 function exsit() {
@@ -22,22 +24,29 @@ function exsit() {
 
 //nta3 navbar saide bar
 
+
 const sidebar = document.createElement("div");
-//sidebar.id = 'sidebar';
+//sidebar.id = 'sidebar';   #1c274c
 sidebar.className = "sidebar";
 sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<h3>القائمة</h3>
-			<a href="https://pricealerts.web.app/">الرئيسية</a>
+			<a href="https://pricealerts.web.app/">
+			الرئيسية
+			<img src="./imgs/web/home-alt-1-svgrepo-com.svg" alt="home"></a>
 			<a href="https://pricealerts.web.app/otherPage/about.html">
-            من نحن</a>
+			من نحن
+             <img src="./imgs/web/info-circle-svgrepo-com.svg" alt="inf"></a>
+
 		<!--
         	<a href="#">المنتجات</a>
 			<a href="#">الخدمات</a> 
              -->
 			<a href="https://pricealerts.web.app/otherPage/privacy.html">
-            سياسة الخصوصية</a>
+            سياسة الخصوصية
+			<img src="./imgs/web/privacy-svgrepo-com.svg" alt=""></a>
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
-            اتصل بنا</a>
+            اتصل بنا
+			<img src="./imgs/web/mail-svgrepo-com.svg" alt="home"></a>
 			<a style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
 		

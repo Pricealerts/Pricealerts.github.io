@@ -88,7 +88,9 @@
 }
 
 .sidebar a {
-	display: block;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
 	padding: 12px 10px;
 	color: var(--text);
 	text-decoration: none;
@@ -100,7 +102,9 @@
 .sidebar a:hover {
 	background: #f0f0f0;
 }
-
+.sidebar a img{
+	width:20px ;
+}
 /* Overlay */
 .overlay {
 	position: fixed;
