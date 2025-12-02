@@ -5,15 +5,15 @@ let enteEsc = ` تسجبل الدخول
  حسابي
  <img src=${UserImage} alt="">
  `;
-if (localStorage.UserPicture) {
-	UserImage = localStorage.UserPicture;
+if (localStorage.email) {
+	UserImage = localStorage.picture;
 	enteEsc = ` تسجبل الخروج
  <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 }
 
 function exsit() {
-	if (localStorage.UserPicture) {
-		localStorage.clear();
+	if (localStorage.email) {
+		localStorage.removeItem('picture');
 	}
 	window.location.href = "https://pricealerts.web.app/signin/index.html";
 }
