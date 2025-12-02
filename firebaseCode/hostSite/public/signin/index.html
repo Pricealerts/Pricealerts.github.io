@@ -426,11 +426,6 @@
 					<div class="social-container">
                         
 						<div id="buttonSignUp" ></div>
-						<!-- <a href="#" class="social fb"><i class="fab fa-facebook-f"></i></a>
-						<a href="#" class="social google"><i class="fab fa-google"></i></a>
-						<a href="#" class="social twitter"
-							><i class="fab fa-twitter"></i
-						></a> -->
 					</div>
 
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
@@ -466,9 +461,6 @@
 							<h3 id="userName"></h3>
 							<p id="userEmail"></p>
 						</div>
-						<!--     <a href="#" class="social fb"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" class="social google"><i class="fab fa-google"></i></a>
-                <a href="#" class="social twitter"><i class="fab fa-twitter"></i></a> -->
 					</div>
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						ليس لديك حساب؟
@@ -494,7 +486,9 @@
 				</div>
 			</div>
 		</div>
+		<!--  Navbar -->
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
+		<!--  front end log in  -->
 		<script>
 			const signUpButton = document.getElementById("signUp");
 			const signInButton = document.getElementById("signIn");
@@ -517,6 +511,7 @@
 			if (mobileSignInBtn)
 				mobileSignInBtn.addEventListener("click", activateSignIn);
 		</script>
+		<!--  get data from google -->
 		<script>
 			// دالة لفك تشفير الـ JWT Token الذي ترجعه جوجل
 			// هذه الدالة ضرورية لأن جوجل ترسل البيانات مشفرة
@@ -584,5 +579,18 @@
 				google.accounts.id.prompt();
 			};
 		</script>
+<!--  call farebase -->
+  <script>
+	async function ftchFnctn(url, body) {
+	const response = await fetch(url, {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify(body),
+	});
+	const data = await response.json();
+	return data 
+}
+  </script>
+		
 	</body>
 </html>

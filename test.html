@@ -9,60 +9,85 @@
 		
 	</head>
 
-	<body>
-        <iframe src="https://drive.google.com/uc?export=view&id=1wUSuzYlwJY_-eA5ZODhPWX370zyhSMqk" frameborder="0"></iframe>
+	<body><input type="file" id="inputFile">
+<img id="preview" width="200">
 
-<img style="display: block;-webkit-user-select: none;margin: auto;background-color: hsl(0, 0%, 90%);transition: background-color 300ms;" src="https://drive.usercontent.google.com/download?id=1wUSuzYlwJY_-eA5ZODhPWX370zyhSMqk&amp;export=view&amp;authuser=0">
-
-
-	<input type="file" id="inputFile">
-<img id="preview" width="200"/>
+<div>
+    <img id="reslt" src="" alt="">
+</div>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbQ2g5Rq3A2g51oTqBKqAu3LdAXXqWQ-KTGnjct0gENexQYt-p_Z5Ec1V-_ytZ6JDF/exec"; // رابط apps script
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwbQ2g5Rq3A2g51oTqBKqAu3LdAXXqWQ-KTGnjct0gENexQYt-p_Z5Ec1V-_ytZ6JDF/exec";
+
+
+
+
+
 
 document.getElementById("inputFile").addEventListener("change", async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // 1 MB = 1,000,000 bytes (تقريبًا)
-    const MAX_SIZE = 1 * 1024 * 1024; // أو 1_000_000
-
-    if (file.size > MAX_SIZE) {
-        alert("حجم الصورة يجب أن يكون أقل من 1 MB");
+    // تحقق من الحجم < 1MB
+    if (file.size > 1 * 1024 * 1024) {
+        alert("حجم الصورة يجب أن يكون أقل من 1MB");
         return;
     }
 
-    // عرض الصورة في الصفحة
+    // عرض الصورة فورًا
     document.getElementById("preview").src = URL.createObjectURL(file);
+try {
+     // تحويل الصورة إلى Base64
+    const base64 = await toBase64(file);
 
-    // تحويل الصورة Base64
-    const base64 = await convertToBase64(file);
-const imgName = localStorage.UserId || 'cco'
-    // إرسال الصورة عبر fetch
+    // رفع الصورة عبر fetch
     const response = await fetch(WEB_APP_URL, {
         method: "POST",
-        body: JSON.stringify({
-            image: base64,         // بدون data:image/png;base64,
-            name:imgName
-        })/* ,
-        headers: {
-            "Content-Type": "application/json"
-        } */
+       // headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({/* action:'postImg', */ image: base64, name: 'dd' })
     });
 
     const result = await response.json();
-
+    
     console.log(result);
-
+    
     if (result.status === "success") {
-        alert("تم رفع الصورة! File ID: " + result.url );
+       /*  // بعد الرفع، جلب Blob من Web App
+        const response2 = await fetch(WEB_APP_URL, {
+        method: "POST",
+        //headers: { "Content-Type": "application/json" },fileId
+        body: JSON.stringify({action:'getImg',  fileId: result.fileId })
+    });
+
+const data = await response2.json();
+ console.log(data); */
+//document.getElementById("reslt").src = URL.createObjectURL(blob);
+const urlImg =  `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w800`;
+document.getElementById("reslt").src = urlImg;
+
+
+
+
+
+/* if(data.status === "success") {
+    const imgSrc = `data:${data.mimeType};base64,${data.base64}`;
+    console.log(imgSrc);
+    
+    document.getElementById("reslt").src = imgSrc;
+} */
+
+
     } else {
-        alert("Error: " + result.message);
+        console.log("Error: " + result.message);
     }
+} catch (error) {
+    console.log(error);
+    
+}
+   
 });
 
-function convertToBase64(file) {
+function toBase64(file) {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result.split(",")[1]);
@@ -70,12 +95,8 @@ function convertToBase64(file) {
         reader.readAsDataURL(file);
     });
 }
-
-
-
-
-
 </script>
+
 
 	</body>
 </html>

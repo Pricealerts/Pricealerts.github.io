@@ -39,7 +39,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<img src="/imgs/web/home-alt-1-svgrepo-com.svg" alt="home"></a>
 			<a href="https://pricealerts.web.app/otherPage/about.html">
 			من نحن
-             <img src="./imgs/web/info-circle-svgrepo-com.svg" alt="inf"></a>
+             <img src="/imgs/web/info-circle-svgrepo-com.svg" alt="inf"></a>
 
 		<!--
         	<a href="#">المنتجات</a>
