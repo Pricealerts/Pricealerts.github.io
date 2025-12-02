@@ -414,7 +414,7 @@
 		<div class="container" id="container">
 			<br />
 			<div class="form-container sign-up-container">
-				<form action="#">
+				<form id="frmSgnUp" action="#">
 					<h1>إنشاء حساب</h1>
 					<span> استخدم بريدك الإلكتروني للتسجيل</span>
 
@@ -424,8 +424,7 @@
 					<button>تسجيل</button>
 					<span>أو أنشئ حساب ب </span>
 					<div class="social-container">
-                        
-						<div id="buttonSignUp" ></div>
+						<div id="buttonSignUp"></div>
 					</div>
 
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
@@ -438,18 +437,17 @@
 			</div>
 
 			<div class="form-container sign-in-container">
-				<form action="#">
+				<form id="frmSgnIn" action="#">
 					<h1>تسجيل الدخول</h1>
 
-					<span>أو استخدم حسابك هنا</span>
-
-					<input type="email" placeholder="البريد الإلكتروني" />
+					<input id="emlSgnUp" type="email" placeholder="البريد الإلكتروني" />
 					<input type="password" placeholder="كلمة المرور" />
+					<p id="errmsgsgnIn"></p>
 					<a href="#" class="forgot-pass">هل نسيت كلمة المرور؟</a>
 					<button>دخول</button>
 					<span> أو سجل الدخول ب</span>
 					<div class="social-container">
-						<div id="buttonSignIn" ></div>
+						<div id="buttonSignIn"></div>
 
 						<div id="userInfo" class="rsltSignin">
 							<img
@@ -547,9 +545,9 @@
 
 				// عرض البيانات في الصفحة
 				//document.getElementById("userInfo").style.display = "flex";
-                localStorage.UserName = responsePayload.name;
-                localStorage.UserEmail = responsePayload.email;
-                localStorage.UserPicture = responsePayload.picture;
+				localStorage.UserName = responsePayload.name;
+				localStorage.UserEmail = responsePayload.email;
+				localStorage.UserPicture = responsePayload.picture;
 				localStorage.UserId = responsePayload.sub;
 				window.location.href = "https://pricealerts.web.app";
 				/* document.getElementById("userName").innerText = responsePayload.name;
@@ -565,32 +563,161 @@
 						"200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com",
 					callback: handleCredentialResponse,
 				});
-                gogleRender("buttonSignUp");
-                gogleRender("buttonSignIn");
+				gogleRender("buttonSignUp");
+				gogleRender("buttonSignIn");
 
-                function gogleRender(btn) {
-                    google.accounts.id.renderButton(
-					document.getElementById(btn),
-					{ theme: "outline", size: "large" } // خصائص شكل الزر
-				);
-                }
+				function gogleRender(btn) {
+					google.accounts.id.renderButton(
+						document.getElementById(btn),
+						{ theme: "outline", size: "large" } // خصائص شكل الزر
+					);
+				}
 
 				// اختياري: إظهار نافذة التسجيل المنبثقة تلقائياً
 				google.accounts.id.prompt();
 			};
 		</script>
-<!--  call farebase -->
-  <script>
-	async function ftchFnctn(url, body) {
-	const response = await fetch(url, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify(body),
-	});
-	const data = await response.json();
-	return data 
-}
-  </script>
+		<!--  call farebase -->
+		<script>
+			function gebi(el) {
+				return document.getElementById(el);
+			}
+			gebi("frmSgnIn").addEventListener("submit", async e => {
+				e.preventDefault();
+				const acont = document.querySelectorAll("#frmSgnIn input");
+
+				if (acont[0].value.length && acont[1].value.length) {
+					const body = {
+						action: "getAccont",
+						email: acont[0].value,
+						password: acont[1].value,
+					};
+
+					const rspns = await ftchFnctn(body);
+
+					if (rspns.status == "success") {
+						const rslt = rspns.rslt;
+						localStorage.UserId = rslt.id;
+						localStorage.UserName = rslt.name;
+						localStorage.UserEmail = rslt.email;
+						localStorage.chtId1 = rslt.chtId1;
+						localStorage.chtId2 = rslt.chtId2;
+						localStorage.chtIdD3 = rslt.chtId3;
+						saveImage(rslt.picture);
+
+						window.location.href = "https://pricealerts.web.app/accont";
+					} else if (rspns.status == "NoPassword" || rspns.status == "notexsist") {
+						gebi("errmsgsgnIn").innerText =
+							"  كلمة السر أو الإيميل خاطئ يرجى التأكد من الحساب";
+						gebi("errmsgsgnIn").style.color = "red";
+					}else{console.log('rah flelse'); }
+				} else {
+					gebi("errmsgsgnIn").innerText = "عليك ملأ البيانات";
+					gebi("errmsgsgnIn").style.color = "red";
+				}
+			});
+
+			gebi("frmSgnUp").addEventListener("submit", async e => {
+				e.preventDefault();
+				const acont = document.querySelectorAll("#frmSgnUp input");
+				console.log(acont[1].value.length);
+
+				if (
+					acont[0].value.length &&
+					acont[1].value.length &&
+					acont[2].value.length
+				) {
+					const now = new Date();
+					const idUser = now.getTime();
+					const body = {
+						action: "addAccont",
+						id: idUser,
+						name: acont[0].value,
+						email: acont[1].value,
+						password: acont[2].value,
+						picture: "/imgs/web/apple-touch-icon.png",
+						chtId1: "",
+						chtId2: "",
+						chtId3: "",
+						paid: false,
+					};
+					//console.log(body);
+
+					const rspns = await ftchFnctn(body);
+					if (rspns.status == "exist") {
+						gebi("errmsgsgnIn").innerText =
+							"هذا الحساب موجود بالفعل قم بتسجيل الدخول";
+						gebi("errmsgsgnIn").style.color = "red";
+					} else if (rspns.status == "success") {
+						localStorage.id= body.id; 
+						localStorage.name = body.name;
+						localStorage.email = body.email;
+						//localStorage.password = body.password;
+						saveImage(body.picture) ;
+						localStorage.chtId1 = body.chtId1; //sourceImg=body.sourceImg;
+						localStorage.chtId2 = body.chtId2;
+						localStorage.chtId3 = body.chtId3;
+						localStorage.paid = body.paid;
+					}
+						window.location.href = "https://pricealerts.web.app/accont";
+				} else {
+					gebi("errmsgsgnIn").innerText = "عليك ملأ البيانات";
+					gebi("errmsgsgnIn").style.color = "red";
+				}
+			});
+
 		
+
+			
+
+			async function ftchFnctn(body) {
+				try {
+					const url =
+					"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+				const response = await fetch(url, {
+					method: "POST",
+					headers: { "Content-Type": "application/json" },
+					body: JSON.stringify(body),
+				});
+				console.log(response);
+				const data = await response.json();
+				console.log(data);
+				
+				const rspns = JSON.parse(data)
+				return rspns;
+				} catch (error) {
+					console.log('kayn error :'+ error);
+					
+				}
+				
+			}
+		</script>
+
+		<!-- save image -->
+		<script>
+			function saveImage(source) {
+				const img = document.createElement("img");
+				img.src = source;
+
+				// إنشاء canvas مؤقت
+				const canvas = document.createElement("canvas");
+				const ctx = canvas.getContext("2d");
+
+				// ضبط حجم canvas على حجم الصورة
+				canvas.width = img.width;
+				canvas.height = img.height;
+
+				// رسم الصورة على canvas
+				ctx.drawImage(img, 0, 0, img.width, img.height);
+
+				// استخراج Base64
+				const base64 = canvas.toDataURL("image/png");
+
+				// حفظ Base64 في localStorage
+				localStorage.setItem("picture", base64);
+
+				//alert("تم تخزين الصورة في LocalStorage!");
+			}
+		</script>
 	</body>
 </html>

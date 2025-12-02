@@ -13,9 +13,7 @@ if (localStorage.UserPicture) {
 
 function exsit() {
 	if (localStorage.UserPicture) {
-		localStorage.UserName = "";
-		localStorage.UserEmail = "";
-		localStorage.UserPicture = "";
+		localStorage.clear();
 	}
 	window.location.href = "https://pricealerts.web.app/signin/index.html";
 }

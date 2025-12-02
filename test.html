@@ -95,6 +95,24 @@ function toBase64(file) {
         reader.readAsDataURL(file);
     });
 }
+
+
+const allUsers = {usr1:{email:'dadi',password: 'abdou'},usr2:{email:'ossama',password: 'souso'} }
+
+for (const userId in allUsers) {
+				console.log(allUsers[userId].email);
+                
+				/* if (allUsers[userId].email == data.email){
+					if (allUsers[userId].password == data.password) {
+						
+						return {status : "success",rslt:allUsers[userId]}
+					}else{
+						return {status : "NoPassword",message : 'error Password'}
+					}
+					
+				} */
+				
+			}
 </script>
 
 

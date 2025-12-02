@@ -195,29 +195,39 @@
 			<p id="uerEmail" class="user-email">raki.chai3i@gmail.com</p>
 
 			<div class="chatIds">
+<label for="paswordInpt">كلمة السر</label>
+				<br />
+				<input
+					type="password"
+					id="paswordInpt"
+					placeholder="كلمة السر"
+				/>
+				<br /><br />
+
+
 				معرّفات دردشة التيليجرام (Chat ID) : الخاص بك
 				<br /><br />
-				<label for="targetPrice">Chat ID 1</label>
+				<label for="telegramChatId1">Chat ID 1</label>
 				<br />
 				<input
 					type="text"
-					id="telegramChatId"
+					id="telegramChatId1"
 					placeholder="أدخل معرّف دردشة تيليجرام"
 				/>
 				<br /><br />
-				<label for="targetPrice">Chat ID 2</label>
+				<label for="telegramChatId2">Chat ID 2</label>
 				<br />
 				<input
 					type="text"
-					id="telegramChatId"
+					id="telegramChatId2"
 					placeholder="أدخل معرّف دردشة تيليجرام"
 				/>
 				<br /><br />
-				<label for="targetPrice">Chat ID 3</label>
+				<label for="telegramChatId3">Chat ID 3</label>
 				<br />
 				<input
 					type="text"
-					id="telegramChatId"
+					id="telegramChatId3"
 					placeholder="أدخل معرّف دردشة تيليجرام"
 				/>
 			</div>
@@ -232,13 +242,13 @@
             function gebi(el) {return document.getElementById(el);}//   https://drive.google.com/file/d/1jCfKYWrJP462N840a5juX-H8Uwj_HxCR/view
 		//	UserImage
         gebi("uploadedImage").src = UserImage;
-            gebi('userNname').innerText  = localStorage.UserName || 'yor Name' ;
-               gebi('uerEmail').innerText  = localStorage.UserEmail || 'yor email'
+            gebi('userNname').innerText  = localStorage.UserName || 'إسمك' ;
+               gebi('uerEmail').innerText  = localStorage.UserEmail || 'إيميلك'
 
 
             const inputFile = gebi("input-file");
 			let imgCntnt;
-			let file ;
+			let file =UserImage ;
 inputFile.addEventListener("change", async e => {
 	 file = e.target.files[0];
 
@@ -264,11 +274,15 @@ gebi('saveBtn').addEventListener("click", async (e) => {
     // 1 MB = 1,000,000 bytes (تقريبًا)
     const MAX_SIZE = 1 * 1024 * 1024; // أو 1_000_000
 
-    if (file.size > MAX_SIZE) {
+  /*   if (file.size > MAX_SIZE) {
         alert("حجم الصورة يجب أن يكون أقل من 1 MB");
         return;
-    }
+    } */
 
+    if (gebi('userNname').innerText.length < 2) {
+        gebi('rspns').innerText = '  خانة الإسم فارغة عليك ملأها '
+	   gebi('rspns').style.color = 'red'
+    }
 
     // تحويل الصورة Base64
     const base64 = await toBase64(file);
@@ -324,16 +338,32 @@ function toBase64(file) {
 
 
 
-
-
-
-
-
-
-
-
-
-
         </script>
+	<!-- save image -->
+        <script>
+			function saveImage(source) {
+				const img = document.createElement("img");
+				img.src = source;
+
+				// إنشاء canvas مؤقت
+				const canvas = document.createElement("canvas");
+				const ctx = canvas.getContext("2d");
+
+				// ضبط حجم canvas على حجم الصورة
+				canvas.width = img.width;
+				canvas.height = img.height;
+
+				// رسم الصورة على canvas
+				ctx.drawImage(img, 0, 0, img.width, img.height);
+
+				// استخراج Base64
+				const base64 = canvas.toDataURL("image/png");
+
+				// حفظ Base64 في localStorage
+				localStorage.setItem("picture", base64);
+
+				//alert("تم تخزين الصورة في LocalStorage!");
+			}
+		</script>
 	</body>
 </html>
