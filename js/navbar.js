@@ -6,14 +6,14 @@ let enteEsc = ` تسجبل الدخول
  <img src=${UserImage} alt="">
  `;
 if (localStorage.email) {
-	UserImage = localStorage.picture;
+	UserImage = localStorage.b64Price;
 	enteEsc = ` تسجبل الخروج
  <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 }
 
 function exsit() {
 	if (localStorage.email) {
-		localStorage.removeItem('picture');
+		localStorage.removeItem('b64Price');
 	}
 	window.location.href = "https://pricealerts.web.app/signin/index.html";
 }
