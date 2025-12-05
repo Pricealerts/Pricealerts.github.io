@@ -55,18 +55,26 @@
 		<div class="container" id="container">
 			<br />
 			<div class="form-container sign-up-container">
-				<form id="frmSgnUp" action="#">
+				<div class="frmSnd" id="frmSgnUp">
 					<h1>إنشاء حساب</h1>
 					<span> استخدم بريدك الإلكتروني للتسجيل</span>
 
 					<input type="text" placeholder="الاسم" required />
 					<input type="email" placeholder="البريد الإلكتروني" required />
 					<div class="password-box">
-						<input id="passwordUp"  type="password" placeholder="كلمة المرور" required />
-						<span  class="eye" onclick="togglePwd(this,'passwordUp')"><i class="fa-solid fa-eye"></i></span>
+						<input
+							id="passwordUp"
+							type="password"
+							placeholder="كلمة المرور"
+							required
+						/>
+						<span class="eye" onclick="togglePwd(this,'passwordUp')">
+							<i class="fa-solid fa-eye"></i>
+						</span>
 					</div>
 					<p id="errmsgsgnUp"></p>
-					<button>تسجيل</button>
+					<button id="btnSignUp">تسجيل</button>
+					<br />
 					<span>أو أنشئ حساب ب </span>
 					<div class="social-container">
 						<div id="buttonSignUp"></div>
@@ -75,8 +83,10 @@
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						لديك حساب بالفعل؟
 					</p>
-					<button id="mobileSignIn"  class="ghost mobile-btn" >تسجيل الدخول</button>
-				</form>
+					<button id="mobileSignIn" class="ghost mobile-btn">
+						تسجيل الدخول
+					</button>
+				</div>
 				<div id="msgCnfrm" class="msgCnfrm">
 					<h2>لقد تم إرسال رمز التحقق إلى بريدك الإلكتروني</h2>
 					<p>
@@ -89,7 +99,7 @@
 			</div>
 
 			<div class="form-container sign-in-container">
-				<form id="frmSgnIn" action="#">
+				<div class="frmSnd" id="frmSgnIn">
 					<h1>تسجيل الدخول</h1>
 
 					<input
@@ -100,8 +110,15 @@
 					/>
 
 					<div class="password-box">
-						<input id="passwordIn"  type="password" placeholder="كلمة المرور" required />
-						<span  class="eye" onclick="togglePwd(this,'passwordIn')"><i class="fa-solid fa-eye"></i></span>
+						<input
+							id="passwordIn"
+							type="password"
+							placeholder="كلمة المرور"
+							required
+						/>
+						<span class="eye" onclick="togglePwd(this,'passwordIn')"
+							><i class="fa-solid fa-eye"></i
+						></span>
 					</div>
 
 					<p id="errmsgsgnIn"></p>
@@ -111,7 +128,8 @@
 					>
 						هل نسيت كلمة المرور؟
 					</div>
-					<button>دخول</button>
+					<button id="btnSignIn">دخول</button>
+					<br />
 					<span> أو سجل الدخول ب</span>
 					<div class="social-container">
 						<div id="buttonSignIn"></div>
@@ -133,7 +151,7 @@
 					<button type="button" class="ghost mobile-btn" id="mobileSignUp">
 						إنشاء حساب جديد
 					</button>
-				</form>
+				</div>
 
 				<div id="msgCnfrmInEmail" class="msgCnfrm">
 					<h2>ضع ايميلك لإرسال رمز التحقق</h2>
@@ -155,6 +173,22 @@
 					/>
 					<p id="errmsgCnfrmIn"></p>
 					<button id="btnCnfrmIn">تحقق</button>
+				</div>
+				<div id="newPswrd" class="msgCnfrm">
+					<h2>ضع كلمة المرور الجديدة</h2>
+					<div class="password-box">
+						<input
+							id="inptNewPswrd"
+							type="password"
+							placeholder="كلمة المرور"
+							required
+						/>
+						<span class="eye" onclick="togglePwd(this,'inptNewPswrd')"
+							><i class="fa-solid fa-eye"></i
+						></span>
+					</div>
+					<p id="errNewPswrd"></p>
+					<button id="btnNewPswrd">إرسال</button>
 				</div>
 			</div>
 
@@ -204,17 +238,13 @@
 			if (mobileSignInBtn)
 				mobileSignInBtn.addEventListener("click", activateSignIn);
 
-			
-
-			function togglePwd(toggle,id) {
+			function togglePwd(toggle, id) {
 				const password = gebi(id);
 				if (password.type === "password") {
 					password.type = "text"; // إظهار
-					
 
-					toggle.innerHTML = '<i class="fa-solid fa-eye-slash"></i>'; 
+					toggle.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
 				} else {
-
 					password.type = "password"; // إخفاء
 					toggle.innerHTML = '<i class="fa-solid fa-eye"></i>'; // إعادة الأيقونة
 				}

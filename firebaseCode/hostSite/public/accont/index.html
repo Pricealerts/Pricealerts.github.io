@@ -180,7 +180,7 @@
 
 			.password-box .eye {
 				position: absolute;
-				left: 5%;
+				left: calc(10% - 12px);
 				top: calc(50% - 9px);
 				transform: translateY(-50%);
 				cursor: pointer;
@@ -195,6 +195,9 @@
 				}
 				.chatIds {
 					width: 93%;
+				}
+				.password-box .eye {
+					left: 15px;
 				}
 			}
 		</style>
@@ -271,42 +274,50 @@
 				return document.getElementById(el);
 			} //   https://drive.google.com/file/d/1jCfKYWrJP462N840a5juX-H8Uwj_HxCR/view
 			//	UserImage
-			window.addEventListener('load', async ()=>{await startpage()})
+			window.addEventListener("load", async () => {
+				await startpage();
+			});
 			//window.onload()
-			 
+
 			async function startpage() {
-					const userEmailCnt = localStorage.userEmail || "إيميلك";
-			gebi("uploadedImage").src = UserImage
-			gebi("userName").innerText = localStorage.userName || "إسمك";
-			gebi("uesrEmail").innerHTML = userEmailCnt || "إيميلك";
-			if (localStorage.userPassword) {
-				gebi("userPassword").value = localStorage.userPassword;
-				localStorage.removeItem('userPassword');
-			} else {if(userEmailCnt =="إيميلك" ){return false}
-				try {
-					const urlFirebase ="https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
-					const response = await fetch(urlFirebase, {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({action: 'forgetPswrd',userEmail:userEmailCnt}),
-					});
-					const data = await response.json();
-					const rspns = JSON.parse(data);
-					if(rspns.status == "success"){
-						gebi("userPassword").value = rspns.rslt.userPassword;
-						
+				const userEmailCnt = localStorage.userEmail || "إيميلك";
+				gebi("uploadedImage").src =
+					UserImage || "/imgs/web/apple-touch-icon.png";
+				gebi("userName").innerText = localStorage.userName || "إسمك";
+				gebi("uesrEmail").innerHTML = userEmailCnt || "إيميلك";
+				if (localStorage.userPassword) {
+					gebi("userPassword").value = localStorage.userPassword;
+					localStorage.removeItem("userPassword");
+				} else {
+					if (userEmailCnt == "إيميلك") {
+						return false;
 					}
-				} catch (error) {
-					console.error("kayn error :" + error);
+					try {
+						const urlFirebase =
+							"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+						const response = await fetch(urlFirebase, {
+							method: "POST",
+							headers: { "Content-Type": "application/json" },
+							body: JSON.stringify({
+								action: "forgetPswrd",
+								userEmail: userEmailCnt,
+							}),
+						});
+						const data = await response.json();
+						const rspns = JSON.parse(data);
+						if (rspns.status == "success") {
+							gebi("userPassword").value = rspns.rslt.userPassword;
+						}
+					} catch (error) {
+						console.error("kayn error :" + error);
+					}
 				}
+
+				gebi("telegramChatId1").value = localStorage.chtId1;
+				gebi("telegramChatId2").value = localStorage.chtId2;
+				gebi("telegramChatId3").value = localStorage.chtId3;
 			}
 
-			gebi("telegramChatId1").value = localStorage.chtId1;
-			gebi("telegramChatId2").value = localStorage.chtId2;
-			gebi("telegramChatId3").value = localStorage.chtId3;
-
-			}
-		
 			const inputFile = gebi("input-file");
 			let imgCntnt;
 			let file;

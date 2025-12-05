@@ -9,7 +9,7 @@ firebase deploy --only functions
 firebase deploy --only functions
 
 رفع الملف hosting
-firebase deploy --only hosting 
+firebase deploy --only hosting
 
 باش نعرف واشمن بروجي راني فيه 
 gcloud config get-value project

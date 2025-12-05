@@ -1,4 +1,4 @@
-gebi("frmSgnIn").addEventListener("submit", async e => {
+gebi("btnSignIn").addEventListener("click", async e => {
 	e.preventDefault();
 	const acont = document.querySelectorAll("#frmSgnIn input");
 	userEmail = acont[0].value;
@@ -102,7 +102,7 @@ gebi('btnCnfrmIn').addEventListener("click", async e => {
 		});
 
 		if (data.status == "overNmber") {
-			gebi("errmsgCnfrmIn").innerText = "لقد قمت بالمحاولة أكثر من اللازم أعد المحاولة بعد ساعة";
+			gebi("errmsgCnfrmIn").innerText = "لقد قمت بالمحاولة أكثر من 4 مرات  أعد المحاولة بعد ساعة";
 			gebi("errmsgCnfrmIn").style.color = "red";
 		}
 		console.log(data.status);
@@ -112,7 +112,10 @@ gebi('btnCnfrmIn').addEventListener("click", async e => {
 			gebi("errmsgCnfrmIn").style.color = "red";
 		}
 		if (data.status == "exist") {
-		const rspns = await ftchFirebase(body);
+			gebi("errmsgsgnIn").innerText = "";
+			gebi("msgCnfrmIn").style.transform = "translateY(0%)";
+
+		/* const rspns = await ftchFirebase(body);
 
 	if (rspns.status == "success") {
 		const rslt = rspns.rslt;
@@ -125,7 +128,7 @@ gebi('btnCnfrmIn').addEventListener("click", async e => {
 	} else {
 		gebi("errmsgsgnIn").innerText = "حدث خطأ أعد المحاولة";
 		gebi("errmsgsgnIn").style.color = "red";
-	}
+	} */
 		}
 	} catch (error) {
 		console.log("error appscript : " + error);
@@ -133,9 +136,40 @@ gebi('btnCnfrmIn').addEventListener("click", async e => {
 	}
 })
 
+/////// btnCnfrmIn
+gebi('btnNewPswrd').addEventListener("click", async e => {
+	gebi("errNewPswrd").innerText = "جاري التحديث ...";
+	gebi("errNewPswrd").style.color = "black";
+	// conferm send message
+	try {
+		const data = await ftchAppsScript({
+			action: "updtPsw",
+			userEmail: userEmail,
+			nwPswrd: gebi("inptNewPswrd").value,
+			signIn:true
+		});
 
+		if (data.status == "notExist") {
+			gebi("errNewPswrd").innerText = 'إيميلك غير موجود أعد المحاولة من جديد';
+			gebi("errNewPswrd").style.color = "red";
+		}
+		
 
+	if (data.status == "success") {
+		const rslt = data.rslt;
+		for (const key in rslt) {
+			localStorage[key] = rslt[key];
+		}
+		saveImage(localStorage.userPicture);
 
-
-
-
+		window.location.href = "https://pricealerts.web.app/accont";
+	} else {
+		gebi("errmsgsgnIn").innerText = "حدث خطأ أعد المحاولة " + data.status;
+		gebi("errmsgsgnIn").style.color = "red";
+	}
+		
+	} catch (error) {
+		console.log("error appscript : " + error);
+		return false;
+	}
+})

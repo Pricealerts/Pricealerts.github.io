@@ -1,10 +1,11 @@
 const lstLoclSrorge = ['action','userId','userName','userEmail','userPassword','userPicture','chtId1','chtId2','chtId3','paid','base64Pctr']
-for (let i = 0; i < array.length; i++) {
+for (let i = 0; i < lstLoclSrorge.length; i++) {
 	const strg = lstLoclSrorge[i];
 	localStorage.removeItem(strg);
 }
-gebi("frmSgnUp").addEventListener("submit", async e => {
-	e.preventDefault();
+	
+gebi("btnSignUp").addEventListener("click", async () => {
+	
 	const acont = document.querySelectorAll("#frmSgnUp input");
 	userName = acont[0].value;
 	userEmail = acont[1].value;
@@ -55,10 +56,16 @@ gebi("frmSgnUp").addEventListener("submit", async e => {
 });
 
 ///////////// conferm code
-gebi("btnCnfrm").addEventListener("click", async e => {
+gebi("btnCnfrm").addEventListener("click", async ()=> {
+	console.log('ddd');
 	await adedUser();
 });
 async function adedUser() {
+	 if(gebi("codeCnfrm").value.length < 6) {
+		gebi("errmsgsgnIn").innerText = "عليك ملأ الخانة ب 6 أرقام";
+		gebi("errmsgsgnIn").style.color = "red";
+		return false;
+	}
   	gebi("errmsgCnfrm").innerText = "جاري التحقق ...";
 	gebi("errmsgCnfrm").style.color = "black";
 	// conferm send message
@@ -67,10 +74,11 @@ async function adedUser() {
 			action: "cnfrmCode",
 			userEmail: userEmail,
 			inputCode: gebi("codeCnfrm").value,
+			signIn:false
 		});
 
 		if (data.status == "overNmber") {
-			gebi("errmsgCnfrm").innerText = "لقد قمت بالمحاولة أكثر من اللازم أعد المحاولة بعد ساعة";
+			gebi("errmsgCnfrm").innerText = "لقد قمت بالمحاولة أكثر من 4 مرات أعد المحاولة بعد ساعة";
 			gebi("errmsgCnfrm").style.color = "red";
 		}
 		if (data.status == "notExist") {
@@ -90,20 +98,16 @@ async function adedUser() {
 		userEmail: userEmail,
 		userPassword: userPassword,
 		userPicture: "/imgs/web/apple-touch-icon.png",
-		chtId1: "",
-		chtId2: "",
-		chtId3: "",
-		paid: false,
 	};
 
 	const rspns = await ftchFirebase(bodyUp);
 	if (rspns.status == "success") {
-		for (const key in body) {
-			const element = body[key];
+		const {userPassword,userId, ...newbodyUp } = bodyUp;
+		for (const key in newbodyUp) {
+			const element = newbodyUp[key];
 			localStorage[key] = element;
 		}
-    
-		saveImage(body.userPicture);
+		saveImage(newbodyUp.userPicture);
 		window.location.href = "https://pricealerts.web.app/accont";
 	}
 }
@@ -130,9 +134,7 @@ async function ftchFirebase(body) {
 
 
 async function ftchAppsScript(body) {
-	
-	
-	const APP_script_URL ="https://script.google.com/macros/s/AKfycbyPSbiRBdAKQIQiV4eqMZZgb3IM1x_Fp89UPSkCvABNpp4BMOVnRh75_JblSB3Mx0Ls/exec"
+	const APP_script_URL ="https://script.google.com/macros/s/AKfycbz6meme_5kiDjQu2MMLpvLL7fDegh-KpI7njxEWj05pRbjJRo7KmGANcz1aPaBymziY/exec"
 		try {
 		const apsResponse = await fetch(APP_script_URL, {
 			method: "POST",

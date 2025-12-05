@@ -25,12 +25,14 @@ async function cAllDatabase(data) {
 			rspns = await dltAlrt(data);
 		} else if (["addAccont", "upditAccont"].includes(action)) {
 			rspns = await addUser(data);
-		} else if (["getAccont", "forgetPswrd"].includes(action) ) {
+		} else if (["getAccont", "forgetPswrd"].includes(action)) {
 			rspns = await gtUser(data);
-		}else if(action == "cnfrmExist"){
+		} else if (action == "cnfrmExist") {
 			rspns = await cnfrmExist(data);
+		} else if (action == "updatePsw") {
+			rspns = await updtPsw(data);
 		}
-		
+
 		return rspns;
 	} catch (error) {
 		// Throw an Error object for better stack traces and consistency
@@ -207,10 +209,10 @@ async function addUser(data) {
 		userEmail: data.userEmail,
 		userPassword: data.userPassword,
 		userPicture: data.userPicture,
-		chtId1: data.chtId1,
-		chtId2: data.chtId2,
-		chtId3: data.chtId3,
-		paid: data.paid,
+		chtId1: data.chtId1 || "",
+		chtId2: data.chtId2 || "",
+		chtId3: data.chtId3 || "",
+		paid: data.paid || false,
 	};
 
 	const rspns = {};
@@ -228,9 +230,8 @@ async function addUser(data) {
 					return rspns;
 				}
 			}
-			
 		}
-		
+
 		const callDbUsr = db.ref(`allAcconts/${data.userId}`);
 		await callDbUsr.set(userAdd);
 		rspns.status = "success";
@@ -245,7 +246,7 @@ async function addUser(data) {
 }
 
 async function gtUser(data) {
-	const rspns ={};
+	const rspns = {};
 	try {
 		const callDb = db.ref(`allAcconts`);
 		const getUsrs = await callDb.get();
@@ -255,8 +256,15 @@ async function gtUser(data) {
 			for (const userId in allUsers) {
 				const user = allUsers[userId];
 				if (user.userEmail == data.userEmail) {
-					if (user.userPassword == data.userPassword || data.action == 'forgetPswrd') {
-						user.userId = userId;
+					if (
+						user.userPassword == data.userPassword ||
+						data.action == "forgetPswrd" ||
+						data.action == "updatePsw"
+					) {
+						if (data.action == "updatePsw") {
+							user.userId = userId;
+						}
+						delete user.userPassword;
 						return { status: "success", rslt: user };
 					} else {
 						return { status: "NoPassword", message: "error Password" };
@@ -277,7 +285,7 @@ async function gtUser(data) {
 }
 
 async function cnfrmExist(data) {
-	const rspns ={};
+	const rspns = {};
 	try {
 		const callDb = db.ref(`allAcconts`);
 		const getUsrs = await callDb.get();
@@ -286,7 +294,7 @@ async function cnfrmExist(data) {
 			const allUsers = getUsrs.val();
 			for (const userId in allUsers) {
 				if (allUsers[userId].userEmail == data.userEmail) {
-					return { status: "exist" , userName :allUsers[userId].userName };
+					return { status: "exist", userName: allUsers[userId].userName };
 				}
 			}
 			return { status: "notexsist", message: "not exist email" };
@@ -299,6 +307,29 @@ async function cnfrmExist(data) {
 		// make sure we reference the symbol correctly
 		console.error(`فشل  لـ ${data.userEmail} : `, error);
 		return rspns;
+	}
+}
+async function updtPsw(data) {
+	try {
+		const usrData = await gtUser(data);
+		if (usrData.status == "success") {
+			const user = usrData.rslt;
+			const rslt = user;
+			delete rslt.userId;
+			user.userPassword = data.userPassword;
+			const adusr = await addUser(user);
+			if (adusr.status == "success") {
+				return { status: "success", rslt: rslt };
+			} else {
+				return { status: "notSucsus" };
+			}
+		} else {
+			return usrData.status;
+		}
+	} catch (error) {
+		console.log(" error updtPsw : " + error);
+
+		return { status: "notexsist", message: "not exist email" };
 	}
 }
 

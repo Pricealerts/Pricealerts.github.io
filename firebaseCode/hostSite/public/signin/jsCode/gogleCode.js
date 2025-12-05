@@ -46,10 +46,10 @@
 			window.onload = function () {
 				google.accounts.id.initialize({
 					// ⚠️ هام جداً: استبدل هذا بالكلاينت آيدي الخاص بك
-					client_id:
+					client_id://'200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com'
 						"200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com",
 					callback: handleCredentialResponse,
-				});
+				});// nta3 4808 '1764807444546'   nta3 4509 '101949427684476062511'
 				gogleRender("buttonSignUp");
 				gogleRender("buttonSignIn");
 

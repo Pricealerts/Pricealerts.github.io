@@ -1,15 +1,17 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
 let enteEsc = ` تسجبل الدخول
  <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
- let enteEsc2 = `
- حسابي
- <img src=${UserImage} alt="">
- `;
+let dsplyCont = 'display: none;'
 if (localStorage.userEmail) {
 	UserImage = localStorage.base64Pctr;
 	enteEsc = ` تسجبل الخروج
  <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
+ dsplyCont = 'display: block;'
 }
+ let enteEsc2 = `
+ حسابي
+ <img src=${UserImage} alt="">
+ `;
 
 function exsit() {
 	if (localStorage.email) {
@@ -51,8 +53,8 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
 			<a style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
-	   <a href="https://pricealerts.web.app/otherPage/contact.html"  style = "position: absolute; bottom:0;width: calc(100% - 40px);">
-       ${enteEsc2}</a>
+	   <a href="https://pricealerts.web.app/accont"  style = "${dsplyCont} position: absolute; bottom:0;width: calc(100% - 40px);">
+       ${localStorage.userName}</a>
 		
 
 
