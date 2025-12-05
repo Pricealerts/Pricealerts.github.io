@@ -1,3 +1,8 @@
+const lstLoclSrorge = ['action','userId','userName','userEmail','userPassword','userPicture','chtId1','chtId2','chtId3','paid','base64Pctr']
+for (let i = 0; i < array.length; i++) {
+	const strg = lstLoclSrorge[i];
+	localStorage.removeItem(strg);
+}
 gebi("frmSgnUp").addEventListener("submit", async e => {
 	e.preventDefault();
 	const acont = document.querySelectorAll("#frmSgnUp input");
@@ -78,7 +83,7 @@ async function adedUser() {
 	}
 	const now = new Date();
 	const idUser = now.getTime();
-	const body = {
+	const bodyUp = {
 		action: "addAccont",
 		userId: idUser,
 		userName: userName,
@@ -91,7 +96,7 @@ async function adedUser() {
 		paid: false,
 	};
 
-	const rspns = await ftchFirebase(body);
+	const rspns = await ftchFirebase(bodyUp);
 	if (rspns.status == "success") {
 		for (const key in body) {
 			const element = body[key];
@@ -145,29 +150,4 @@ async function ftchAppsScript(body) {
 }
 
 
-
-
-function runScheduler() {
-  const sheet = SpreadsheetApp.getActive().getSheetByName("requests");
-  const rows = sheet.getDataRange().getValues();
-
-  const now = new Date();
-
-  for (let i = 1; i < rows.length; i++) {
-    const time = rows[i][0];       // وقت الطلب
-    const status = rows[i][2];     // الحالة
-
-    if (status === "pending") {
-      const diff = (now - time) / 1000 / 60; // عدد الدقائق
-
-      if (diff >= 60) {
-        // نفّذ العملية بعد مرور ساعة
-        recalcN(rows[i]);
-
-        // حدّث الحالة
-        sheet.getRange(i + 1, 3).setValue("done");
-      }
-    }
-  }
-}
 

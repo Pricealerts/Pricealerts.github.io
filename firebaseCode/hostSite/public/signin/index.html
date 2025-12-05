@@ -219,7 +219,6 @@
 					toggle.innerHTML = '<i class="fa-solid fa-eye"></i>'; // إعادة الأيقونة
 				}
 			}
-			toggle.addEventListener("click", () => {});
 		</script>
 		<!--  get data from google -->
 		<script src="./jsCode/gogleCode.js"></script>
@@ -248,7 +247,7 @@
 				const base64 = canvas.toDataURL("image/png");
 
 				// حفظ Base64 في localStorage  UserPicture
-				localStorage.setItem("b64Price", base64);
+				localStorage.setItem("base64Pctr", base64);
 
 				//alert("تم تخزين الصورة في LocalStorage!");
 			}

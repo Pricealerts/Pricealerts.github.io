@@ -207,10 +207,9 @@ async function addUser(data) {
 		userEmail: data.userEmail,
 		userPassword: data.userPassword,
 		userPicture: data.userPicture,
-		//sourceImg:data.sourceImg,
 		chtId1: data.chtId1,
 		chtId2: data.chtId2,
-		chtIdD3: data.chtId3,
+		chtId3: data.chtId3,
 		paid: data.paid,
 	};
 

@@ -5,15 +5,15 @@ let enteEsc = ` تسجبل الدخول
  حسابي
  <img src=${UserImage} alt="">
  `;
-if (localStorage.email) {
-	UserImage = localStorage.b64Price;
+if (localStorage.userEmail) {
+	UserImage = localStorage.base64Pctr;
 	enteEsc = ` تسجبل الخروج
  <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 }
 
 function exsit() {
 	if (localStorage.email) {
-		localStorage.removeItem('b64Price');
+		localStorage.removeItem('base64Pctr');
 	}
 	window.location.href = "https://pricealerts.web.app/signin/index.html";
 }

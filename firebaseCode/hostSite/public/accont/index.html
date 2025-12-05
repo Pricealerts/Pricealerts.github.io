@@ -37,7 +37,10 @@
 		/>
 
 		<title>حسابي</title>
-
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
 		<link
 			rel="stylesheet"
 			href="https://pricealerts.github.io/style/navbar.css"
@@ -170,6 +173,30 @@
 				position: absolute;
 				text-align: center;
 			}
+			.password-box {
+				position: relative;
+				width: 100%;
+			}
+
+			.password-box .eye {
+				position: absolute;
+				left: 5%;
+				top: calc(50% - 9px);
+				transform: translateY(-50%);
+				cursor: pointer;
+				font-size: 18px;
+				user-select: none;
+			}
+			@media (max-width: 768px) {
+				.profile-container {
+					width: 100%;
+					margin: 0;
+					padding: 0;
+				}
+				.chatIds {
+					width: 93%;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -190,16 +217,20 @@
 				/>
 			</div>
 
-			<h1 id="userName" class="user-name" contenteditable="true">
-				
-			</h1>
+			<h1 id="userName" class="user-name" contenteditable="true"></h1>
 
 			<p id="uesrEmail" class="user-email"></p>
 
 			<div class="chatIds">
 				<label for="userPassword">كلمة السر</label>
 				<br />
-				<input type="password" id="userPassword" placeholder="كلمة السر" />
+
+				<div class="password-box">
+					<input id="userPassword" type="password" placeholder="كلمة السر" />
+					<span class="eye" onclick="togglePwd(this,'userPassword')"
+						><i class="fa-solid fa-eye"></i
+					></span>
+				</div>
 				<br /><br />
 
 				معرّفات دردشة التيليجرام (Chat ID) : الخاص بك
@@ -234,21 +265,48 @@
 
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 
-		<!--  <script type="module" src="./jsCode/uplodImage.js"></script> -->
+		<!-- front and script -->
 		<script>
 			function gebi(el) {
 				return document.getElementById(el);
 			} //   https://drive.google.com/file/d/1jCfKYWrJP462N840a5juX-H8Uwj_HxCR/view
 			//	UserImage
-			gebi("uploadedImage").src =
-				localStorage.b64Price || "/imgs/web/apple-touch-icon.png";
+			window.addEventListener('load', async ()=>{await startpage()})
+			//window.onload()
+			 
+			async function startpage() {
+					const userEmailCnt = localStorage.userEmail || "إيميلك";
+			gebi("uploadedImage").src = UserImage
 			gebi("userName").innerText = localStorage.userName || "إسمك";
-			gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
-			gebi("userPassword").value = localStorage.userPassword;
+			gebi("uesrEmail").innerHTML = userEmailCnt || "إيميلك";
+			if (localStorage.userPassword) {
+				gebi("userPassword").value = localStorage.userPassword;
+				localStorage.removeItem('userPassword');
+			} else {if(userEmailCnt =="إيميلك" ){return false}
+				try {
+					const urlFirebase ="https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+					const response = await fetch(urlFirebase, {
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify({action: 'forgetPswrd',userEmail:userEmailCnt}),
+					});
+					const data = await response.json();
+					const rspns = JSON.parse(data);
+					if(rspns.status == "success"){
+						gebi("userPassword").value = rspns.rslt.userPassword;
+						
+					}
+				} catch (error) {
+					console.error("kayn error :" + error);
+				}
+			}
+
 			gebi("telegramChatId1").value = localStorage.chtId1;
 			gebi("telegramChatId2").value = localStorage.chtId2;
 			gebi("telegramChatId3").value = localStorage.chtId3;
 
+			}
+		
 			const inputFile = gebi("input-file");
 			let imgCntnt;
 			let file;
@@ -261,20 +319,21 @@
 				}
 				imgCntnt = URL.createObjectURL(file);
 				gebi("uploadedImage").src = imgCntnt;
-				
 			});
-
+		</script>
+		<!-- btn save -->
+		<script>
 			const WEB_APP_URL =
 				"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
 
 			gebi("saveBtn").addEventListener("click", async e => {
 				gebi("rspns").innerText = "جاري الحفظ ...";
 				gebi("rspns").style.color = "black";
-				/////////////////////////// jiht limage
 
+				/////////////////////////// jiht limage
 				let imgSrc = localStorage.userPicture;
 
-				if (gebi("userNname").innerText.length < 2) {
+				if (gebi("userName").innerText.length < 2) {
 					gebi("rspns").innerText = "  خانة الإسم فارغة عليك ملأها ";
 					gebi("rspns").style.color = "red";
 					setTimeout(() => {
@@ -303,7 +362,7 @@
 					}
 					// تحويل الصورة Base64
 					const base64 = await toBase64(file);
-                    localStorage.b64Price = base64;
+					localStorage.base64Pctr = base64;
 					const imgName = localStorage.userId || "dadi";
 					// إرسال الصورة عبر fetch
 					const response = await fetch(WEB_APP_URL, {
@@ -335,7 +394,7 @@
 					userName: gebi("userName").innerText,
 					userEmail: gebi("userEmail").innerText,
 					userPassword: gebi("userPassword").value,
-					userPicture:imgSrc || "/imgs/web/apple-touch-icon.png",
+					userPicture: imgSrc || "/imgs/web/apple-touch-icon.png",
 					chtId1: gebi("telegramChatId1").value,
 					chtId2: gebi("telegramChatId2").value,
 					chtId3: gebi("telegramChatId3").value,
@@ -347,8 +406,6 @@
 					localStorage[key] = element;
 				}
 				saveImage(imgSrc);
-
-				
 
 				try {
 					const url =
@@ -362,17 +419,16 @@
 					const data = await response.json();
 
 					const rspns = JSON.parse(data);
-					if (rspns.status == 'success') {
-                      gebi("rspns").innerText = "تم التحديث بنجاح";
-					gebi("rspns").style.color = "green";
-					setTimeout(() => {
-						gebi("rspns").innerText = "";
-                        window.location.href = "https://pricealerts.web.app";
-					}, 3000);
-					return false;  
-                    } else {
-                        
-                    };
+					if (rspns.status == "success") {
+						gebi("rspns").innerText = "تم التحديث بنجاح";
+						gebi("rspns").style.color = "green";
+						setTimeout(() => {
+							gebi("rspns").innerText = "";
+							window.location.href = "https://pricealerts.web.app";
+						}, 3000);
+						return false;
+					} else {
+					}
 				} catch (error) {
 					console.log("kayn error :" + error);
 				}
@@ -394,7 +450,7 @@
 				});
 			}
 		</script>
-		<!-- save image -->
+		<!-- save image and togglePwd -->
 		<script>
 			function saveImage(source) {
 				const img = document.getElementById("uploadedImage");
@@ -415,10 +471,22 @@
 				const base64 = canvas.toDataURL("image/png");
 
 				// حفظ Base64 في localStorage
-				localStorage.setItem("b64Price", base64);
+				localStorage.setItem("base64Pctr", base64);
 				//return base64;
 
 				//alert("تم تخزين الصورة في LocalStorage!");
+			}
+
+			function togglePwd(toggle, id) {
+				const password = gebi(id);
+				if (password.type === "password") {
+					password.type = "text"; // إظهار
+
+					toggle.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+				} else {
+					password.type = "password"; // إخفاء
+					toggle.innerHTML = '<i class="fa-solid fa-eye"></i>'; // إعادة الأيقونة
+				}
 			}
 		</script>
 	</body>
