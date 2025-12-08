@@ -4,6 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>Firebase Google Login</title>
+		<script src="https://accounts.google.com/gsi/client" async defer></script>
 
 		<script type="module">
 			// ----------------- Import Firebase -----------------
@@ -41,6 +42,20 @@
 					.catch(err => {
 						alert("Error: " + err.message);
 					});
+			};
+
+			// تستقبل بيانات Google وترسلها لـ Firebase
+			window.handleGoogle = async response => {
+				try {
+					const credential = GoogleAuthProvider.credential(response.credential);
+					const result = await signInWithCredential(auth, credential);
+
+					console.log("User:", result.user);
+					alert("تم تسجيل الدخول بنجاح!");
+				} catch (err) {
+					console.error(err);
+					alert("خطأ في تسجيل الدخول");
+				}
 			};
 		</script>
 
@@ -83,12 +98,30 @@
 	<body>
 		<div class="box">
 			<h2>تسجيل الدخول</h2>
-			<button onclick="loginWithGoogle()">
+			<!-- <button onclick="loginWithGoogle()">
 				<img
 					src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
 				/>
 				تسجيل الدخول بواسطة Google
-			</button>
+			</button> -->
+			<div
+				id="g_id_onload"
+				data-client_id="YOUR_GOOGLE_CLIENT_ID"
+				data-context="signin"
+				data-ux_mode="popup"
+				data-callback="handleGoogle"
+				data-auto_select="true"
+			></div>
+
+			<div
+				class="g_id_signin"
+				data-type="standard"
+				data-shape="rectangular"
+				data-theme="outline"
+				data-text="signin_with"
+				data-size="large"
+				data-logo_alignment="right"
+			></div>
 		</div>
 	</body>
 </html>

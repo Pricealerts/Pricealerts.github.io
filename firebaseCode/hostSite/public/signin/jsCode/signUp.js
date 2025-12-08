@@ -70,34 +70,7 @@ async function adedUser() {
 	}
 	gebi("errmsgCnfrm").innerText = "جاري التحقق ...";
 	gebi("errmsgCnfrm").style.color = "black";
-	// conferm send message
-/* 	try {
-		const data = await ftchFirebase({
-			action: "cnfrmCode",
-			userEmail: userEmail,
-			inputCode: gebi("codeCnfrm").value,
-			signUp: true,
-		});
-
-		if (data.status == "overNmber") {
-			gebi("errmsgCnfrm").innerText =
-				"لقد قمت بالمحاولة أكثر من 4 مرات أعد المحاولة بعد ساعة";
-			gebi("errmsgCnfrm").style.color = "red";
-			return false;
-		} else if (data.status == "notExist") {
-			gebi("errmsgCnfrm").innerText = "رمز التحقق خاطئ أعد المحاولة";
-			gebi("errmsgCnfrm").style.color = "red";
-			return false;
-		} else if (data.status != "exist") {
-			gebi("errmsgCnfrm").innerText = "حدث خطأ أعد المحاولة";
-			gebi("errmsgCnfrm").style.color = "red";
-			return false;
-		}
-	} catch (error) {
-		console.log("error appscript : " + error);
-		return false;
-	} */
-
+	
 	const now = new Date();
 	const idUser = now.getTime();
 	const bodyUp = {
@@ -117,14 +90,15 @@ async function adedUser() {
 		for (const key in newbodyUp) {
 			localStorage[key] = newbodyUp[key];
 		}
-		saveImage(newbodyUp.userPicture);
-		window.location.href = drction;
+		await sgnIn('errmsgCnfrm')
+		
+		
 	}
 }
 
 async function ftchFirebase(body) {
 	try {
-		const urlFirebase = //https://proxyrequestv2-zzdsz5x2ea-ew.a.run.app
+		const urlFirebase = 
 			"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2/";
 		const response = await fetch(urlFirebase, {
 			method: "POST",
@@ -136,7 +110,7 @@ async function ftchFirebase(body) {
 		console.log(rspns);
 		return rspns;
 	} catch (error) {
-		console.error("kayn error :" + error);
+		console.error("kayn error ftchFirebase 115 : " + error);
 	}
 }
 

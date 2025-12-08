@@ -4,12 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script type="module">
-  // Import Firebase SDKs
+  <!-- Firebase App -->
+<script type="module">
+  // استيراد Firebase SDKs
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+  import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
-  // إعدادات مشروع Firebase الخاص بك
+  // إعدادات Firebase الخاصة بك
   const firebaseConfig = {
 				apiKey: "AIzaSyCL11Nbo54WUlFCGN3raQB-AsVWfR2_guM",
 				authDomain: "alertprice-c0176.firebaseapp.com",
@@ -20,42 +21,68 @@
 				measurementId: "G-YV336XXHKP",
 			};
 
-  // تهيئة التطبيق
+  // تهيئة Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
 
-  // أرسل إيميل إعادة التعيين
-  window.resetPassword = function () {
-    const email = document.getElementById("resetEmail").value;
+  // تغيير كلمة السر
+  window.changePassword = function () {
+    const user = auth.currentUser;
 
-    sendPasswordResetEmail(auth, email)
-      .then(() => {
-        alert("تم إرسال رابط إعادة تعيين كلمة السر إلى بريدك الإلكتروني");
-      })
-      .catch((error) => {
-        alert("حدث خطأ: " + error.message);
-      });
+    const currentPassword = document.getElementById("currentPassword").value;
+    const newPassword = document.getElementById("newPassword").value;
+
+    if (user) {
+      // إنشاء بيانات لتوثيق المستخدم
+      const credential = EmailAuthProvider.credential(user.email, currentPassword);
+
+      // إعادة التوثيق باستخدام بيانات البريد الإلكتروني الحالية وكلمة السر
+      reauthenticateWithCredential(user, credential)
+        .then(() => {
+          // إذا تم التوثيق بنجاح، نغير كلمة السر
+          updatePassword(user, newPassword)
+            .then(() => {
+              alert("تم تغيير كلمة السر بنجاح.");
+            })
+            .catch((error) => {
+              alert("حدث خطأ أثناء تغيير كلمة السر: " + error.message);
+            });
+        })
+        .catch((error) => {
+          alert("كلمة السر الحالية غير صحيحة: " + error.message);
+        });
+    } else {
+      alert("يجب أن تكون مسجلاً الدخول أولاً.");
+    }
   }
 </script>
+
 </head>
 <body>
-    <!-- Firebase App -->
-
 <div style="width: 300px; margin: 50px auto; text-align: center;">
-  <h2>نسيت كلمة السر</h2>
+  <h2>تغيير كلمة السر</h2>
 
+  <!-- كلمة السر الحالية -->
   <input 
-    type="email" 
-    id="resetEmail" 
-    placeholder="أدخل بريدك الإلكتروني" 
+    type="password" 
+    id="currentPassword" 
+    placeholder="أدخل كلمة السر الحالية" 
+    style="width: 100%; padding: 10px; margin-bottom: 10px;"/>
+
+  <!-- كلمة السر الجديدة -->
+  <input 
+    type="password" 
+    id="newPassword" 
+    placeholder="أدخل كلمة السر الجديدة" 
     style="width: 100%; padding: 10px; margin-bottom: 10px;"/>
 
   <button 
-    onclick="resetPassword()" 
+    onclick="changePassword()" 
     style="width: 100%; padding: 10px;">
-      إرسال رابط إعادة التعيين
+      تغيير كلمة السر
   </button>
 </div>
+
 
 </body>
 </html>

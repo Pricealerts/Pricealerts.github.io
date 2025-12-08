@@ -1,6 +1,6 @@
 //import { defineSecret } from "firebase-functions/params";
 import { cAllDatabase } from "./cAllDatabase.js";
-import { getAuth } from "firebase-admin/auth";
+import {authChngePswrd ,authSignUp} from "./auth.js";
 
 let db;
 
@@ -19,12 +19,7 @@ async function sndEmail(data, dtbs) {
 			if (ovrNmb) {
 				reponse = { status: "overNmber" };
 			} else {
-				reponse = await verifyCode(
-					userEmail,
-					data.userPassword,
-					data.inputCode,
-					data.signUp
-				);
+				reponse = await verifyCode(data);
 			}
 		} else if (action == "updtPsw") {
 			const bdyFirebase = {
@@ -111,33 +106,34 @@ async function sendVerificationEmail(userEmail, userName) {
 	}
 }
 
-async function verifyCode(userEmail, userPassword, inputCode, signUp) {
+async function verifyCode(data) {
+	const userEmail = data.userEmail;
 	try {
 		let gtData = await gtDb();
 		let respns = { status: "notExist" };
 		if (!gtData) return respns;
 		let fltr = gtData.filter(item => item[0] == userEmail);
 		if (fltr.length > 0) {
-			let data = fltr[0];
-			data[2] = data[2] + 1;
-			data[3] = new Date().getTime(); // oled date
-			if (data[1] == inputCode) {
+			let arow = fltr[0];
+			arow[2] = arow[2] + 1;
+			arow[3] = new Date().getTime(); // oled date
+			if (arow[1] == data.inputCode) {
 				if (signUp) {
 					await rmovInArryDb(userEmail);
-					const auSignUp = auth(userEmail, userPassword);
+					const auSignUp =await authSignUp(userEmail, data.userPassword);
 					if (auSignUp.status == "success") {
+						await db.ref(`allAcconts/${data.userId}`).set(data)
+						return { status: "exist" };
 					}
-					authSignUp(userEmail);
-					return { status: "exist" };
+					return { status: "notExist" };
 				}
-				data[4] = true;
-
+				arow[4] = true;
 				respns = { status: "exist" };
 			}
 			let dtSet;
 			dtSet = gtData.filter(item => item[0] != userEmail);
 
-			dtSet.push(data);
+			dtSet.push(arow);
 			await db.ref("allSndEmails").set(dtSet);
 		}
 		return respns;
@@ -161,9 +157,11 @@ async function updtPswd(data) {
 			if (usrData.status == "success") {
 				const user = usrData.rslt;
 				//delete rslt.userId;
+				const nwPasword = data.userPassword;
+				const updt= await authChngePswrd(data.userEmail, usrData.userPassword, nwPasword)
+				if(!updt) return { status: "notSuccess" }
 				let { userId, ...nwRslt } = user;
-				nwRslt.userPassword = data.userPassword;
-
+				nwRslt.userPassword = nwPasword;
 				await db.ref(`allAcconts/${user.userId}`).set(nwRslt);
 				const { userPassword, paid, ...rslt } = nwRslt;
 				return { status: "success", rslt: rslt };
@@ -205,25 +203,4 @@ async function gtDb() {
 	}
 }
 
-async function authSignUp(userEmail, userPassword) {
-	try {
-		if (!userEmail || !userPassword) {
-			return { error: "userEmail and userPassword are required" };
-		}
-
-		const user = await getAuth().createUser({
-			userEmail,
-			userPassword,
-		});
-
-		return {
-			status: "success",
-		};
-	} catch (error) {
-		return {
-			status: "error",
-			message: error.message,
-		};
-	}
-}
 export { sndEmail };

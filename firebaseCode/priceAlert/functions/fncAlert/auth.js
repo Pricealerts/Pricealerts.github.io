@@ -1,69 +1,50 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { initializeApp } from "firebase-admin/app";
-import fetch from "node-fetch";
 
-initializeApp();
+import { getAuth } from "firebase-admin/auth";
 
-const API_KEY = "YOUR_FIREBASE_WEB_API_KEY"; // ضع هنا Web API Key من Firebase Console
+async function authChngePswrd(email, currentPassword, newPassword) {
+  try {
+      // الحصول على مستخدم Firebase
+      const auth = getAuth();
+      const user = await auth.getUserByEmail(email);
 
-export const loginUserV2 = onRequest(
-    { region: "europe-west1" },
-    async (req, res) => {
-        res.set("Access-Control-Allow-Origin", "*");
-        res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-        res.set("Access-Control-Allow-Headers", "Content-Type");
+      // إعادة توثيق المستخدم باستخدام البريد وكلمة السر الحالية
+      const credential = await auth.createUser({
+        email: email,
+        password: currentPassword,
+      });
 
-        if (req.method === "OPTIONS") return res.status(204).send("");
+      // تحديث كلمة السر للمستخدم
+      await auth.updateUser(user.uid, { password: newPassword });
 
-        if (req.method !== "POST") {
-            return res.status(405).json({ error: "Only POST allowed" });
-        }
+      // إرسال الرد بعد تغيير كلمة السر
+      	return true
+  } catch (error) {
+          console.error("Error changing password:", error);
 
-        try {
-            const { email, password } = req.body;
+    return false;
+  }
+}
 
-            if (!email || !password) {
-                return res.status(400).json({
-                    error: "Email and password are required",
-                });
-            }
+async function authSignUp(userEmail, userPassword) {
+	try {
+		if (!userEmail || !userPassword) {
+			return { error: "userEmail and userPassword are required" };
+		}
 
-            // 🔥 Firebase Identity Toolkit login REST API
-            const response = await fetch(
-                `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        email,
-                        password,
-                        returnSecureToken: true,
-                    }),
-                }
-            );
+		const user = await getAuth().createUser({
+			userEmail,
+			userPassword,
+		});
 
-            const data = await response.json();
+		return {
+			status: "success",
+		};
+	} catch (error) {
+		return {
+			status: "error",
+			message: error.message,
+		};
+	}
+}
 
-            if (data.error) {
-                return res.status(400).json({
-                    status: "error",
-                    message: data.error.message,
-                });
-            }
-
-            // 🔥 تسجيل الدخول ناجح
-            return res.json({
-                status: "success",
-                idToken: data.idToken,
-                refreshToken: data.refreshToken,
-                expiresIn: data.expiresIn,
-                localId: data.localId,
-            });
-        } catch (err) {
-            return res.status(500).json({
-                status: "error",
-                message: err.message,
-            });
-        }
-    }
-);
+export {authChngePswrd ,authSignUp}

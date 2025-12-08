@@ -32,7 +32,7 @@ async function cAllDatabase(data) {
 			//
 			rspns = await gtUser(data);
 		} else if (
-			["cnfrmExist", "cnfrmExistUp", "sndMsgCnferIn", "sndMsgCnfer"].includes(
+			[ "sndMsgCnferIn", "sndMsgCnfer"].includes(
 				action
 			)
 		) {
@@ -281,6 +281,7 @@ async function gtUser(data) {
 				const { userPassword, paid, ...newUser } = user;
 				if (data.action == "updatePsw") {
 					newUser.userId = data.userId;
+					newUser.userPassword = user.userPassword 
 					newUser.paid = user.paid;
 				}
 				
@@ -305,8 +306,7 @@ async function gtUser(data) {
 async function cnfrmExist(data) {
 	const rspns = {};
 	try {
-		const callDb = db.ref(`allAcconts`);
-		const gtUsrs = await callDb.get();
+		const gtUsrs = await db.ref(`allAcconts`).get();
 
 		if (gtUsrs.exists()) {
 			const allUsers = gtUsrs.val();

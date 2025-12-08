@@ -21,9 +21,9 @@ gebi("btnSignIn").addEventListener("click", async e => {
 		for (const key in rslt) {
 			localStorage[key] = rslt[key];
 		}
-		saveImage(localStorage.userPicture);
+		
 		await sgnIn('errmsgsgnIn')
-		window.location.href = drction;
+
 	} else if (rspns.status == "NoPassword" || rspns.status == "notexsist") {
 		gebi("errmsgsgnIn").innerText =
 			"  كلمة السر أو الإيميل خاطئ يرجى التأكد من الحساب";
@@ -104,8 +104,6 @@ gebi("btnCnfrmIn").addEventListener("click", async e => {
 			gebi("errmsgCnfrmIn").innerText = "";
 			gebi("newPswrd").style.transform = "translateY(0%)";
 			return false
-
-		
 		}
 	} catch (error) {
 		console.log("error appscript : " + error);
@@ -134,12 +132,13 @@ gebi("btnNewPswrd").addEventListener("click", async e => {
 		}
 
 		if (data.status == "success") {
-			const rslt = data.rslt;
-			for (const key in rslt) {
-				localStorage[key] = rslt[key];
-			}
-			saveImage(localStorage.userPicture);
-			window.location.href = drction;
+		const rslt = data.rslt;
+		for (const key in rslt) {
+			localStorage[key] = rslt[key];
+		}
+		
+			await sgnIn(msgErr)
+			
 		} else {
 			gebi("errmsgsgnIn").innerText = "حدث خطأ أعد المحاولة " ;
 			gebi("errmsgsgnIn").style.color = "red";
@@ -153,19 +152,13 @@ gebi("btnNewPswrd").addEventListener("click", async e => {
 });
 
 async function sgnIn(msgErr) {
+	saveImage(localStorage.userPicture);
 	try {
-		const rspns = await signInWithEmailAndPassword(
+	 await signInWithEmailAndPassword(
 			auth,
 			userEmail,
 			userPassword
 		);
-
-		const rslt = rspns.rslt;
-		for (const key in rslt) {
-			localStorage[key] = rslt[key];
-		}
-		saveImage(localStorage.userPicture);
-
 		window.location.href = drction;
 	} catch (error) {
 		gebi(msgErr).innerText = "حدث خطأ أعد المحاولة ";
