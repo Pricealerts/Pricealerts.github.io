@@ -6,9 +6,11 @@ npm install
 firebase deploy --only functions
 
 رفع الملف functions
+cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\priceAlert
 firebase deploy --only functions
 
 رفع الملف hosting
+cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\hostSite
 firebase deploy --only hosting
 
 باش نعرف واشمن بروجي راني فيه 

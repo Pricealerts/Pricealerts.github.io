@@ -1,6 +1,6 @@
 //import { defineSecret } from "firebase-functions/params";
 import { cAllDatabase } from "./cAllDatabase.js";
-import {authChngePswrd ,authSignUp} from "./auth.js";
+import { chngePswrd, sgnUp /* ,vrfIdToken */ } from "./ddauth.js";
 
 let db;
 
@@ -28,6 +28,8 @@ async function sndEmail(data, dtbs) {
 				userPassword: data.userPassword,
 			};
 			reponse = await updtPswd(bdyFirebase);
+		}else if (action == "verifyIdToken") {
+			vrfIdToken(data)
 		}
 
 		return reponse;
@@ -120,9 +122,9 @@ async function verifyCode(data) {
 			if (arow[1] == data.inputCode) {
 				if (signUp) {
 					await rmovInArryDb(userEmail);
-					const auSignUp =await authSignUp(userEmail, data.userPassword);
+					const auSignUp = await sgnUp(userEmail, data.userPassword);
 					if (auSignUp.status == "success") {
-						await db.ref(`allAcconts/${data.userId}`).set(data)
+						await db.ref(`allAcconts/${data.userId}`).set(data);
 						return { status: "exist" };
 					}
 					return { status: "notExist" };
@@ -158,8 +160,12 @@ async function updtPswd(data) {
 				const user = usrData.rslt;
 				//delete rslt.userId;
 				const nwPasword = data.userPassword;
-				const updt= await authChngePswrd(data.userEmail, usrData.userPassword, nwPasword)
-				if(!updt) return { status: "notSuccess" }
+				const updt = await chngePswrd(
+					data.userEmail,
+					usrData.userPassword,
+					nwPasword
+				);
+				if (!updt) return { status: "notSuccess" };
 				let { userId, ...nwRslt } = user;
 				nwRslt.userPassword = nwPasword;
 				await db.ref(`allAcconts/${user.userId}`).set(nwRslt);

@@ -4,7 +4,7 @@ import { getDatabase } from "firebase-admin/database";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
 import { checkAndSendAlerts, sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
-import {auth} from "./auth.js"
+
 //import { sndEmail } from "./sndEmail.js";
 
 let postsRef;
@@ -31,19 +31,16 @@ async function cAllDatabase(data) {
 		} else if (["getAccont", "updatePsw"].includes(action)) {
 			//
 			rspns = await gtUser(data);
-		} else if (
-			[ "sndMsgCnferIn", "sndMsgCnfer"].includes(
-				action
-			)
-		) {
+		} else if (["sndMsgCnferIn", "sndMsgCnfer"].includes(action)) {
 			rspns = await cnfrmExist(data);
 			/* } else if (action == "updatePsw") {   
 			rspns = await updtPsw(data); */
-		} else if (["updtPsw", "cnfrmCode"].includes(action)) {
+		} else if (["updtPsw", "cnfrmCode","verifyIdToken"].includes(action)) {
 			rspns = await sndEmail(data, db);
-		}if (action === "getAuth") {
-			rspns = await auth(data)
 		}
+		/* if (action === "getAuth") {
+			rspns = await auth(data);
+		} */
 
 		return rspns;
 	} catch (error) {
@@ -281,10 +278,10 @@ async function gtUser(data) {
 				const { userPassword, paid, ...newUser } = user;
 				if (data.action == "updatePsw") {
 					newUser.userId = data.userId;
-					newUser.userPassword = user.userPassword 
+					newUser.userPassword = user.userPassword;
 					newUser.paid = user.paid;
 				}
-				
+
 				//delete user.userPassword;
 				// fl signIn normal manjiboch userPassword userId paid
 				return { status: "success", rslt: newUser };

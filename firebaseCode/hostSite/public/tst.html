@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-functions.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+  import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-functions.js";
+
+  // إعداد Firebase
+  // إعدادات Firebase الخاصة بك
+  const firebaseConfig = {
+				apiKey: "AIzaSyCL11Nbo54WUlFCGN3raQB-AsVWfR2_guM",
+				authDomain: "alertprice-c0176.firebaseapp.com",
+				projectId: "alertprice-c0176",
+				storageBucket: "alertprice-c0176.firebasestorage.app",
+				messagingSenderId: "48895497565",
+				appId: "1:48895497565:web:8b7c5e16335812f6c344b4",
+				measurementId: "G-YV336XXHKP",
+			};
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const functions = getFunctions(app);
+
+  // تفعيل Google Sign-In
+  const provider = new GoogleAuthProvider();
+
+  // تسجيل الدخول عبر Google
+   window.signInWithGoogle = async function () {
+    signInWithPopup(auth, provider)
+      .then((result) => {
+        // يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
+        const user = result.user;
+        console.log(user);
+        const idToken = {action :'verifyIdToken',  result:result.user.getIdToken()};
+
+        // إرسال التوكن إلى Firebase Function للتحقق من الهوية
+        verifyIdToken(idToken);
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+  }
+
+  // دالة للتحقق من التوكن عبر Firebase Functions
+  async function verifyIdToken(idToken) {
+    const verifyTokenFunction = httpsCallable(functions, 'proxyRequestV2');
+
+    try {
+      const response = await verifyTokenFunction({ idToken });
+      console.log('Token is valid', response.data);
+    } catch (error) {
+      console.error('Error verifying token', error);
+    }
+  }
+
+  // مراقبة حالة تسجيل الدخول
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      console.log('User is signed in:', user);
+    } else {
+      console.log('User is signed out');
+    }
+  });
+</script>
+
+</head>
+<body>
+    <button onclick="signInWithGoogle()">تسجيل الدخول باستخدام Google</button>
+
+</body>
+</html>

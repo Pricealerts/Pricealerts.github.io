@@ -39,7 +39,7 @@ window.loginWithGoogle = function () {
 	signInWithPopup(auth, provider)
 		.then(result => {
 			console.log("User:", result.user);
-			window.location.href = "index.html"; // الصفحة التي تريدها
+			//window.location.href = "index.html"; // الصفحة التي تريدها
 		})
 		.catch(err => {
 			alert("Error: " + err.message);
