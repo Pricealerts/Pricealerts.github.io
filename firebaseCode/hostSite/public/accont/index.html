@@ -225,7 +225,7 @@
 			<p id="uesrEmail" class="user-email"></p>
 
 			<div class="chatIds">
-				<label for="userPassword">كلمة السر</label>
+				<!-- <label for="userPassword">كلمة السر</label>
 				<br />
 
 				<div class="password-box">
@@ -233,7 +233,7 @@
 					<span class="eye" onclick="togglePwd(this,'userPassword')"
 						><i class="fa-solid fa-eye"></i
 					></span>
-				</div>
+				</div> -->
 				<br /><br />
 
 				معرّفات دردشة التيليجرام (Chat ID) : الخاص بك
@@ -285,7 +285,7 @@
 					UserImage || "/imgs/web/apple-touch-icon.png";
 				gebi("userName").innerText = localStorage.userName || "إسمك";
 				gebi("uesrEmail").innerHTML = userEmailCnt || "إيميلك";
-				if (localStorage.userPassword) {
+				/* if (localStorage.userPassword) {
 					gebi("userPassword").value = localStorage.userPassword;
 					localStorage.removeItem("userPassword");
 				} else {
@@ -311,7 +311,7 @@
 					} catch (error) {
 						console.error("kayn error :" + error);
 					}
-				}
+				} */
 
 				gebi("telegramChatId1").value = localStorage.chtId1;
 				gebi("telegramChatId2").value = localStorage.chtId2;

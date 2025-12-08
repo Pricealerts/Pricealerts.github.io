@@ -22,6 +22,7 @@ gcloud config set account raki.chai3i@gmail.com
 
 باش نبدل القبول 
  gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+  gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
 
  تلمد الفنكشن 
 ctl + alt + s

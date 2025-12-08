@@ -3,16 +3,18 @@ import { getDatabase } from "firebase-admin/database";
 //import { object } from "firebase-functions/v1/storage";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
 import { checkAndSendAlerts, sendTelegramMessage } from "./srchSmbls.js";
-import { object } from "firebase-functions/v1/storage";
+import { sndEmail } from "./sndEmail.js";
+//import { sndEmail } from "./sndEmail.js";
 
 let postsRef;
 let db;
 /**
  * دالة لإضافة تنبيه جديد إلى Realtime Database
- * @param {object} alert - البيانات التي سيتم إضافتها
+ * @param alert - البيانات التي سيتم إضافتها
  */
 async function cAllDatabase(data) {
 	db = getDatabase();
+	data.userId = btoa(data.userEmail);
 	postsRef = db.ref("alerts");
 	try {
 		const action = data.action;
@@ -23,14 +25,21 @@ async function cAllDatabase(data) {
 			rspns = await setAlert(data);
 		} else if (action === "dltAlrt") {
 			rspns = await dltAlrt(data);
-		} else if (["addAccont", "upditAccont"].includes(action)) {
+		} else if (["addAccont", "addAccontGogl"].includes(action)) {
 			rspns = await addUser(data);
-		} else if (["getAccont", "forgetPswrd"].includes(action)) {
+		} else if (["getAccont", "updatePsw"].includes(action)) {
+			//
 			rspns = await gtUser(data);
-		} else if (action == "cnfrmExist") {
+		} else if (
+			["cnfrmExist", "cnfrmExistUp", "sndMsgCnferIn", "sndMsgCnfer"].includes(
+				action
+			)
+		) {
 			rspns = await cnfrmExist(data);
-		} else if (action == "updatePsw") {
-			rspns = await updtPsw(data);
+			/* } else if (action == "updatePsw") {   
+			rspns = await updtPsw(data); */
+		} else if (["updtPsw", "cnfrmCode"].includes(action)) {
+			rspns = await sndEmail(data, db);
 		}
 
 		return rspns;
@@ -207,7 +216,7 @@ async function addUser(data) {
 		//userId: data.userId,
 		userName: data.userName,
 		userEmail: data.userEmail,
-		userPassword: data.userPassword,
+		userPassword: data.userPassword || "",
 		userPicture: data.userPicture,
 		chtId1: data.chtId1 || "",
 		chtId2: data.chtId2 || "",
@@ -218,22 +227,22 @@ async function addUser(data) {
 	const rspns = {};
 
 	try {
-		const callDb = db.ref(`allAcconts`);
-		const getUsrs = await callDb.get();
-
-		if (getUsrs.exists()) {
-			const allUsers = getUsrs.val();
-			for (const userId in allUsers) {
-				if (allUsers[userId].userEmail == data.userEmail) {
-					rspns.status = "exist";
-					rspns.message = "accont is exist";
-					return rspns;
-				}
+		if (data.action == "addAccont") {
+			const cnfrm = sndEmail(data, db);
+			if (cnfrm.status != "exist") {
+				return cnfrm.status;
 			}
 		}
+		const gtUserExist = db.ref(`allAcconts/${data.userId}`).get();
 
-		const callDbUsr = db.ref(`allAcconts/${data.userId}`);
-		await callDbUsr.set(userAdd);
+		if (gtUserExist.exists()) {
+			if (data.action == "addAccont") {
+			}
+			rspns.status = "exist";
+			rspns.message = "accont is exist";
+			return rspns;
+		}
+		await db.ref(`allAcconts/${data.userId}`).set(userAdd);
 		rspns.status = "success";
 		return rspns;
 	} catch (error) {
@@ -248,30 +257,36 @@ async function addUser(data) {
 async function gtUser(data) {
 	const rspns = {};
 	try {
-		const callDb = db.ref(`allAcconts`);
-		const getUsrs = await callDb.get();
-
-		if (getUsrs.exists()) {
-			const allUsers = getUsrs.val();
-			for (const userId in allUsers) {
-				const user = allUsers[userId];
-				if (user.userEmail == data.userEmail) {
-					if (
-						user.userPassword == data.userPassword ||
-						data.action == "forgetPswrd" ||
-						data.action == "updatePsw"
-					) {
-						if (data.action == "updatePsw") {
-							user.userId = userId;
-						}
-						delete user.userPassword;
-						return { status: "success", rslt: user };
-					} else {
-						return { status: "NoPassword", message: "error Password" };
-					}
-				}
+		if (data.action == "addAccontGogl") {
+			const gtUsr = await db.ref(`allAcconts/${data.userId}`).get();
+			if (gtUsr.exists()) {
+				const user = gtUsr.val();
+				const { userPassword, paid, ...newUser } = user;
+				return { status: "success", rslt: newUser };
 			}
-			return { status: "notexsist", message: "not exist email" };
+			return { status: "error", message: "error" };
+		}
+
+		const gtUsrs = await db.ref(`allAcconts/${data.userId}`).get();
+
+		if (gtUsrs.exists()) {
+			const user = gtUsrs.val();
+			if (
+				user.userPassword == data.userPassword ||
+				data.action == "updatePsw"
+			) {
+				const { userPassword, paid, ...newUser } = user;
+				if (data.action == "updatePsw") {
+					newUser.userId = data.userId;
+					newUser.paid = user.paid;
+				}
+				
+				//delete user.userPassword;
+				// fl signIn normal manjiboch userPassword userId paid
+				return { status: "success", rslt: newUser };
+			} else {
+				return { status: "NoPassword", message: "error Password" };
+			}
 		}
 
 		return { status: "notexsist", message: "not exist email" };
@@ -288,14 +303,23 @@ async function cnfrmExist(data) {
 	const rspns = {};
 	try {
 		const callDb = db.ref(`allAcconts`);
-		const getUsrs = await callDb.get();
+		const gtUsrs = await callDb.get();
 
-		if (getUsrs.exists()) {
-			const allUsers = getUsrs.val();
+		if (gtUsrs.exists()) {
+			const allUsers = gtUsrs.val();
 			for (const userId in allUsers) {
 				if (allUsers[userId].userEmail == data.userEmail) {
-					return { status: "exist", userName: allUsers[userId].userName };
+					data.userName = allUsers[userId].userName;
+					if (data.action == "sndMsgCnferIn") {
+						const rslt = await sndEmail(data, db);
+						return rslt;
+					}
+					return { status: "exist" };
 				}
+			}
+			if (data.action == "sndMsgCnfer") {
+				const rslt = await sndEmail(data, db);
+				return rslt;
 			}
 			return { status: "notexsist", message: "not exist email" };
 		}
@@ -309,28 +333,5 @@ async function cnfrmExist(data) {
 		return rspns;
 	}
 }
-async function updtPsw(data) {
-	try {
-		const usrData = await gtUser(data);
-		if (usrData.status == "success") {
-			const user = usrData.rslt;
-			const rslt = user;
-			delete rslt.userId;
-			user.userPassword = data.userPassword;
-			const adusr = await addUser(user);
-			if (adusr.status == "success") {
-				return { status: "success", rslt: rslt };
-			} else {
-				return { status: "notSucsus" };
-			}
-		} else {
-			return usrData.status;
-		}
-	} catch (error) {
-		console.log(" error updtPsw : " + error);
 
-		return { status: "notexsist", message: "not exist email" };
-	}
-}
-
-export { cAllDatabase, dltAlrt, gtAlerts };
+export { cAllDatabase };

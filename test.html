@@ -1,88 +1,94 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, minimum-scale=0.1" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>صفحة مع شريط جانبي</title>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Firebase Google Login</title>
+
+		<script type="module">
+			// ----------------- Import Firebase -----------------
+			import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+			import {
+				getAuth,
+				GoogleAuthProvider,
+				signInWithPopup,
+			} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+			// ----------------- Firebase Config -----------------
+			// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+			const firebaseConfig = {
+				apiKey: "AIzaSyCL11Nbo54WUlFCGN3raQB-AsVWfR2_guM",
+				authDomain: "alertprice-c0176.firebaseapp.com",
+				projectId: "alertprice-c0176",
+				storageBucket: "alertprice-c0176.firebasestorage.app",
+				messagingSenderId: "48895497565",
+				appId: "1:48895497565:web:8b7c5e16335812f6c344b4",
+				measurementId: "G-YV336XXHKP",
+			};
+
+			// ----------------- Initialize -----------------
+			const app = initializeApp(firebaseConfig);
+			const auth = getAuth(app);
+			const provider = new GoogleAuthProvider();
+
+			// ----------------- Login Function -----------------
+			window.loginWithGoogle = function () {
+				signInWithPopup(auth, provider)
+					.then(result => {
+						console.log("User:", result.user);
+						window.location.href = "dashboard.html"; // الصفحة التي تريدها
+					})
+					.catch(err => {
+						alert("Error: " + err.message);
+					});
+			};
+		</script>
+
+		<style>
+			body {
+				font-family: sans-serif;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+				background: #f9f9f9;
+			}
+			.box {
+				padding: 25px;
+				width: 320px;
+				background: #fff;
+				border-radius: 14px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				text-align: center;
+			}
+			button {
+				width: 100%;
+				padding: 12px;
+				border-radius: 8px;
+				font-size: 16px;
+				border: 1px solid #ccc;
+				background: #fff;
+				cursor: pointer;
+			}
+			button:hover {
+				background: #f0f0f0;
+			}
+			img {
+				width: 20px;
+				vertical-align: middle;
+			}
+		</style>
 	</head>
 
 	<body>
-		<input type="file" id="inputFile" />
-		<img id="preview" width="200" />
-
-		<div>
-			<img id="reslt" src="" alt="" />
+		<div class="box">
+			<h2>تسجيل الدخول</h2>
+			<button onclick="loginWithGoogle()">
+				<img
+					src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+				/>
+				تسجيل الدخول بواسطة Google
+			</button>
 		</div>
-
-		<script>
-			const WEB_APP_URL =
-				"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec";
-
-			document
-				.getElementById("inputFile")
-				.addEventListener("change", async e => {
-					const file = e.target.files[0];
-					if (!file) return;
-
-					// تحقق من الحجم < 1MB
-					if (file.size > 1 * 1024 * 1024) {
-						alert("حجم الصورة يجب أن يكون أقل من 1MB");
-						return;
-					}
-
-					// عرض الصورة فورًا
-					document.getElementById("preview").src = URL.createObjectURL(file);
-					try {
-						// تحويل الصورة إلى Base64
-						const base64 = await toBase64(file);
-
-						// رفع الصورة عبر fetch
-						const response = await fetch(WEB_APP_URL, {
-							method: "POST",
-							// headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								/* action:'postImg', */ image: base64,
-								name: "dd",
-							}),
-						});
-
-						const result = await response.json();
-
-						console.log(result);
-
-						if (result.status === "success") {
-							const urlImg = `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w8000`;
-							document.getElementById("reslt").src = urlImg;
-						} else {
-							console.log("Error: " + result.message);
-						}
-					} catch (error) {
-						console.log(error);
-					}
-				});
-
-			function toBase64(file) {
-				return new Promise((resolve, reject) => {
-					const reader = new FileReader();
-					reader.onload = () => resolve(reader.result.split(",")[1]);
-					reader.onerror = reject;
-					reader.readAsDataURL(file);
-				});
-			}
-
-			const allUsers = {
-				usr1: { email: "dadi", password: "abdou" },
-				usr2: { email: "ossama", password: "laos" },
-			};
-
-			for (const userId in allUsers) {
-				console.log(allUsers[userId].email);
-			}
-
-			const now = new Date().getTime(); 
-			console.log(now);
-			
-		</script>
 	</body>
 </html>

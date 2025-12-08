@@ -1,102 +1,57 @@
-/**
- * Import function triggers from v2
- */
-import { onObjectFinalized } from "firebase-functions/v2/storage";
-import { setGlobalOptions } from "firebase-functions/v2/options";
+const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+
+// تهيئة تطبيق الأدمن للوصول لقاعدة البيانات
+admin.initializeApp();
+
+const db = admin.firestore();
 
 /**
- * Import Admin SDK to interact with DB and Storage
+ * 1. دالة تعمل تلقائياً عند إنشاء مستخدم جديد
+ * الهدف: إنشاء مستند في مجموعة "users" في Firestore يحمل نفس الـ UID
  */
-import { initializeApp } from "firebase-admin/app";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
-import { getDatabase } from "firebase-admin/database"; // Realtime DB
-import { getStorage } from "firebase-admin/storage";   // Storage (للحذف)
+exports.onUserCreated = functions.auth.user().onCreate((user) => {
+  // الحصول على بيانات المستخدم من عملية التسجيل
+  const { uid, email, displayName, photoURL } = user;
 
-// 1. تهيئة التطبيق
-initializeApp();
+  // إنشاء مرجع للمستند
+  const userDocRef = db.collection("users").doc(uid);
 
-let dbFirestore;
-let dbRealtime ;
-let storage ;
+  // البيانات التي نريد تخزينها
+  const userData = {
+    email: email,
+    displayName: displayName || "مستخدم جديد", // قيمة افتراضية إذا لم يتوفر الاسم
+    photoURL: photoURL || null,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    role: "user", // يمكن تحديد صلاحيات افتراضية
+  };
 
-// 2. ضبط المنطقة لجميع الدوال
-setGlobalOptions({ region: "europe-west1" });
+  // الحفظ في قاعدة البيانات وإرجاع الـ Promise
+  return userDocRef.set(userData)
+    .then(() => {
+      console.log(`User profile created for ${uid}`);
+    })
+    .catch((error) => {
+      console.error("Error writing document: ", error);
+    });
+});
 
 /**
- * الدالة الرئيسية: تعمل بعد رفع أي ملف
+ * 2. دالة تعمل تلقائياً عند حذف مستخدم
+ * الهدف: حذف بيانات المستخدم من Firestore لتنظيف قاعدة البيانات
  */
-async function valdProfileImgeAndSet(event) {
-      dbFirestore = getFirestore();
- dbRealtime = getDatabase();
- storage = getStorage();
-    const fileData = event.data;
-    const filePath = fileData.name; // مثال: users/Mohamed/profile.jpg
-    const bucketName = fileData.bucket;
-    const contentType = fileData.contentType;
+exports.onUserDeleted = functions.auth.user().onDelete((user) => {
+  const { uid } = user;
 
-    // --- (أ) فلترة أولية: هل الملف في مجلد users؟ وهل هو صورة؟ ---
-    
-    // إذا لم يكن في مجلد users، لا نتدخل (أو يمكن حذفه أيضاً إذا أردت صرامة أكثر)
-    if (!filePath.startsWith("users/")) {
-      console.log("الملف ليس في مجلد users، تم تجاهله.");
-      return;
-    }
+  // مرجع المستند المراد حذفه
+  const userDocRef = db.collection("users").doc(uid);
 
-    // إذا لم يكن صورة، نحذفه فوراً لتنظيف التخزين
-    if (!contentType || !contentType.startsWith("image/")) {
-      console.log("الملف ليس صورة. جاري الحذف...");
-      await storage.bucket(bucketName).file(filePath).delete();
-      return;
-    }
-
-    // --- (ب) استخراج معرف المستخدم والتحقق من Realtime DB ---
-
-    const parts = filePath.split("/");
-    const userId = parts[1]; // الاسم الموجود بعد users/
-
-    try {
-      // البحث عن المستخدم في Realtime Database
-      const rtdbRef = dbRealtime.ref(`users/${userId}`);
-      const snapshot = await rtdbRef.get();
-
-      // --- السيناريو 1: المستخدم غير موجود (محاولة اختراق أو خطأ) ---
-      if (!snapshot.exists()) {
-        console.warn(`تحذير: المستخدم ${userId} غير موجود في Realtime DB. جاري حذف الصورة المرفوعة.`);
-        
-        // الحذف الفوري للصورة من Storage
-        await storage.bucket(bucketName).file(filePath).delete();
-        return;
-      }
-
-      // --- السيناريو 2: المستخدم موجود (عملية شرعية) ---
-      
-      // إنشاء رابط الصورة (Download URL)
-      // بما أن الـ Rules مفتوحة (if true)، يمكننا استخدام هذا الرابط المباشر
-      const fileUrl = `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(filePath)}?alt=media`;
-
-      // تحديث Firestore ليظهر في التطبيق
-      await dbFirestore.collection("users").doc(userId).set(
-        {
-          photoURL: fileUrl,
-          lastUpdated: FieldValue.serverTimestamp(),
-        },
-        { merge: true } // دمج البيانات
-      );
-
-      console.log(`تم قبول الصورة وتحديث البروفايل للمستخدم: ${userId}`);
-
-    } catch (error) {
-      console.error("حدث خطأ غير متوقع:", error);
-    }
-}
-
-
-export const validateAndSetProfileImage = onObjectFinalized(
-  {
-    region: "europe-west1",
-    // cpu: 1, // يمكنك ضبط الموارد هنا إذا أردت
-  },
-  async (event) => {
-   await valdProfileImgeAndSet(event);
-  }
-);
+  // حذف المستند وإرجاع الـ Promise
+  return userDocRef.delete()
+    .then(() => {
+      console.log(`User profile deleted for ${uid}`);
+    })
+    .catch((error) => {
+      console.error("Error removing document: ", error);
+    });
+});

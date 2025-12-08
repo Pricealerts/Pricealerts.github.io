@@ -1,24 +1,36 @@
-const lstLoclSrorge = ['action','userId','userName','userEmail','userPassword','userPicture','chtId1','chtId2','chtId3','paid','base64Pctr']
+const lstLoclSrorge = [
+	"action",
+	"userId",
+	"userName",
+	"userEmail",
+	"userPassword",
+	"userPicture",
+	"chtId1",
+	"chtId2",
+	"chtId3",
+	"paid",
+	"base64Pctr",
+];
 for (let i = 0; i < lstLoclSrorge.length; i++) {
 	const strg = lstLoclSrorge[i];
 	localStorage.removeItem(strg);
 }
-	
+
+const drction = "../accont/";
 gebi("btnSignUp").addEventListener("click", async () => {
-	
 	const acont = document.querySelectorAll("#frmSgnUp input");
 	userName = acont[0].value;
 	userEmail = acont[1].value;
 	userPassword = acont[2].value;
-
 
 	gebi("errmsgsgnUp").innerText = "جاري التسجيل ...";
 	gebi("errmsgsgnUp").style.color = "black";
 	// cnfr cont is exist
 	try {
 		const rspnsCnfrm = await ftchFirebase({
-			action: "cnfrmExist",
+			action: "sndMsgCnfer",
 			userEmail: userEmail,
+			userName: userName,
 		});
 		if (rspnsCnfrm.status == "exist") {
 			gebi("errmsgsgnUp").innerText =
@@ -28,23 +40,14 @@ gebi("btnSignUp").addEventListener("click", async () => {
 				activateSignIn();
 			}, 2000);
 			return false;
-		}
-
-
-		// send message
-		const data = await ftchAppsScript({
-			action: "sndMsgCnfer",
-			userEmail: userEmail,
-			userName: userName,
-		});
-
-		//const apRpond = JSON.parse(data);
-		if (data.status == "notSend") {
+		} else if (rspnsCnfrm.status == "success") {
+			gebi("msgCnfrm").style.transform = "translateY(0%)";
+		} else if (data.status == "notSend") {
 			gebi("errmsgsgnUp").innerText = "الإيمل خاطئ تأكد منه وأعد المحاولة";
 			gebi("errmsgsgnUp").style.color = "red";
-			return false;
-		}else{
-			gebi("msgCnfrm").style.transform = "translateY(0%)";
+		} else {
+			gebi("errmsgsgnUp").innerText = "حدث خطأ أعد المحاولة";
+			gebi("errmsgsgnUp").style.color = "red";
 		}
 	} catch (error) {
 		console.error("err rspnsCnfrm" + error);
@@ -52,43 +55,49 @@ gebi("btnSignUp").addEventListener("click", async () => {
 	}
 
 	// send message
-
 });
 
 ///////////// conferm code
-gebi("btnCnfrm").addEventListener("click", async ()=> {
-	console.log('ddd');
+gebi("btnCnfrm").addEventListener("click", async () => {
+	console.log("ddd");
 	await adedUser();
 });
 async function adedUser() {
-	 if(gebi("codeCnfrm").value.length < 6) {
-		gebi("errmsgsgnIn").innerText = "عليك ملأ الخانة ب 6 أرقام";
-		gebi("errmsgsgnIn").style.color = "red";
+	if (gebi("codeCnfrm").value.length < 6) {
+		gebi("errmsgCnfrm").innerText = "رمز التحقق خاطئ أعد المحاولة";
+		gebi("errmsgCnfrm").style.color = "red";
 		return false;
 	}
-  	gebi("errmsgCnfrm").innerText = "جاري التحقق ...";
+	gebi("errmsgCnfrm").innerText = "جاري التحقق ...";
 	gebi("errmsgCnfrm").style.color = "black";
 	// conferm send message
-	try {
-		const data = await ftchAppsScript({
+/* 	try {
+		const data = await ftchFirebase({
 			action: "cnfrmCode",
 			userEmail: userEmail,
 			inputCode: gebi("codeCnfrm").value,
-			signIn:false
+			signUp: true,
 		});
 
 		if (data.status == "overNmber") {
-			gebi("errmsgCnfrm").innerText = "لقد قمت بالمحاولة أكثر من 4 مرات أعد المحاولة بعد ساعة";
+			gebi("errmsgCnfrm").innerText =
+				"لقد قمت بالمحاولة أكثر من 4 مرات أعد المحاولة بعد ساعة";
 			gebi("errmsgCnfrm").style.color = "red";
-		}
-		if (data.status == "notExist") {
+			return false;
+		} else if (data.status == "notExist") {
 			gebi("errmsgCnfrm").innerText = "رمز التحقق خاطئ أعد المحاولة";
 			gebi("errmsgCnfrm").style.color = "red";
+			return false;
+		} else if (data.status != "exist") {
+			gebi("errmsgCnfrm").innerText = "حدث خطأ أعد المحاولة";
+			gebi("errmsgCnfrm").style.color = "red";
+			return false;
 		}
 	} catch (error) {
 		console.log("error appscript : " + error);
 		return false;
-	}
+	} */
+
 	const now = new Date();
 	const idUser = now.getTime();
 	const bodyUp = {
@@ -98,32 +107,31 @@ async function adedUser() {
 		userEmail: userEmail,
 		userPassword: userPassword,
 		userPicture: "/imgs/web/apple-touch-icon.png",
+		inputCode: gebi("codeCnfrm").value,
+		signUp: true,
 	};
 
 	const rspns = await ftchFirebase(bodyUp);
 	if (rspns.status == "success") {
-		const {userPassword,userId, ...newbodyUp } = bodyUp;
+		const { userPassword, userId,inputCode,signUp, ...newbodyUp } = bodyUp;
 		for (const key in newbodyUp) {
-			const element = newbodyUp[key];
-			localStorage[key] = element;
+			localStorage[key] = newbodyUp[key];
 		}
 		saveImage(newbodyUp.userPicture);
-		window.location.href = "https://pricealerts.web.app/accont";
+		window.location.href = drction;
 	}
 }
 
 async function ftchFirebase(body) {
 	try {
-		const urlFirebase =
-			"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+		const urlFirebase = //https://proxyrequestv2-zzdsz5x2ea-ew.a.run.app
+			"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2/";
 		const response = await fetch(urlFirebase, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(body),
 		});
 		const data = await response.json();
-		
-
 		const rspns = JSON.parse(data);
 		console.log(rspns);
 		return rspns;
@@ -133,23 +141,7 @@ async function ftchFirebase(body) {
 }
 
 
-async function ftchAppsScript(body) {
-	const APP_script_URL ="https://script.google.com/macros/s/AKfycbz6meme_5kiDjQu2MMLpvLL7fDegh-KpI7njxEWj05pRbjJRo7KmGANcz1aPaBymziY/exec"
-		try {
-		const apsResponse = await fetch(APP_script_URL, {
-			method: "POST",
-			body: JSON.stringify(body),
-		});
-
-		const data = await apsResponse.json();
-		console.log(data);
-
-		return data;
-	} catch (error) {
-		console.error("error appscript : " + error);
-		return false;
-	}
-}
 
 
 
+ 

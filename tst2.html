@@ -135,13 +135,13 @@
 				showDriveImage(input.value);
 			});
 
-			const now = new Date();
-			const idUser = now.getTime();
-			let nmbr6 = idUser * 7;
-			nmbr6 = nmbr6.toString();
-			const strtNmbr = nmbr6.length - 6;
-			nmbr6 = nmbr6.slice(strtNmbr, nmbr6.length - 1);
-			console.log(nmbr6);
+			const numbers = [['abdou','souso'], ['sfgh','sdf'], ['yfs','sdgg']];
+
+// Filter for even numbers
+const evenNumbers = numbers.filter(number => number[0] === 'abdou');
+console.log(evenNumbers[0]); // Output: [2, 4, 6, 8, 10]
+
+
 		</script>
 	</body>
 </html>
