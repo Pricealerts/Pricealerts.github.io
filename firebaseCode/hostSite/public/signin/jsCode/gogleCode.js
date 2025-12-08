@@ -1,96 +1,101 @@
- // 1. استيراد الدوال اللازمة من مكتبة Firebase
-    	// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-analytics.js";
+import {
+	getAuth,
+	signInWithEmailAndPassword,
+	createUserWithEmailAndPassword,
+	signInWithPopup,
+	GoogleAuthProvider,
+	onAuthStateChanged,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    import { 
-        getAuth, 
-        signInWithEmailAndPassword, 
-        createUserWithEmailAndPassword, 
-        signInWithPopup, 
-        GoogleAuthProvider,
-        onAuthStateChanged 
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
- // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDIR4H7Jk3bJN_QZp-Cs4CbqpRmsKkUTxc",
-  authDomain: "pricealert-31787.firebaseapp.com",
-  databaseURL: "https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "pricealert-31787",
-  storageBucket: "pricealert-31787.firebasestorage.app",
-  messagingSenderId: "200237716010",
-  appId: "1:200237716010:web:65a9e33254d2302339a953",
-  measurementId: "G-L693265WLN"
+	apiKey: "AIzaSyCL11Nbo54WUlFCGN3raQB-AsVWfR2_guM",
+	authDomain: "alertprice-c0176.firebaseapp.com",
+	databaseURL:
+		"https://alertprice-c0176-default-rtdb.europe-west1.firebasedatabase.app",
+	projectId: "alertprice-c0176",
+	storageBucket: "alertprice-c0176.firebasestorage.app",
+	messagingSenderId: "48895497565",
+	appId: "1:48895497565:web:8b7c5e16335812f6c344b4",
+	measurementId: "G-YV336XXHKP",
 };
 
-import { getFunctions, httpsCallable } from "firebase/functions";
+//import { getFunctions, httpsCallable } from "firebase/functions";
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
-    const provider = new GoogleAuthProvider();
+const provider = new GoogleAuthProvider();
 
 // ... كود تسجيل الدخول السابق ...
 
-document.getElementById('googleBtn').addEventListener('click', () => {
-    signInWithPopup(auth, provider)
-        .then(async (result) => {
-            // 1. تم تسجيل الدخول بنجاح
-            console.log("Logged in!");
+// ----------------- Initialize ----------------
+const auth = getAuth(app);
 
-            // 2. الآن نستدعي الدالة يدوياً لإنشاء الملف
-            const functions = getFunctions();
-            const createUserProfile = httpsCallable(functions, 'createUserProfile');
+// ----------------- Login Function -----------------
+window.loginWithGoogle = function () {
+	signInWithPopup(auth, provider)
+		.then(result => {
+			console.log("User:", result.user);
+			window.location.href = "index.html"; // الصفحة التي تريدها
+		})
+		.catch(err => {
+			alert("Error: " + err.message);
+		});
+};
 
-            // نرسل البيانات الإضافية التي نريدها
-            await createUserProfile({ 
-                userType: "trader", // مثلاً نرسل نوع المستخدم
-                phoneNumber: "0555555555" 
-            });
+/* 
 
-            console.log("Profile created in Database!");
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
+document.getElementById("googleBtn").addEventListener("click", () => {
+	signInWithPopup(auth, provider)
+		.then(async result => {
+			// 1. تم تسجيل الدخول بنجاح
+			console.log("Logged in!");
+
+			// 2. الآن نستدعي الدالة يدوياً لإنشاء الملف
+			const functions = getFunctions();
+			const createUserProfile = httpsCallable(functions, "createUserProfile");
+
+			// نرسل البيانات الإضافية التي نريدها
+			await createUserProfile({
+				userType: "trader", // مثلاً نرسل نوع المستخدم
+				phoneNumber: "0555555555",
+			});
+
+			console.log("Profile created in Database!");
+		})
+		.catch(error => {
+			console.error("Error:", error);
+		});
 });
-document.getElementById('googleBtn').addEventListener('click', () => {
-    signInWithPopup(auth, provider)
-        .then(async (result) => {
-            // 1. استخراج الـ ID من نتيجة تسجيل الدخول
-            const uid = result.user.uid; 
-			
-            
-            console.log("Logged in!");
-            console.log("My User ID is:", uid); // ✅ هنا يظهر الـ ID
+document.getElementById("googleBtn").addEventListener("click", () => {
+	signInWithPopup(auth, provider)
+		.then(async result => {
+			// 1. استخراج الـ ID من نتيجة تسجيل الدخول
+			const uid = result.user.uid;
 
-            // 2. الآن نستدعي الدالة يدوياً لإنشاء الملف
-            const functions = getFunctions();
-            const createUserProfile = httpsCallable(functions, 'createUserProfile');
+			console.log("Logged in!");
+			console.log("My User ID is:", uid); // ✅ هنا يظهر الـ ID
 
-            // نرسل البيانات الإضافية
-            // ملاحظة: لا تحتاج لإرسال الـ uid هنا لأن الدالة السحابية تعرفه تلقائياً (context.auth.uid)
-            await createUserProfile({ 
-                userType: "trader",
-                phoneNumber: "0555555555" 
-            });
+			// 2. الآن نستدعي الدالة يدوياً لإنشاء الملف
+			const functions = getFunctions();
+			const createUserProfile = httpsCallable(functions, "createUserProfile");
 
-            console.log("Profile created in Database for user:", uid);
-        })
-        .catch((error) => {
-            console.error("Error:", error);
-        });
+			// نرسل البيانات الإضافية
+			// ملاحظة: لا تحتاج لإرسال الـ uid هنا لأن الدالة السحابية تعرفه تلقائياً (context.auth.uid)
+			await createUserProfile({
+				userType: "trader",
+				phoneNumber: "0555555555",
+			});
+
+			console.log("Profile created in Database for user:", uid);
+		})
+		.catch(error => {
+			console.error("Error:", error);
+		});
 });
-
-
-
-
-
-
 
 // 3. تهيئة الزر عند تحميل الصفحة
 window.onload = function () {
@@ -128,7 +133,7 @@ async function handleCredentialResponse(response) {
 		userName: responsePayload.name, // Full name
 		userEmail: responsePayload.email,
 		userPicture: responsePayload.picture,
-		usergogl :true
+		usergogl: true,
 	};
 	try {
 		const rspns = await ftchFirebase(bodyUp);
@@ -139,11 +144,11 @@ async function handleCredentialResponse(response) {
 			}
 			saveImage(nwbodyUp.userPicture);
 			//bodyUp = {};
-	responsePayload.sub = "";
+			responsePayload.sub = "";
 			//window.location.href = drction;
 		}
 	} catch (error) {}
-	
+
 	//userId = "";
 }
 
@@ -164,3 +169,4 @@ function parseJwt(token) {
 
 	return JSON.parse(jsonPayload);
 }
+ */

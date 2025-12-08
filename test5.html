@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="module">
+  // Import Firebase SDKs
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getAuth, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+  // إعدادات مشروع Firebase الخاص بك
+  const firebaseConfig = {
+				apiKey: "AIzaSyCL11Nbo54WUlFCGN3raQB-AsVWfR2_guM",
+				authDomain: "alertprice-c0176.firebaseapp.com",
+				projectId: "alertprice-c0176",
+				storageBucket: "alertprice-c0176.firebasestorage.app",
+				messagingSenderId: "48895497565",
+				appId: "1:48895497565:web:8b7c5e16335812f6c344b4",
+				measurementId: "G-YV336XXHKP",
+			};
+
+  // تهيئة التطبيق
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // أرسل إيميل إعادة التعيين
+  window.resetPassword = function () {
+    const email = document.getElementById("resetEmail").value;
+
+    sendPasswordResetEmail(auth, email)
+      .then(() => {
+        alert("تم إرسال رابط إعادة تعيين كلمة السر إلى بريدك الإلكتروني");
+      })
+      .catch((error) => {
+        alert("حدث خطأ: " + error.message);
+      });
+  }
+</script>
+</head>
+<body>
+    <!-- Firebase App -->
+
+<div style="width: 300px; margin: 50px auto; text-align: center;">
+  <h2>نسيت كلمة السر</h2>
+
+  <input 
+    type="email" 
+    id="resetEmail" 
+    placeholder="أدخل بريدك الإلكتروني" 
+    style="width: 100%; padding: 10px; margin-bottom: 10px;"/>
+
+  <button 
+    onclick="resetPassword()" 
+    style="width: 100%; padding: 10px;">
+      إرسال رابط إعادة التعيين
+  </button>
+</div>
+
+</body>
+</html>

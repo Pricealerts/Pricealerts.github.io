@@ -4,17 +4,14 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import { initializeApp } from "firebase-admin/app";
 import { cAllDatabase } from "./fncAlert/cAllDatabase.js";
 import { checkAndSendAlerts } from "./fncAlert/srchSmbls.js";
-import { onUserCreated, onUserDeleted } from "firebase-functions/v2/auth";
-//import { onCall } from "firebase-functions/v2/https";
-//import nodemailer from "nodemailer";
-//import { getSecret } from "firebase-functions/params";
-// ⭐ يجب أن يتم قبل استيراد أي ملف يستخدم الـ Admin SDK
+//import { onUserCreated, onUserDeleted } from "firebase-functions/v2/auth";
+
 initializeApp();
-// … بقية الكود
 
 export const proxyRequestV2 = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
+
 		// تعيين رؤوس CORS
 		const origin = req.headers.origin;
 		const allowedOrigins = [
@@ -142,7 +139,7 @@ export const sendVerificationEmail = onCall(
 /**
  * 1️⃣ دالة تعمل عند إنشاء مستخدم جديد
  */
-export const onUserCreatedV2 = onUserCreated(
+/* export const onUserCreatedV2 = onUserCreated(
 	{ region: "europe-west1" },
 	async event => {
 
@@ -171,45 +168,9 @@ export const onUserCreatedV2 = onUserCreated(
 
 	}
 );
+ */
 
 
 
 
 
-
-
-
-import { onRequest } from "firebase-functions/v2/https";
-import { initializeApp } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-
-initializeApp();
-
-export const getUserById = onRequest(
-  { region: "europe-west1" },
-  async (req, res) => {
-    try {
-      const uid = req.query.uid || req.body.uid;
-
-      if (!uid) {
-        return res.status(400).json({ error: "UID مطلوب" });
-      }
-
-      const auth = getAuth();
-      const userRecord = await auth.getUser(uid);
-
-      res.json({
-        uid: userRecord.uid,
-        email: userRecord.email,
-        displayName: userRecord.displayName,
-        photoURL: userRecord.photoURL,
-        emailVerified: userRecord.emailVerified,
-        disabled: userRecord.disabled,
-        providers: userRecord.providerData
-      });
-      
-    } catch (error) {
-      res.status(500).json({ error: error.message });
-    }
-  }
-);

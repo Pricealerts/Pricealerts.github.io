@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المستخدمين - لوحة التحكم</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-functions-compat.js"></script>
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            background-color: #f5f7fb;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #3a56d4;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #e11575;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: var(--dark);
+        }
+        
+        .btn-success:hover {
+            background-color: #3db8db;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+        
+        /* Forms */
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .form-col {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        /* Users Table */
+        .users-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .table-header {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr 1fr 2fr;
+            padding: 15px 20px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .table-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 2fr 1fr 1fr 2fr;
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        
+        .table-row:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-active {
+            background-color: rgba(76, 201, 240, 0.2);
+            color: #0a6c7e;
+        }
+        
+        .status-inactive {
+            background-color: rgba(247, 37, 133, 0.2);
+            color: #a4134d;
+        }
+        
+        .role-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .role-user {
+            background-color: #e9ecef;
+            color: var(--gray);
+        }
+        
+        .role-admin {
+            background-color: rgba(67, 97, 238, 0.2);
+            color: var(--primary);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        /* Messages */
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        
+        .message.success {
+            background-color: rgba(76, 201, 240, 0.1);
+            color: #0a6c7e;
+            border: 1px solid rgba(76, 201, 240, 0.3);
+        }
+        
+        .message.error {
+            background-color: rgba(247, 37, 133, 0.1);
+            color: #a4134d;
+            border: 1px solid rgba(247, 37, 133, 0.3);
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0,0,0,0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border-left-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .table-header,
+            .table-row {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .table-header {
+                display: none;
+            }
+            
+            .table-row {
+                padding: 20px;
+                border: 1px solid #eee;
+                margin-bottom: 10px;
+                border-radius: 6px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>لوحة إدارة المستخدمين</h1>
+                <div class="user-info">
+                    <span id="adminName"></span>
+                    <button id="logoutBtn" class="btn btn-danger">تسجيل الخروج</button>
+                </div>
+            </div>
+        </header>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="users-list">قائمة المستخدمين</div>
+            <div class="tab" data-tab="add-user">إضافة مستخدم جديد</div>
+            <div class="tab" data-tab="batch-users">إضافة جماعية</div>
+        </div>
+        
+        <!-- Messages Container -->
+        <div id="messageContainer"></div>
+        
+        <!-- Tab 1: Users List -->
+        <div id="users-list" class="tab-content">
+            <div class="form-container">
+                <div class="form-row">
+                    <div class="form-col">
+                        <input type="text" id="searchUsers" class="form-control" placeholder="بحث بالمستخدمين...">
+                    </div>
+                    <div class="form-col">
+                        <select id="filterRole" class="form-control">
+                            <option value="">جميع الأدوار</option>
+                            <option value="user">مستخدم عادي</option>
+                            <option value="admin">أدمن</option>
+                        </select>
+                    </div>
+                    <div class="form-col">
+                        <select id="filterStatus" class="form-control">
+                            <option value="">جميع الحالات</option>
+                            <option value="active">نشط</option>
+                            <option value="inactive">غير نشط</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="usersTable" class="users-table">
+                <!-- سيتم تعبئة الجدول عبر JavaScript -->
+                <div class="loading" id="usersLoading">
+                    <div class="spinner"></div>
+                    <p>جاري تحميل المستخدمين...</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab 2: Add User -->
+        <div id="add-user" class="tab-content" style="display: none;">
+            <div class="form-container">
+                <h3>إضافة مستخدم جديد</h3>
+                
+                <div class="form-group">
+                    <label for="newEmail">البريد الإلكتروني *</label>
+                    <input type="email" id="newEmail" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPassword">كلمة المرور *</label>
+                    <input type="password" id="newPassword" class="form-control" required>
+                    <small style="color: var(--gray);">يجب أن تكون 6 أحرف على الأقل</small>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="newDisplayName">اسم المستخدم</label>
+                            <input type="text" id="newDisplayName" class="form-control">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label for="newRole">الدور</label>
+                            <select id="newRole" class="form-control">
+                                <option value="user">مستخدم عادي</option>
+                                <option value="admin">أدمن</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="newPhone">رقم الهاتف</label>
+                    <input type="tel" id="newPhone" class="form-control">
+                </div>
+                
+                <button id="createUserBtn" class="btn btn-primary">إنشاء المستخدم</button>
+            </div>
+        </div>
+        
+        <!-- Tab 3: Batch Users -->
+        <div id="batch-users" class="tab-content" style="display: none;">
+            <div class="form-container">
+                <h3>إضافة مستخدمين جماعي</h3>
+                <p>يمكنك إضافة مستخدمين متعددة باستخدام JSON</p>
+                
+                <div class="form-group">
+                    <label for="batchJson">بيانات المستخدمين (JSON)</label>
+                    <textarea id="batchJson" class="form-control" rows="10" placeholder='[
+  {
+    "email": "user1@example.com",
+    "password": "password123",
+    "displayName": "مستخدم أول",
+    "role": "user"
+  },
+  {
+    "email": "user2@example.com",
+    "password": "password456",
+    "displayName": "مستخدم ثاني",
+    "role": "admin"
+  }
+]'></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <button id="validateJsonBtn" class="btn btn-primary">تحقق من الصيغة</button>
+                    <button id="batchCreateUsersBtn" class="btn btn-success">إنشاء المستخدمين</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal for User Actions -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalTitle">إدارة المستخدم</h3>
+            <div id="modalContent"></div>
+            <div class="form-group" style="margin-top: 20px;">
+                <button id="closeModalBtn" class="btn btn-primary">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // تهيئة Firebase
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT_ID.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const functions = firebase.functions();
+        
+        // استدعاء الدوال
+        const createUserFunction = functions.httpsCallable('createUser');
+        const listUsersFunction = functions.httpsCallable('listUsers');
+        const updateUserFunction = functions.httpsCallable('updateUser');
+        const deleteUserFunction = functions.httpsCallable('deleteUser');
+        const setAdminFunction = functions.httpsCallable('setAdmin');
+        const sendPasswordResetFunction = functions.httpsCallable('sendPasswordReset');
+        const batchCreateUsersFunction = functions.httpsCallable('batchCreateUsers');
+        
+        // عناصر DOM
+        const adminNameSpan = document.getElementById('adminName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const messageContainer = document.getElementById('messageContainer');
+        const userModal = document.getElementById('userModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalContent = document.getElementById('modalContent');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        
+        // عرض رسالة
+        function showMessage(message, type = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            
+            messageContainer.innerHTML = '';
+            messageContainer.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        // تبديل التبويبات
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabId = tab.getAttribute('data-tab');
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.style.display = 'none');
+                
+                tab.classList.add('active');
+                document.getElementById(tabId).style.display = 'block';
+                
+                if (tabId === 'users-list') {
+                    loadUsers();
+                }
+            });
+        });
+        
+        // تحميل قائمة المستخدمين
+        async function loadUsers(page = 1) {
+            const usersTable = document.getElementById('usersTable');
+            usersTable.innerHTML = '<div class="loading"><div class="spinner"></div><p>جاري تحميل المستخدمين...</p></div>';
+            
+            try {
+                const result = await listUsersFunction({ page: page, limit: 20 });
+                
+                if (result.data.success) {
+                    renderUsersTable(result.data.users);
+                }
+            } catch (error) {
+                usersTable.innerHTML = '<div class="message error">خطأ في تحميل المستخدمين</div>';
+                console.error(error);
+            }
+        }
+        
+        // عرض جدول المستخدمين
+        function renderUsersTable(users) {
+            const usersTable = document.getElementById('usersTable');
+            
+            if (users.length === 0) {
+                usersTable.innerHTML = '<div class="message info">لا توجد مستخدمين</div>';
+                return;
+            }
+            
+            let html = `
+                <div class="table-header">
+                    <div>الحالة</div>
+                    <div>الاسم</div>
+                    <div>البريد الإلكتروني</div>
+                    <div>الدور</div>
+                    <div>آخر دخول</div>
+                    <div>الإجراءات</div>
+                </div>
+            `;
+            
+            users.forEach(user => {
+                const statusClass = user.disabled ? 'status-inactive' : 'status-active';
+                const statusText = user.disabled ? 'غير نشط' : 'نشط';
+                const roleClass = user.isAdmin ? 'role-admin' : 'role-user';
+                const roleText = user.isAdmin ? 'أدمن' : 'مستخدم';
+                
+                const lastLogin = user.lastSignIn ? 
+                    new Date(user.lastSignIn).toLocaleDateString('ar-SA') : 
+                    'لم يسجل دخول';
+                
+                html += `
+                    <div class="table-row" data-user-id="${user.uid}">
+                        <div><span class="status-badge ${statusClass}">${statusText}</span></div>
+                        <div>${user.displayName || 'بدون اسم'}</div>
+                        <div>${user.email}</div>
+                        <div><span class="role-badge ${roleClass}">${roleText}</span></div>
+                        <div>${lastLogin}</div>
+                        <div>
+                            <button class="btn btn-primary btn-sm" onclick="showUserActions('${user.uid}')">إدارة</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            usersTable.innerHTML = html;
+        }
+        
+        // عرض خيارات إدارة المستخدم
+        window.showUserActions = async function(userId) {
+            try {
+                modalTitle.textContent = 'إدارة المستخدم';
+                
+                // جلب معلومات المستخدم
+                const result = await listUsersFunction({ page: 1, limit: 1 });
+                const user = result.data.users.find(u => u.uid === userId);
+                
+                if (!user) {
+                    modalContent.innerHTML = '<p>المستخدم غير موجود</p>';
+                    userModal.classList.add('active');
+                    return;
+                }
+                
+                modalContent.innerHTML = `
+                    <div class="form-group">
+                        <p><strong>الاسم:</strong> ${user.displayName || 'بدون اسم'}</p>
+                        <p><strong>البريد:</strong> ${user.email}</p>
+                        <p><strong>الدور:</strong> ${user.isAdmin ? 'أدمن' : 'مستخدم'}</p>
+                        <p><strong>الحالة:</strong> ${user.disabled ? 'غير نشط' : 'نشط'}</p>
+                        <p><strong>تاريخ الإنشاء:</strong> ${new Date(user.createdAt).toLocaleString('ar-SA')}</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button class="btn btn-primary" onclick="toggleAdmin('${userId}', ${!user.isAdmin})">
+                            ${user.isAdmin ? 'إزالة صلاحية الأدمن' : 'تعيين كأدمن'}
+                        </button>
+                        <button class="btn btn-primary" onclick="sendResetPassword('${userId}')">
+                            إرسال إعادة تعيين كلمة المرور
+                        </button>
+                        <button class="btn btn-danger" onclick="deleteUser('${userId}')">
+                            حذف المستخدم
+                        </button>
+                    </div>
+                `;
+                
+                userModal.classList.add('active');
+            } catch (error) {
+                showMessage('خطأ في تحميل معلومات المستخدم', 'error');
+            }
+        };
+        
+        // تعيين/إزالة صلاحية الأدمن
+        window.toggleAdmin = async function(userId, makeAdmin) {
+            try {
+                await setAdminFunction({ userId: userId, isAdmin: makeAdmin });
+                showMessage(`تم ${makeAdmin ? 'تعيين' : 'إزالة'} صلاحية الأدمن بنجاح`);
+                loadUsers();
+                userModal.classList.remove('active');
+            } catch (error) {
+                showMessage('خطأ في تحديث صلاحيات المستخدم', 'error');
+            }
+        };
+        
+        // إرسال إعادة تعيين كلمة المرور
+        window.sendResetPassword = async function(userId) {
+            try {
+                await sendPasswordResetFunction({ userId: userId });
+                showMessage('تم إرسال رابط إعادة تعيين كلمة المرور');
+                userModal.classList.remove('active');
+            } catch (error) {
+                showMessage('خطأ في إرسال رابط إعادة التعيين', 'error');
+            }
+        };
+        
+        // حذف المستخدم
+        window.deleteUser = async function(userId) {
+            if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+            
+            try {
+                await deleteUserFunction({ userId: userId });
+                showMessage('تم حذف المستخدم بنجاح');
+                loadUsers();
+                userModal.classList.remove('active');
+            } catch (error) {
+                showMessage('خطأ في حذف المستخدم', 'error');
+            }
+        };
+        
+        // إغلاق المودال
+        closeModalBtn.addEventListener('click', () => {
+            userModal.classList.remove('active');
+        });
+        
+        // إنشاء مستخدم جديد
+        document.getElementById('createUserBtn').addEventListener('click', async () => {
+            const email = document.getElementById('newEmail').value;
+            const password = document.getElementById('newPassword').value;
+            const displayName = document.getElementById('newDisplayName').value;
+            const role = document.getElementById('newRole').value;
+            const phone = document.getElementById('newPhone').value;
+            
+            if (!email || !password) {
+                showMessage('البريد الإلكتروني وكلمة المرور مطلوبان', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('كلمة المرور يجب أن تكون 6 أحرف على الأقل', 'error');
+                return;
+            }
+            
+            document.getElementById('createUserBtn').disabled = true;
+            document.getElementById('createUserBtn').textContent = 'جاري الإنشاء...';
+            
+            try {
+                const result = await createUserFunction({
+                    email: email,
+                    password: password,
+                    displayName: displayName,
+                    phoneNumber: phone,
+                    role: role
+                });
+                
+                showMessage('تم إنشاء المستخدم بنجاح');
+                
+                // إعادة تعيين النموذج
+                document.getElementById('newEmail').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('newDisplayName').value = '';
+                document.getElementById('newPhone').value = '';
+                
+                // التحويل إلى قائمة المستخدمين
+                document.querySelector('[data-tab="users-list"]').click();
+                
+            } catch (error) {
+                showMessage(error.message || 'خطأ في إنشاء المستخدم', 'error');
+            } finally {
+                document.getElementById('createUserBtn').disabled = false;
+                document.getElementById('createUserBtn').textContent = 'إنشاء المستخدم';
+            }
+        });
+        
+        // إنشاء مستخدمين جماعي
+        document.getElementById('batchCreateUsersBtn').addEventListener('click', async () => {
+            const jsonText = document.getElementById('batchJson').value;
+            
+            if (!jsonText) {
+                showMessage('الرجاء إدخال بيانات المستخدمين', 'error');
+                return;
+            }
+            
+            let users;
+            try {
+                users = JSON.parse(jsonText);
+                
+                if (!Array.isArray(users)) {
+                    showMessage('يجب أن تكون البيانات مصفوفة', 'error');
+                    return;
+                }
+                
+                if (users.length > 50) {
+                    showMessage('الحد الأقصى للمستخدمين في الدفعة الواحدة هو 50', 'error');
+                    return;
+                }
+                
+            } catch (error) {
+                showMessage('صيغة JSON غير صالحة', 'error');
+                return;
+            }
+            
+            document.getElementById('batchCreateUsersBtn').disabled = true;
+            document.getElementById('batchCreateUsersBtn').textContent = 'جاري الإنشاء...';
+            
+            try {
+                const result = await batchCreateUsersFunction({ users: users });
+                
+                if (result.data.success) {
+                    const successful = result.data.results.successful.length;
+                    const failed = result.data.results.failed.length;
+                    
+                    showMessage(`تم إنشاء ${successful} مستخدم بنجاح، فشل ${failed} مستخدم`);
+                    
+                    // عرض النتائج
+                    if (failed > 0) {
+                        let failedList = 'المستخدمين الذين فشل إنشاؤهم:\n';
+                        result.data.results.failed.forEach(f => {
+                            failedList += `${f.email}: ${f.error}\n`;
+                        });
+                        alert(failedList);
+                    }
+                    
+                    // التحويل إلى قائمة المستخدمين
+                    document.querySelector('[data-tab="users-list"]').click();
+                }
+                
+            } catch (error) {
+                showMessage(error.message || 'خطأ في إنشاء المستخدمين', 'error');
+            } finally {
+                document.getElementById('batchCreateUsersBtn').disabled = false;
+                document.getElementById('batchCreateUsersBtn').textContent = 'إنشاء المستخدمين';
+            }
+        });
+        
+        // التحقق من صيغة JSON
+        document.getElementById('validateJsonBtn').addEventListener('click', () => {
+            const jsonText = document.getElementById('batchJson').value;
+            
+            if (!jsonText) {
+                showMessage('الرجاء إدخال بيانات JSON', 'error');
+                return;
+            }
+            
+            try {
+                const users = JSON.parse(jsonText);
+                
+                if (!Array.isArray(users)) {
+                    showMessage('يجب أن تكون البيانات مصفوفة', 'error');
+                    return;
+                }
+                
+                // التحقق من كل مستخدم
+                let isValid = true;
+                let errors = [];
+                
+                users.forEach((user, index) => {
+                    if (!user.email) {
+                        isValid = false;
+                        errors.push(`المستخدم ${index + 1}: البريد الإلكتروني مطلوب`);
+                    }
+                    
+                    if (!user.password) {
+                        isValid = false;
+                        errors.push(`المستخدم ${index + 1}: كلمة المرور مطلوبة`);
+                    }
+                });
+                
+                if (isValid) {
+                    showMessage(`صيغة JSON صالحة (${users.length} مستخدم)`);
+                } else {
+                    showMessage(errors.join('\n'), 'error');
+                }
+                
+            } catch (error) {
+                showMessage('صيغة JSON غير صالحة', 'error');
+            }
+        });
+        
+        // تسجيل الخروج
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut()
+                .then(() => {
+                    window.location.href = 'index.html';
+                })
+                .catch(error => {
+                    showMessage('خطأ في تسجيل الخروج', 'error');
+                });
+        });
+        
+        // التحقق من حالة المستخدم
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                // جلب بيانات المستخدم للتحقق من أنه أدمن
+                try {
+                    const idTokenResult = await user.getIdTokenResult();
+                    const isAdmin = idTokenResult.claims.admin === true;
+                    
+                    if (!isAdmin) {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+                    
+                    adminNameSpan.textContent = user.displayName || user.email;
+                    loadUsers();
+                    
+                } catch (error) {
+                    console.error('خطأ في التحقق من الصلاحيات:', error);
+                    window.location.href = 'index.html';
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+        
+        // تهيئة التطبيق
+        window.addEventListener('DOMContentLoaded', () => {
+            // التحقق من أن المستخدم مسجل
+            if (!auth.currentUser) {
+                window.location.href = 'index.html';
+            }
+        });
+    </script>
+</body>
+</html>

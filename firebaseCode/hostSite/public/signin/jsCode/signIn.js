@@ -22,7 +22,7 @@ gebi("btnSignIn").addEventListener("click", async e => {
 			localStorage[key] = rslt[key];
 		}
 		saveImage(localStorage.userPicture);
-
+		await sgnIn('errmsgsgnIn')
 		window.location.href = drction;
 	} else if (rspns.status == "NoPassword" || rspns.status == "notexsist") {
 		gebi("errmsgsgnIn").innerText =
@@ -151,3 +151,24 @@ gebi("btnNewPswrd").addEventListener("click", async e => {
 		return false;
 	}
 });
+
+async function sgnIn(msgErr) {
+	try {
+		const rspns = await signInWithEmailAndPassword(
+			auth,
+			userEmail,
+			userPassword
+		);
+
+		const rslt = rspns.rslt;
+		for (const key in rslt) {
+			localStorage[key] = rslt[key];
+		}
+		saveImage(localStorage.userPicture);
+
+		window.location.href = drction;
+	} catch (error) {
+		gebi(msgErr).innerText = "حدث خطأ أعد المحاولة ";
+		gebi(msgErr).style.color = "red";
+	}
+}

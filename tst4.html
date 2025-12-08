@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+ <script type="module">
+  // Firebase imports مباشرة من CDN
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+  // إعداد Firebase
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // جعل الدالة عالمية ليتم استدعاؤها من HTML
+  window.login = async function () {
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+
+    try {
+      const result = await signInWithEmailAndPassword(auth, email, password);
+      console.log("Logged in:", result.user);
+      alert("تم تسجيل الدخول بنجاح!");
+    } catch (err) {
+      alert("خطأ: " + err.message);
+    }
+  };
+</script>
+
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
+
+<button onclick="login()">تسجيل الدخول</button>
+
+
+</body>
+</html>

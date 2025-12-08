@@ -1,10 +1,6 @@
 //import { defineSecret } from "firebase-functions/params";
 import { cAllDatabase } from "./cAllDatabase.js";
-//import nodemailer from "nodemailer";
-/* // تفعيل secrets
-	const GMAIL_EMAIL = defineSecret("GMAIL_EMAIL");
-	const GMAIL_PASSWORD = defineSecret("GMAIL_PASSWORD");
-	// جلب الإعدادات من environment variables */
+import { getAuth } from "firebase-admin/auth";
 
 let db;
 
@@ -23,7 +19,12 @@ async function sndEmail(data, dtbs) {
 			if (ovrNmb) {
 				reponse = { status: "overNmber" };
 			} else {
-				reponse = await verifyCode(userEmail, data.inputCode, data.signUp);
+				reponse = await verifyCode(
+					userEmail,
+					data.userPassword,
+					data.inputCode,
+					data.signUp
+				);
 			}
 		} else if (action == "updtPsw") {
 			const bdyFirebase = {
@@ -99,7 +100,6 @@ async function sendVerificationEmail(userEmail, userName) {
 			let arrFnl = [];
 			if (arr) arrFnl = arr;
 			arrFnl.push(stDt);
-
 			await db.ref("allSndEmails").set(arrFnl);
 			return { status: "success" };
 		}
@@ -111,7 +111,7 @@ async function sendVerificationEmail(userEmail, userName) {
 	}
 }
 
-async function verifyCode(userEmail, inputCode, signUp) {
+async function verifyCode(userEmail, userPassword, inputCode, signUp) {
 	try {
 		let gtData = await gtDb();
 		let respns = { status: "notExist" };
@@ -124,9 +124,14 @@ async function verifyCode(userEmail, inputCode, signUp) {
 			if (data[1] == inputCode) {
 				if (signUp) {
 					await rmovInArryDb(userEmail);
+					const auSignUp = auth(userEmail, userPassword);
+					if (auSignUp.status == "success") {
+					}
+					authSignUp(userEmail);
 					return { status: "exist" };
 				}
 				data[4] = true;
+
 				respns = { status: "exist" };
 			}
 			let dtSet;
@@ -154,17 +159,13 @@ async function updtPswd(data) {
 			// كتابة المصفوفة بعد التعديل
 			const usrData = await cAllDatabase(data);
 			if (usrData.status == "success") {
-				
-				
-				
 				const user = usrData.rslt;
 				//delete rslt.userId;
-				let {userId, ...nwRslt} = user
+				let { userId, ...nwRslt } = user;
 				nwRslt.userPassword = data.userPassword;
-				
-				
+
 				await db.ref(`allAcconts/${user.userId}`).set(nwRslt);
-				const {userPassword,paid, ...rslt} = nwRslt
+				const { userPassword, paid, ...rslt } = nwRslt;
 				return { status: "success", rslt: rslt };
 			} else {
 				return { status: "notSuccess" };
@@ -201,6 +202,28 @@ async function gtDb() {
 	} catch (error) {
 		console.log("err gtDb :" + error);
 		return false;
+	}
+}
+
+async function authSignUp(userEmail, userPassword) {
+	try {
+		if (!userEmail || !userPassword) {
+			return { error: "userEmail and userPassword are required" };
+		}
+
+		const user = await getAuth().createUser({
+			userEmail,
+			userPassword,
+		});
+
+		return {
+			status: "success",
+		};
+	} catch (error) {
+		return {
+			status: "error",
+			message: error.message,
+		};
 	}
 }
 export { sndEmail };

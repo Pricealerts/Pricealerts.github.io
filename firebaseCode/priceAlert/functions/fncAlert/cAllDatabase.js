@@ -4,6 +4,7 @@ import { getDatabase } from "firebase-admin/database";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
 import { checkAndSendAlerts, sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
+import {auth} from "./auth.js"
 //import { sndEmail } from "./sndEmail.js";
 
 let postsRef;
@@ -40,6 +41,8 @@ async function cAllDatabase(data) {
 			rspns = await updtPsw(data); */
 		} else if (["updtPsw", "cnfrmCode"].includes(action)) {
 			rspns = await sndEmail(data, db);
+		}if (action === "getAuth") {
+			rspns = await auth(data)
 		}
 
 		return rspns;
