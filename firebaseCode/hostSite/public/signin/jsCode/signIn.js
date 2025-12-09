@@ -158,6 +158,7 @@ gebi("btnNewPswrd").addEventListener("click", async e => {
 			userEmail,
 			userPassword
 		);
+		updateUserData(user, isExst) 
 		saveImage(localStorage.userPicture);
 		userPassword = '';
 		window.location.href = drction;

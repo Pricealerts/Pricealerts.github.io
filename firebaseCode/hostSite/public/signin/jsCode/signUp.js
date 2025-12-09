@@ -90,7 +90,7 @@ async function adedUser() {
 		for (const key in newbodyUp) {
 			localStorage[key] = newbodyUp[key];
 		}
-		await sgnIn('errmsgCnfrm')
+		 sgnIn('errmsgCnfrm' ,true)
 		
 		
 	}

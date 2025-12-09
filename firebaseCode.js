@@ -68,4 +68,5 @@ export {
     provider,
     setUpdtData,
     onAuthStateChanged,
+	signInWithEmailAndPassword,
 }
