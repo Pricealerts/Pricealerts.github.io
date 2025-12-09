@@ -1,4 +1,4 @@
-import {signInWithPopup,auth,provider,onAuthStateChanged,get,set,signOut} from 'https://pricealerts.github.io/firbaseCode.js';
+import {signInWithPopup,auth,provider,onAuthStateChanged,get,set,signOut} from 'https://pricealerts.github.io/firebaseCode.js';
 
 // تسجيل الدخول عبر Google
 window.signInWithGoogle = async function () {

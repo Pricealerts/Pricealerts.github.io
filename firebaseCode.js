@@ -5,6 +5,7 @@ import {
 	GoogleAuthProvider,
 	signOut,
     onAuthStateChanged,
+	signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 import {
 	getDatabase,
