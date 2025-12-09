@@ -28,9 +28,9 @@ async function sndEmail(data, dtbs) {
 				userPassword: data.userPassword,
 			};
 			reponse = await updtPswd(bdyFirebase);
-		}else if (action == "verifyIdToken") {
+		}/* else if (action == "verifyIdToken") {
 			vrfIdToken(data)
-		}
+		} */
 
 		return reponse;
 	} catch (err) {
@@ -124,7 +124,7 @@ async function verifyCode(data) {
 					await rmovInArryDb(userEmail);
 					const auSignUp = await sgnUp(userEmail, data.userPassword);
 					if (auSignUp.status == "success") {
-						await db.ref(`allAcconts/${data.userId}`).set(data);
+						//await  db.ref(`allAcconts/${data.userId}`).set(data);
 						return { status: "exist" };
 					}
 					return { status: "notExist" };

@@ -4,7 +4,6 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import { initializeApp } from "firebase-admin/app";
 import { cAllDatabase } from "./fncAlert/cAllDatabase.js";
 import { checkAndSendAlerts } from "./fncAlert/srchSmbls.js";
-/* import {vrfIdToken} from "./fncAlert/dauth.js" */
 
 //import { onUserCreated, onUserDeleted } from "firebase-functions/v2/auth";
 

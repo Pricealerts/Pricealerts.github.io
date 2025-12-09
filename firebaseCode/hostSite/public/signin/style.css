@@ -53,7 +53,7 @@ span {
 
 /* --- تنسيق أزرار التواصل الاجتماعي --- */
 .social-container {
-	margin:  0;
+	margin: 0;
 	display: flex;
 	gap: 10px;
 }
@@ -120,13 +120,13 @@ button.ghost:hover {
 	background-color: rgba(255, 255, 255, 0.1);
 }
 
-.frmSnd  {
+.frmSnd {
 	background-color: #ffffff;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	flex-direction: column;
-	padding:  40px;
+	padding: 40px;
 	height: 100%;
 	text-align: center;
 }
@@ -150,15 +150,15 @@ input:focus {
 /* الحاوية الرئيسية */
 .container {
 	background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    position: relative;
-    overflow: hidden;
-    width: 850px;
-    max-width: 100%;
-    min-height: 700px;
-    margin: auto;
-    margin-bottom: 30px;
+	border-radius: 12px;
+	box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+	position: relative;
+	overflow: hidden;
+	width: 850px;
+	max-width: 100%;
+	min-height: 700px;
+	margin: auto;
+	margin-bottom: 30px;
 }
 
 .form-container {
@@ -316,19 +316,55 @@ input:focus {
 	margin: 0;
 }
 .password-box {
-  position: relative;
-  width: 100%;
+	position: relative;
+	width: 100%;
 }
 
-
 .password-box .eye {
- position: absolute;
-    left: 10px;
-    top: calc(50% - 9px);
-    transform: translateY(-50%);
-    cursor: pointer;
-    font-size: 18px;
-    user-select: none;
+	position: absolute;
+	left: 10px;
+	top: calc(50% - 9px);
+	transform: translateY(-50%);
+	cursor: pointer;
+	font-size: 18px;
+	user-select: none;
+}
+
+/* nta3 google */
+.box {
+	background: white;
+	padding: 0px 20px 10px;
+	width: 330px;
+	border-radius: 12px;
+	/* box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); */
+	text-align: center;
+}
+.box h5{
+	margin: 10px;
+}
+
+.google-btn {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	border: 1px solid #ccc;
+	padding: 12px;
+	width: 100%;
+	border-radius: 8px;
+	cursor: pointer;
+	background: white;
+	font-size: 16px;
+	color: black;
+	margin: auto;
+}
+
+.google-btn:hover {
+	background: #f0f0f0;
+}
+
+.google-btn img {
+	width: 22px;
 }
 
 /* =========================================
@@ -347,11 +383,6 @@ input:focus {
 		background: var(--bg-color);
 		padding: 0 20px;
 	}
-	/*  .pirantCntynr{
-    padding: 20px;
-    background-color: white;
-    margin-bottom: 30px;
-    } */
 	.overlay-container {
 		display: none;
 	}
@@ -394,5 +425,8 @@ input:focus {
 	}
 	.mobile-btn:hover {
 		background-color: #e9f2ff; /* تعديل الخلفية هنا أيضاً */
+	}
+	.google-btn{
+		width: 200px;
 	}
 }

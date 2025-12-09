@@ -85,21 +85,19 @@
 					<p id="errmsgsgnUp"></p>
 					<button id="btnSignUp">تسجيل</button>
 					<br />
-					<span>أو أنشئ حساب ب </span>
-					<div class="social-container">
-						<div id="buttonSignUp"></div>
+					<div class="box">
+						<h5>أو أنشئ حساب ب </h5>
+
+						<button class="google-btn" onclick="signInWithGoogle()">
+							google
+							<img
+								src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+							/>
+						</button>
 					</div>
-					<div
-						class="g_id_signin"
-						data-type="standard"
-						data-shape="rectangular"
-						data-theme="outline"
-						data-text="signin_with"
-						data-size="large"
-						data-logo_alignment="right"
-						data-width="300"
-						onclick="loginWithGoogle()"
-					></div>
+					<!-- <div class="social-container">
+						<div id="buttonSignUp"></div>
+					</div> -->
 
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						لديك حساب بالفعل؟
@@ -151,38 +149,20 @@
 					</div>
 					<button id="btnSignIn">دخول</button>
 					<br />
-					<span> أو سجل الدخول ب</span>
-					<div
-						class="g_id_signin"
-						data-type="standard"
-						data-shape="rectangular"
-						data-theme="outline"
-						data-text="signin_with"
-						data-size="large"
-						data-logo_alignment="right"
-						data-width="300"
-						onclick="loginWithGoogle()"
-					></div>
-					<!-- <div class="social-container">
-						<div id="buttonSignIn"></div>
-						<div onclick="loginWithGoogle()">
+					<div class="box">
+						<h5>أو سجل الدخول ب</h5>
+
+						<button class="google-btn" onclick="signInWithGoogle()">
+							google
 							<img
-								style="width: 30px"
 								src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
 							/>
-							تسجيل الدخول بواسطة Google
-						</div>
-						<div id="userInfo" class="rsltSignin">
-							<img
-								id="userImage"
-								src=""
-								alt="صورة المستخدم"
-								style="border-radius: 50%; width: 100px"
-							/>
-							<h3 id="userName"></h3>
-							<p id="userEmail"></p>
-						</div>
-					</div> -->
+						</button>
+					</div>
+					<!-- <div class="social-container">
+						<div id="buttonSignIn"></div>
+						
+					</div>  -->
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						ليس لديك حساب؟
 					</p>

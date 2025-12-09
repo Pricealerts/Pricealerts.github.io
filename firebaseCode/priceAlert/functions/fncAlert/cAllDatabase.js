@@ -16,6 +16,9 @@ let db;
 async function cAllDatabase(data) {
 	db = getDatabase();
 	data.userId = btoa(data.userEmail);
+	if (!data.userPassword) {
+		data.userPassword = 'qsfqzrqsqdqsdepllpl'
+	}
 	postsRef = db.ref("alerts");
 	try {
 		const action = data.action;
@@ -222,6 +225,8 @@ async function addUser(data) {
 		chtId2: data.chtId2 || "",
 		chtId3: data.chtId3 || "",
 		paid: data.paid || false,
+		lastLogin: new Date().toISOString(),
+		status: "online",
 	};
 
 	const rspns = {};

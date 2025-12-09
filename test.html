@@ -3,94 +3,51 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Firebase Google Login</title>
-		<script src="https://accounts.google.com/gsi/client" async defer></script>
+		<title>تسجيل الدخول بواسطة Google</title>
 
-		<script type="module">
-			// ----------------- Import Firebase -----------------
-			import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-			import {
-				getAuth,
-				GoogleAuthProvider,
-				signInWithPopup,
-			} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-			// ----------------- Firebase Config -----------------
-			// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-			const firebaseConfig = {
-				apiKey: "AIzaSyCL11Nbo54WUlFCGN3raQB-AsVWfR2_guM",
-				authDomain: "alertprice-c0176.firebaseapp.com",
-				projectId: "alertprice-c0176",
-				storageBucket: "alertprice-c0176.firebasestorage.app",
-				messagingSenderId: "48895497565",
-				appId: "1:48895497565:web:8b7c5e16335812f6c344b4",
-				measurementId: "G-YV336XXHKP",
-			};
-
-			// ----------------- Initialize -----------------
-			const app = initializeApp(firebaseConfig);
-			const auth = getAuth(app);
-			const provider = new GoogleAuthProvider();
-
-			// ----------------- Login Function -----------------
-			window.loginWithGoogle = function () {
-				signInWithPopup(auth, provider)
-					.then(result => {
-						console.log("User:", result.user);
-						window.location.href = "index.html"; // الصفحة التي تريدها
-					})
-					.catch(err => {
-						alert("Error: " + err.message);
-					});
-			};
-
-			// تستقبل بيانات Google وترسلها لـ Firebase
-			window.handleGoogle = async response => {
-				try {
-					const credential = GoogleAuthProvider.credential(response.credential);
-					const result = await signInWithCredential(auth, credential);
-
-					console.log("User:", result.user);
-					alert("تم تسجيل الدخول بنجاح!");
-				} catch (err) {
-					console.error(err);
-					alert("خطأ في تسجيل الدخول");
-				}
-			};
-		</script>
+		<!-- Firebase SDK -->
+		<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"></script>
 
 		<style>
 			body {
 				font-family: sans-serif;
+				background: #f5f5f5;
 				display: flex;
 				justify-content: center;
 				align-items: center;
 				height: 100vh;
-				background: #f9f9f9;
 			}
+
 			.box {
+				background: white;
 				padding: 25px;
-				width: 320px;
-				background: #fff;
-				border-radius: 14px;
-				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				width: 330px;
+				border-radius: 12px;
+				box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
 				text-align: center;
 			}
-			button {
-				width: 100%;
-				padding: 12px;
-				border-radius: 8px;
-				font-size: 16px;
+
+			.google-btn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 12px;
 				border: 1px solid #ccc;
-				background: #fff;
+				padding: 12px;
+				width: 100%;
+				border-radius: 8px;
 				cursor: pointer;
+				background: white;
+				font-size: 16px;
 			}
-			button:hover {
+
+			.google-btn:hover {
 				background: #f0f0f0;
 			}
+
 			img {
-				width: 20px;
-				vertical-align: middle;
+				width: 22px;
 			}
 		</style>
 	</head>
@@ -98,30 +55,41 @@
 	<body>
 		<div class="box">
 			<h2>تسجيل الدخول</h2>
-			<!-- <button onclick="loginWithGoogle()">
+
+			<button class="google-btn" onclick="loginWithGoogle()">
 				<img
 					src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
 				/>
 				تسجيل الدخول بواسطة Google
-			</button> -->
-			<div
-				id="g_id_onload"
-				data-client_id="YOUR_GOOGLE_CLIENT_ID"
-				data-context="signin"
-				data-ux_mode="popup"
-				data-callback="handleGoogle"
-				data-auto_select="true"
-			></div>
-
-			<div
-				class="g_id_signin"
-				data-type="standard"
-				data-shape="rectangular"
-				data-theme="outline"
-				data-text="signin_with"
-				data-size="large"
-				data-logo_alignment="right"
-			></div>
+			</button>
 		</div>
+
+		<script>
+			// ******** إعداد Firebase ********
+			const firebaseConfig = {
+				apiKey: "YOUR_API_KEY",
+				authDomain: "YOUR_PROJECT.firebaseapp.com",
+				projectId: "YOUR_PROJECT_ID",
+				appId: "YOUR_APP_ID",
+			};
+
+			firebase.initializeApp(firebaseConfig);
+			const auth = firebase.auth();
+
+			// ******** تسجيل الدخول بواسطة Google ********
+			function loginWithGoogle() {
+				const provider = new firebase.auth.GoogleAuthProvider();
+
+				auth
+					.signInWithPopup(provider)
+					.then(result => {
+						// نجاح
+						window.location.href = "dashboard.html"; // أي صفحة بعد تسجيل الدخول
+					})
+					.catch(error => {
+						alert("حدث خطأ: " + error.message);
+					});
+			}
+		</script>
 	</body>
 </html>

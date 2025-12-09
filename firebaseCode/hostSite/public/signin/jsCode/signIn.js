@@ -22,7 +22,7 @@ gebi("btnSignIn").addEventListener("click", async e => {
 			localStorage[key] = rslt[key];
 		}
 		
-		await sgnIn('errmsgsgnIn')
+		 sgnIn('errmsgsgnIn')
 
 	} else if (rspns.status == "NoPassword" || rspns.status == "notexsist") {
 		gebi("errmsgsgnIn").innerText =
@@ -137,7 +137,7 @@ gebi("btnNewPswrd").addEventListener("click", async e => {
 			localStorage[key] = rslt[key];
 		}
 		
-			await sgnIn(msgErr)
+			 sgnIn("errmsgsgnIn")
 			
 		} else {
 			gebi("errmsgsgnIn").innerText = "حدث خطأ أعد المحاولة " ;
@@ -151,14 +151,15 @@ gebi("btnNewPswrd").addEventListener("click", async e => {
 	}
 });
 
-async function sgnIn(msgErr) {
-	saveImage(localStorage.userPicture);
+ function sgnIn(msgErr) {
 	try {
-	 await signInWithEmailAndPassword(
+	  signInWithEmailAndPassword(
 			auth,
 			userEmail,
 			userPassword
 		);
+		saveImage(localStorage.userPicture);
+		userPassword = '';
 		window.location.href = drction;
 	} catch (error) {
 		gebi(msgErr).innerText = "حدث خطأ أعد المحاولة ";
