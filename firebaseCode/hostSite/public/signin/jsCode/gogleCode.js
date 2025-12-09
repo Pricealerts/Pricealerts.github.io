@@ -1,5 +1,7 @@
 import {signInWithPopup,auth,provider,onAuthStateChanged,get,set,signOut} from 'https://pricealerts.github.io/firebaseCode.js';
 
+// تفعيل Google Sign-In
+const provider = new GoogleAuthProvider();
 // تسجيل الدخول عبر Google
 window.signInWithGoogle = async function () {
 	signInWithPopup(auth, provider)

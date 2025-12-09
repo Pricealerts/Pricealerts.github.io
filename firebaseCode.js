@@ -1,10 +1,11 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+
 import {
 	getAuth,
 	signInWithPopup,
 	GoogleAuthProvider,
 	signOut,
-    onAuthStateChanged,
+	onAuthStateChanged,
 	signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 import {
@@ -32,12 +33,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const database = getDatabase(app);
-// تفعيل Google Sign-In
-const provider = new GoogleAuthProvider();
-const apdtOrSet = {set : set ,updt :update}
-function setUpdtData(storUp  ,rfrnce ,user ) {
+const apdtOrSet = { set: set, updt: update };
+function setUpdtData(storUp, rfrnce, user) {
 	apdtOrSet[storUp](ref(database, rfrnce), {
-
 		userEmail: user.email,
 		lastLogin: new Date().toISOString(),
 		userName: user.userName,
@@ -53,21 +51,20 @@ function setUpdtData(storUp  ,rfrnce ,user ) {
 		document.getElementById("msg").textContent =
 			"تم التسجيل وتعديل البيانات ✔️";
 	});
-			console.log("الحساب غير موجود في قاعدة البيانات");
-	
+	console.log("الحساب غير موجود في قاعدة البيانات");
 }
 export {
 	getAuth,
 	signInWithPopup,
 	signOut,
-    ref,
+	ref,
 	update,
 	set,
 	get,
-    auth,
-    database,
-    provider,
-    setUpdtData,
-    onAuthStateChanged,
+	auth,
+	database,
+	setUpdtData,
+	onAuthStateChanged,
 	signInWithEmailAndPassword,
-}
+	GoogleAuthProvider
+};
