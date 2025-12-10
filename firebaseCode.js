@@ -59,15 +59,17 @@ export {
 	getAuth,
 	signInWithPopup,
 	signOut,
-	ref,
-	update,
-	set,
-	get,
 	auth,
-	db,
+	
 	setUpdtData,
 	onAuthStateChanged,
 	signInWithEmailAndPassword,
 	signInWithCredential,
 	GoogleAuthProvider,
+	/* jiht db */
+	db,
+	ref,
+	update,
+	set,
+	get,
 };
