@@ -97,8 +97,8 @@ async function sendVerificationEmail(userEmail, userName) {
 			let arrFnl = [];
 			if (arr) arrFnl = arr;
 			arrFnl.push(stDt);
-			await db.ref("allSndEmails").set(arrFnl);
-			return { status: "success" };
+			const rspns = await cAllDatabase('addAccont')
+			return rspns;
 		}
 		return { status: "notsuccess" };
 	} catch (error) {
@@ -124,7 +124,7 @@ async function verifyCode(data) {
 					await rmovInArryDb(userEmail);
 					const auSignUp = await sgnUp(userEmail, data.userPassword);
 					if (auSignUp.status == "success") {
-						//await  db.ref(`allAcconts/${data.userId}`).set(data);
+						await db.ref(`allAcconts/${data.userId}`).set(data);
 						return { status: "exist" };
 					}
 					return { status: "notExist" };

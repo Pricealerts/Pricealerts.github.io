@@ -1,4 +1,4 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 import {
 	getAuth,
@@ -7,7 +7,7 @@ import {
 	signOut,
 	onAuthStateChanged,
 	signInWithEmailAndPassword,
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
 	getDatabase,
 	ref,
@@ -15,7 +15,6 @@ import {
 	set,
 	get,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
-
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
 
@@ -31,8 +30,9 @@ const firebaseConfig = {
 	measurementId: "G-L693265WLN",
 };
 const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 const auth = getAuth(app);
-const database = getDatabase(app);
+const provider = new GoogleAuthProvider();
 const apdtOrSet = { set: set, updt: update };
 function setUpdtData(storUp, rfrnce, user) {
 	apdtOrSet[storUp](ref(database, rfrnce), {
@@ -62,7 +62,7 @@ export {
 	set,
 	get,
 	auth,
-	database,
+	db,
 	setUpdtData,
 	onAuthStateChanged,
 	signInWithEmailAndPassword,

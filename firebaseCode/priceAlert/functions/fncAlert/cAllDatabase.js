@@ -241,8 +241,7 @@ async function addUser(data) {
 		const gtUserExist = db.ref(`allAcconts/${data.userId}`).get();
 
 		if (gtUserExist.exists()) {
-			if (data.action == "addAccont") {
-			}
+			
 			rspns.status = "exist";
 			rspns.message = "accont is exist";
 			return rspns;
