@@ -6,6 +6,7 @@ import {
 	GoogleAuthProvider,
 	signOut,
 	onAuthStateChanged,
+	signInWithCredential,
 	signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
@@ -15,6 +16,7 @@ import {
 	set,
 	get,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
 
@@ -32,7 +34,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+//const provider = new GoogleAuthProvider();
 const apdtOrSet = { set: set, updt: update };
 function setUpdtData(storUp, rfrnce, user) {
 	apdtOrSet[storUp](ref(database, rfrnce), {
@@ -66,5 +68,6 @@ export {
 	setUpdtData,
 	onAuthStateChanged,
 	signInWithEmailAndPassword,
-	GoogleAuthProvider
+	signInWithCredential,
+	GoogleAuthProvider,
 };

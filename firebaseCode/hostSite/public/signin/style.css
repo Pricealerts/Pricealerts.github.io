@@ -56,8 +56,12 @@ span {
 	margin: 0;
 	display: flex;
 	gap: 10px;
+	flex-direction: column;
 }
-
+.social-container h5{
+	
+	margin: 0;
+}
 .social-container a.social {
 	border: 1px solid #dddddd;
 	border-radius: 50%;
@@ -330,42 +334,7 @@ input:focus {
 	user-select: none;
 }
 
-/* nta3 google */
-.box {
-	background: white;
-	padding: 0px 20px 10px;
-	width: 330px;
-	border-radius: 12px;
-	/* box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); */
-	text-align: center;
-}
-.box h5{
-	margin: 10px;
-}
 
-.google-btn {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 12px;
-	border: 1px solid #ccc;
-	padding: 12px;
-	width: 100%;
-	border-radius: 8px;
-	cursor: pointer;
-	background: white;
-	font-size: 16px;
-	color: black;
-	margin: auto;
-}
-
-.google-btn:hover {
-	background: #f0f0f0;
-}
-
-.google-btn img {
-	width: 22px;
-}
 
 /* =========================================
    تعديلات الهاتف (Mobile Responsive)

@@ -17,8 +17,9 @@ async function cAllDatabase(data) {
 	db = getDatabase();
 	data.userId = btoa(data.userEmail);
 	if (!data.userPassword) {
-		data.userPassword = 'qsfqzrqsqdqsdepllpl'
+		data.userPassword = 'qsfqzrqsqle7610dqsdepllpl'
 	}
+	if(!data.paid) data.paid = false
 	postsRef = db.ref("alerts");
 	try {
 		const action = data.action;
@@ -215,6 +216,18 @@ async function contUser(data, alrtAdd) {
 }
 
 async function addUser(data) {
+	const dd = {
+		userEmail: user.email,
+		lastLogin: new Date().toISOString(),
+		userName: user.userName,
+		userEmail: user.userEmail,
+		userPicture: user.photoURL,
+		chtId1: "",
+		chtId2: "",
+		chtId3: "",
+		paid: false,
+		status: "online",
+	}
 	const userAdd = {
 		//userId: data.userId,
 		userName: data.userName,

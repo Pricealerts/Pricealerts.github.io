@@ -15,6 +15,7 @@ import {
 	GoogleAuthProvider,
 	signOut,
 	onAuthStateChanged,
+	signInWithCredential,
 	signInWithEmailAndPassword,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
@@ -44,24 +45,74 @@ const db = getDatabase(app);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 // تسجيل الدخول عبر Google
-window.signInWithGoogle = async function () {
-	signInWithPopup(auth, provider)
-		.then(result => {
+
+
+
+
+ // هذه الدالة ستعمل سواء ضغط المستخدم على الزر أو على النافذة المنبثقة
+        window.handleCredentialResponse = (response) => {
+            console.log("تم استلام التوكن...");
+            
+            // تحويل التوكن لبيانات يفهمها Firebase
+            const credential = GoogleAuthProvider.credential(response.credential);
+
+            signInWithCredential(auth, credential)
+                .then((result) => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
-			const user = result.user;
-			console.log("data user is");
-			console.log(user.user);
+					updateUserData(result.user, false)
+                    // إخفاء الزر بعد النجاح (اختياري)
+                    document.getElementById('buttonSignUp').style.display = 'none';
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                });
+        }
 
-			updateUserData(user, true);
-			//const idToken = {action :'verifyIdToken',  result:result.user.getIdToken()};
 
-			// إرسال التوكن إلى Firebase Function للتحقق من الهوية
-			// verifyIdToken(idToken);
-		})
-		.catch(error => {
-			console.error("kayn err " + error.message);
-		});
-};
+
+
+
+      window.onload = function () {
+            // 1. التهيئة (مشتركة للزر والنافذة)
+            google.accounts.id.initialize({
+                client_id: "200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com", // لا تنس تغيير هذا
+                callback: handleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: false
+            });
+
+            // 2. رسم الزر داخل الـ div
+            google.accounts.id.renderButton(
+                document.getElementById("buttonSignUp"),
+                { 
+                    theme: "outline",  // الخيارات: "outline", "filled_blue", "filled_black"
+                    size: "large",     // الخيارات: "large", "medium", "small"
+                    text: "signin_with", // النص: "signin_with", "signup_with", "continue_with"
+                    shape: "rectangular", // الشكل: "rectangular", "pill"
+                    width: "250"       // عرض الزر بالبكسل
+                } 
+            );
+            google.accounts.id.renderButton(
+                document.getElementById("buttonSignIn"),
+                { 
+                    theme: "outline",  // الخيارات: "outline", "filled_blue", "filled_black"
+                    size: "large",     // الخيارات: "large", "medium", "small"
+                    text: "signin_with", // النص: "signin_with", "signup_with", "continue_with"
+                    shape: "rectangular", // الشكل: "rectangular", "pill"
+                    width: "250"       // عرض الزر بالبكسل
+                } 
+            );
+
+            // 3. إظهار النافذة المنبثقة (One Tap) أيضاً
+            google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                    console.log("النافذة لم تظهر (ربما بسبب إغلاقها سابقاً أو إعدادات المتصفح)");
+                }
+            });
+        };
+
+
+
 // مراقبة حالة تسجيل الدخول
 onAuthStateChanged(auth, user => {
 	if (user) {
@@ -76,13 +127,7 @@ function updateUserData(user, isExst) {
 	const id = btoa(user.userEmail);
 	const userRef = ref(db, "allAcconts/" + id);
 	if (isExst) {
-		gtData(userRef);
-	} else {
-		setData(userRef);
-	}
-}
-function gtData(userRef) {
-	get(userRef).then(snapshot => {
+		get(userRef).then(snapshot => {
 		if (snapshot.exists()) {
 			const { lastLogin, paid, status, userPassword, ...restUsr } =
 				snapshot.val();
@@ -93,7 +138,11 @@ function gtData(userRef) {
 			setData(userRef);
 		}
 	});
+	} else {
+		setData(userRef);
+	}
 }
+
 function setData(userRef) {
 	set(userRef, {
 		userEmail: user.email,
@@ -104,7 +153,6 @@ function setData(userRef) {
 		chtId1: "",
 		chtId2: "",
 		chtId3: "",
-		paid: false,
 		status: "online",
 	}).then(() => {
 		document.getElementById("msg").style.color = "green";
@@ -113,7 +161,7 @@ function setData(userRef) {
 	});
 	console.log("الحساب غير موجود في قاعدة البيانات");
 }
-sgnOUt();
+//sgnOUt();
 function sgnOUt() {
 	signOut(auth)
 		.then(() => {

@@ -1,170 +1,165 @@
+<!-- <!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Price Alerts Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+    <div id="status-message">جاري التحميل...</div>
+
+    <script type="module">
+        // استيراد دوال Firebase الضرورية
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        // إعدادات Firebase
+       const firebaseConfig = {
+	apiKey: "AIzaSyDIR4H7Jk3bJN_QZp-Cs4CbqpRmsKkUTxc",
+	authDomain: "pricealert-31787.firebaseapp.com",
+	databaseURL:
+		"https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
+	projectId: "pricealert-31787",
+	storageBucket: "pricealert-31787.firebasestorage.app",
+	messagingSenderId: "200237716010",
+	appId: "1:200237716010:web:65a9e33254d2302339a953",
+	measurementId: "G-L693265WLN",
+};
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // 2. دالة التعامل مع استجابة Google One Tap
+        window.handleCredentialResponse = (response) => {
+            console.log("تم استلام التوكن من Google");
+            
+            // إنشاء اعتماد (Credential) لـ Firebase باستخدام التوكن القادم من Google
+            const credential = GoogleAuthProvider.credential(response.credential);
+
+            // تسجيل الدخول في Firebase
+            signInWithCredential(auth, credential)
+                .then((result) => {
+                    console.log("تم تسجيل الدخول بنجاح في Firebase:", result.user);
+                    document.getElementById('status-message').innerText = "مرحباً: " + result.user.displayName;
+                    // هنا يمكنك توجيه المستخدم لصفحة أخرى
+                })
+                .catch((error) => {
+                    console.error("خطأ في الربط مع Firebase:", error);
+                });
+        }
+
+        // 3. تهيئة Google One Tap عند تحميل الصفحة
+        window.onload = function () {
+            google.accounts.id.initialize({
+                // ضع هنا الـ Client ID الذي نسخته في الخطوة الأولى
+                client_id: "200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com",
+                callback: handleCredentialResponse, // الدالة التي سيتم استدعاؤها بعد اختيار الحساب
+                auto_select: false, // اجعلها true إذا أردت الدخول التلقائي عند العودة
+                cancel_on_tap_outside: false
+            });
+
+            // إظهار النافذة (كما في الصورة التي أرسلتها)
+            google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                    console.log("لم يتم عرض النافذة أو تم تخطيها");
+                }
+            });
+        };
+    </script>
+</body>
+</html>
+
+
+ -->
+
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width,initial-scale=1" />
-		<title>تسجيل الدخول بـ Google</title>
-<meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <title>Price Alerts Login</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <style>
+        body { font-family: sans-serif; text-align: center; padding-top: 50px; }
+        #buttonDiv { margin: 20px auto; width: fit-content; }
+    </style>
+</head>
+<body>
 
-		<!-- Google Identity -->
-		<script src="https://accounts.google.com/gsi/client" async defer></script>
+    <h2>تسجيل الدخول</h2>
+    
+    <div id="buttonDiv"></div>
 
-		<style>
-			body {
-				font-family: Arial, "Cairo", sans-serif;
-				background: #f5f7fb;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				height: 100vh;
-				margin: 0;
-			}
-			.card {
-				width: 360px;
-				background: #fff;
-				padding: 24px;
-				border-radius: 12px;
-				box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
-				text-align: center;
-			}
-			.h {
-				font-size: 20px;
-				margin-bottom: 8px;
-			}
-			.sub {
-				color: #666;
-				margin-bottom: 18px;
-			}
-		</style>
-	</head>
-	<body>
-		<!-- onload config: واحد فقط في الصفحة  -->
-		<div
-			id="g_id_onload"
-			data-client_id="200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com"
-			data-context="signin"
-			data-ux_mode="popup"
-			data-auto_select="false"
-			data-callback="handleGoogle"
-		></div>
+    <div id="status-message" style="margin-top: 20px; color: green;"></div>
 
-		<div class="card">
-			<div class="h">تسجيل الدخول</div>
-			<div class="sub">اختر حساب Google للمتابعة</div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-			<!-- زر Google (يمكن تكراره عدة مرات في الصفحة) -->
-			<div
-				class="g_id_signin"
-				data-type="standard"
-				data-size="large"
-				data-theme="outline"
-				data-text="continue_with"
-				data-width="300"
-			></div>
+         // إعدادات Firebase
+       const firebaseConfig = {
+	apiKey: "AIzaSyDIR4H7Jk3bJN_QZp-Cs4CbqpRmsKkUTxc",
+	authDomain: "pricealert-31787.firebaseapp.com",
+	databaseURL:
+		"https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
+	projectId: "pricealert-31787",
+	storageBucket: "pricealert-31787.firebasestorage.app",
+	messagingSenderId: "200237716010",
+	appId: "1:200237716010:web:65a9e33254d2302339a953",
+	measurementId: "G-L693265WLN",
+};
 
-			<p style="font-size: 13px; color: #888; margin-top: 14px">
-				إذا ظهر مربع الـ one-tap استخدمه — سيعطيك صورة واسم الحساب.
-			</p>
-		</div>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-  const firebaseConfig = {
-				apiKey: "AIzaSyDIR4H7Jk3bJN_QZp-Cs4CbqpRmsKkUTxc",
-				authDomain: "pricealert-31787.firebaseapp.com",
-				databaseURL:
-					"https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
-				projectId: "pricealert-31787",
-				storageBucket: "pricealert-31787.firebasestorage.app",
-				messagingSenderId: "200237716010",
-				appId: "1:200237716010:web:65a9e33254d2302339a953",
-				measurementId: "G-L693265WLN",
-			};
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const provider = new GoogleAuthProvider();
+        // هذه الدالة ستعمل سواء ضغط المستخدم على الزر أو على النافذة المنبثقة
+        window.handleCredentialResponse = (response) => {
+            console.log("تم استلام التوكن...");
+            
+            // تحويل التوكن لبيانات يفهمها Firebase
+            const credential = GoogleAuthProvider.credential(response.credential);
 
-  window.signInWithPopupFirebase = async () => {
-    try {
-      const result = await signInWithPopup(auth, provider);
-      console.log("popup result:", result.user);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-</script>
+            signInWithCredential(auth, credential)
+                .then((result) => {
+                    document.getElementById('status-message').innerText = "تم تسجيل الدخول بنجاح: " + result.user.displayName;
+                    // إخفاء الزر بعد النجاح (اختياري)
+                    document.getElementById('buttonDiv').style.display = 'none';
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    document.getElementById('status-message').innerText = "حدث خطأ: " + error.message;
+                    document.getElementById('status-message').style.color = "red";
+                });
+        }
 
-<button onclick="signInWithPopupFirebase()">تسجيل دخول ب Popup</button>
+        window.onload = function () {
+            // 1. التهيئة (مشتركة للزر والنافذة)
+            google.accounts.id.initialize({
+                client_id: "200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com", // لا تنس تغيير هذا
+                callback: handleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: false
+            });
 
-		<!-- Firebase (module) -->
-	<!-- 	<script type="module">
-			import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-			import {
-				getAuth,
-				signInWithCredential,
-				GoogleAuthProvider,
-				onAuthStateChanged,
-			} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+            // 2. رسم الزر داخل الـ div
+            google.accounts.id.renderButton(
+                document.getElementById("buttonDiv"),
+                { 
+                    theme: "outline",  // الخيارات: "outline", "filled_blue", "filled_black"
+                    size: "large",     // الخيارات: "large", "medium", "small"
+                    text: "signin_with", // النص: "signin_with", "signup_with", "continue_with"
+                    shape: "rectangular", // الشكل: "rectangular", "pill"
+                    width: "250"       // عرض الزر بالبكسل
+                } 
+            );
 
-			// ضع إعدادات مشروعك هنا
-			const firebaseConfig = {
-				apiKey: "AIzaSyDIR4H7Jk3bJN_QZp-Cs4CbqpRmsKkUTxc",
-				authDomain: "pricealert-31787.firebaseapp.com",
-				databaseURL:
-					"https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
-				projectId: "pricealert-31787",
-				storageBucket: "pricealert-31787.firebasestorage.app",
-				messagingSenderId: "200237716010",
-				appId: "1:200237716010:web:65a9e33254d2302339a953",
-				measurementId: "G-L693265WLN",
-			};
-
-			const app = initializeApp(firebaseConfig);
-			const auth = getAuth(app);
-
-			// تعريف الدالة العالمية التي يستدعيها Google Identity (مهم جداً)
-			// Google يمرّر object فيه property credential (JWT)
-			window.handleGoogle = async function (googleResponse) {
-				try {
-					// googleResponse.credential = JWT id_token من Google
-					const idTokenFromGoogle = googleResponse.credential;
-
-					// أنشئ credential لفايربيز وادخل المستخدم
-					const firebaseCredential =
-						GoogleAuthProvider.credential(idTokenFromGoogle);
-					const userCredential = await signInWithCredential(
-						auth,
-						firebaseCredential
-					);
-
-					// الآن المستخدم مسجَّل في Firebase
-					console.log("Signed in user:", userCredential.user);
-					alert(
-						"تم تسجيل الدخول: " +
-							(userCredential.user.displayName || userCredential.user.email)
-					);
-
-					// مثال: احصل على idToken الخاص بفايربيز (لاستخدامه مع backend)
-					const firebaseIdToken = await userCredential.user.getIdToken();
-					console.log("Firebase ID token:", firebaseIdToken);
-
-					// إعادة توجيه أو أي شيء تريده
-					// window.location.href = "/";
-				} catch (err) {
-					console.error("handleGoogle error:", err);
-					alert("حدث خطأ أثناء تسجيل الدخول: " + (err.message || err));
-				}
-			};
-
-			// اختيارياً: راقب حالة الدخول
-			onAuthStateChanged(auth, user => {
-				if (user) {
-					console.log("user signed in (onAuthStateChanged):", user);
-				} else {
-					console.log("user signed out");
-				}
-			});
-		</script> -->
-	</body>
+            // 3. إظهار النافذة المنبثقة (One Tap) أيضاً
+            google.accounts.id.prompt((notification) => {
+                if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+                    console.log("النافذة لم تظهر (ربما بسبب إغلاقها سابقاً أو إعدادات المتصفح)");
+                }
+            });
+        };
+    </script>
+</body>
 </html>

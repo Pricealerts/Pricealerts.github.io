@@ -53,14 +53,7 @@
 		<link rel="stylesheet" href="./style.css" />
 	</head>
 	<body>
-		<!-- nta3 google -->
-		<!-- <div
-			id="g_id_onload"
-			data-client_id="200237716010-fsre2cg3a1dgm666mb1qcq6gdhntl2sd.apps.googleusercontent.com"
-			data-context="signin"
-			data-ux_mode="popup"
-			data-callback="handleGoogle"
-		></div> -->
+		
 		<div id="pirantCntynr" class="pirantCntynr"></div>
 		<div class="container" id="container">
 			<br />
@@ -85,7 +78,7 @@
 					<p id="errmsgsgnUp"></p>
 					<button id="btnSignUp">تسجيل</button>
 					<br />
-					<div class="box">
+					<!-- <div class="box">
 						<h5>أو أنشئ حساب ب</h5>
 
 						<button class="google-btn" onclick="signInWithGoogle()">
@@ -94,10 +87,11 @@
 								src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
 							/>
 						</button>
-					</div>
-					<!-- <div class="social-container">
-						<div id="buttonSignUp"></div>
 					</div> -->
+					<div class="social-container">
+						<h5>أو أنشئ حساب ب</h5>
+						<div id="buttonSignUp"></div>
+					</div>
 
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						لديك حساب بالفعل؟
@@ -149,20 +143,22 @@
 					</div>
 					<button id="btnSignIn">دخول</button>
 					<br />
-					<div class="box">
-						<h5>أو سجل الدخول ب</h5>
-
+					
+					
+					<!-- <div class="box">
+						
 						<button class="google-btn" onclick="signInWithGoogle()">
 							google
 							<img
 								src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
 							/>
 						</button>
-					</div>
-					<!-- <div class="social-container">
+					</div> -->
+					<div class="social-container">
+						<h5 class="">أو سجل الدخول ب</h5>
 						<div id="buttonSignIn"></div>
 						
-					</div>  -->
+					</div> 
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						ليس لديك حساب؟
 					</p>
@@ -225,8 +221,10 @@
 				</div>
 			</div>
 		</div>
+		
 		<!--  Navbar -->
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
+		<!-- <script src="./jsCode/imgEml.js"></script> -->
 		<!--  front end log in  -->
 		<script>
 			let userName;
@@ -268,7 +266,10 @@
 				}
 			}
 		</script>
-		<script src="./jsCode.min.js" type="module"></script>
+		<script type="module" src="./jsCode/gogleCode.js"></script>
+		<script src="./jsCode/signUp.js"></script>
+		<script src="./jsCode/signIn.js"></script>
+		<!-- <script src="./jsCode.min.js" type="module"></script> -->
 
 		<!-- save image -->
 		<script>

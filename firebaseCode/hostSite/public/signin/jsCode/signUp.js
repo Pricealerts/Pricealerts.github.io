@@ -73,6 +73,7 @@ async function adedUser() {
 	
 	const now = new Date();
 	const idUser = now.getTime();
+	
 	const bodyUp = {
 		action: "addAccont",
 		userId: idUser,
