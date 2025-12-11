@@ -1,5 +1,5 @@
 // Cache name
-const cacheName = 'pwa-cache-v3.11';
+const cacheName = 'pwa-cache-v3.12';
 
 // Files to cache
 const filesToCache = [

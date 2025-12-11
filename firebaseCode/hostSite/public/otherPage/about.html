@@ -3,8 +3,12 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		
-   
+
+		<link
+			rel="icon"
+			href="https://pricealerts.github.io/imgs/web/favicon.ico"
+			sizes="any"
+		/>
 		<!-- end Meta for Social shares   -->
 		<title>من نحن | Price Alerts</title>
 		<link
@@ -41,7 +45,7 @@
 
 	<body>
 		<div class="container">
-			<div id="pirantCntynr" class=" pirantCntynr"></div>
+			<div id="pirantCntynr" class="pirantCntynr"></div>
 			<h1>من نحن</h1>
 
 			<p>
@@ -70,15 +74,23 @@
 			</p>
 		</div>
 
+		<footer
+			style="
+				text-align: center;
+				padding: 20px;
+				margin-top: 40px;
+				background: #f7f7f7;
+			"
+		>
+			<p>© Price Alerts <span id="dateId"> </span> — جميع الحقوق محفوظة</p>
+			<a href="./about.html">من نحن</a> |
+			<a href="./contact.html">اتصل بنا</a> |
+			<a href="./privacy.html">سياسة الخصوصية</a>
+		</footer>
 
-    <footer style="text-align:center; padding:20px; margin-top:40px; background:#f7f7f7;">
-    <p>©  Price Alerts <span id="dateId"> </span> — جميع الحقوق محفوظة</p>
-    <a href="./about.html">من نحن</a> |
-    <a href="./contact.html">اتصل بنا</a> |
-    <a href="./privacy.html">سياسة الخصوصية</a>
-</footer>
-
-<script>document.getElementById('dateId').innerHTML = new Date().getFullYear()</script>
+		<script>
+			document.getElementById("dateId").innerHTML = new Date().getFullYear();
+		</script>
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 	</body>
 </html>

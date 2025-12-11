@@ -13,10 +13,8 @@ import {
 	get,
 } from "https://pricealerts.github.io/firebaseCode.js";
 
-
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
-
 
 // تسجيل الدخول عبر Google
 
@@ -30,7 +28,8 @@ window.handleCredentialResponse = response => {
 	signInWithCredential(auth, credential)
 		.then(result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
-			updateUserData(result.user, false);
+			const user = result.user;
+			updateUserData(user, false);
 			// إخفاء الزر بعد النجاح (اختياري)
 			document.getElementById("buttonSignUp").style.display = "none";
 		})
@@ -47,6 +46,8 @@ window.onload = function () {
 		callback: handleCredentialResponse,
 		auto_select: false,
 		cancel_on_tap_outside: false,
+		// 👇 أضف هذا السطر لتمكين FedCM
+		use_fedcm_for_logins: true,
 	});
 
 	// 2. رسم الزر داخل الـ div
@@ -86,7 +87,7 @@ onAuthStateChanged(auth, user => {
 // تحديث بيانات المستخدم في Firebase DB
 function updateUserData(user, isExst) {
 	// استخدام set بدلاً من update
-	const id = btoa(user.userEmail);
+	const id = btoa(user.email);
 	const userRef = ref(db, "allAcconts/" + id);
 	if (isExst) {
 		get(userRef).then(snapshot => {
@@ -96,35 +97,49 @@ function updateUserData(user, isExst) {
 				for (const key in restUsr) {
 					localStorage[key] = restUsr[key];
 				}
+				update(userRef, {
+					lastLogin: new Date().toISOString(),
+					status: "online",
+				}).then(() => {
+					console.log("تم التسجيل وتعديل البيانات ✔️");
+				});
 			} else {
-				setData(userRef);
+				setData(userRef, user);
 			}
 		});
 	} else {
-		setData(userRef);
+		setData(userRef, user);
 	}
 }
 
-function setData(userRef) {
+function setData(userRef, user) {
 	set(userRef, {
 		userEmail: user.email,
 		lastLogin: new Date().toISOString(),
-		userName: user.userName,
-		userEmail: user.userEmail,
+		lastLogout: "non",
+		userName: user.displayName,
 		userPicture: user.photoURL,
 		chtId1: "",
 		chtId2: "",
 		chtId3: "",
 		status: "online",
 	}).then(() => {
-		document.getElementById("msg").style.color = "green";
-		document.getElementById("msg").textContent =
-			"تم التسجيل وتعديل البيانات ✔️";
+		console.log("تم التسجيل وتعديل البيانات ✔️");
 	});
 	console.log("الحساب غير موجود في قاعدة البيانات");
 }
 //sgnOUt();
+
+
 function sgnOUt() {
+	const id = btoa(user.email);
+	const userRef = ref(db, "allAcconts/" + id);
+	update(userRef, {
+		lastLogout: new Date().toISOString(),
+		status: "outline",
+	}).then(() => {
+		console.log("تم التسجيل وتعديل البيانات ✔️");
+	});
 	signOut(auth)
 		.then(() => {
 			console.log("تم تسجيل الخروج بنجاح");

@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
+//import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";// nta3 tokn
 import {
 	getAuth,
 	signInWithPopup,
@@ -55,6 +55,47 @@ function setUpdtData(storUp, rfrnce, user) {
 	});
 	console.log("الحساب غير موجود في قاعدة البيانات");
 }
+
+// ---------------------------------------------------------
+        // 4. كود الإشعارات (Notification Logic) - الكود الذي سألت عنه
+        // ---------------------------------------------------------
+        
+        // يُفضل طلب الإذن أولاً
+        function requestNotificationPermission() {
+            console.log('جاري طلب إذن الإشعارات...');
+            Notification.requestPermission().then((permission) => {
+                if (permission === 'granted') {
+                    console.log('تم منح الإذن.');
+                    
+                    // 👇 هنا نضع الكود الخاص بك لجلب التوكن
+                    getToken(messaging, { 
+                        vapidKey: "BIpF2FFuUz-1e8gzQc3lmWR77f6BBXy1ssnPdo_2SXD_8vlWimM473gX5VSbeuv0hir8B10Xc--cQA0Y1Vkdyps" 
+                    }).then((currentToken) => {
+                        if (currentToken) {
+                            console.log("Token:", currentToken);
+                            document.getElementById('status-message').innerText += "\n تم جلب توكن الإشعارات بنجاح!";
+                            // هنا يجب إرسال التوكن لقاعدة البيانات الخاصة بك لربطه بالمستخدم
+                        } else {
+                            console.log("No registration token available.");
+                        }
+                    }).catch((err) => {
+                        console.log("An error occurred while retrieving token. ", err);
+                    });
+
+                } else {
+                    console.log('تم رفض الإذن.');
+                }
+            });
+        }
+
+        // استدعاء دالة طلب الإذن (يمكنك وضعها داخل زر بدلاً من تشغيلها مباشرة)
+        requestNotificationPermission();
+
+
+
+
+
+
 export {
 	getAuth,
 	signInWithPopup,
