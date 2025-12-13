@@ -34,7 +34,7 @@
 		<link rel="canonical" href="https://pricealerts.web.app/index.html" />
 		<!-- end OG Meta for Social shares -->
 
-		<title>منبه الأسعار </title>
+		<title>منبه الأسعار</title>
 		<link
 			rel="stylesheet"
 			href="https://pricealerts.github.io/style/style.css"
@@ -44,10 +44,7 @@
 			href="https://pricealerts.github.io/style/navbar.css"
 		/>
 		<!-- Poure applecation -->
-		<link
-			rel="manifest"
-			href="./manifest.json"
-		/>
+		<link rel="manifest" href="./manifest.json" />
 		<meta name="theme-color" content="#f0f2f5" />
 		<link
 			rel="icon"
@@ -222,7 +219,9 @@
 						للحصول على معرف دردشتك.
 						<br />
 					</p>
-					<label for="telegramChatId">معرّف دردشة التيليجرام (Chat ID) : </label>
+					<label for="telegramChatId"
+						>معرّف دردشة التيليجرام (Chat ID) :
+					</label>
 					<input
 						type="text"
 						id="telegramChatId"
@@ -250,16 +249,19 @@
 						margin-bottom: 10px;
 					"
 				>
-				حمله كتطبيق 
-				</h3>
-				<img
+				<div id="installBtn" style="display: none">	حمله كتطبيق 
+			<img
 					id="dwnld"
 					style="display: block; width: 70%; margin: auto"
 					src="/imgs/anddw.png"
 					alt="حمل التطبيق"
 				/>
+		</div>
+				</h3>
 				
 			</div>
+
+		
 
 			<!--  <iframe id="ifrmTRdVw"
   src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&style=1"
@@ -273,21 +275,55 @@
 
 -->
 		</div>
- <script>
-        // هذا الكود هو المسؤول عن تشغيل ملف sw.js
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(registration => {
-                        console.log('✅ تم تسجيل Service 2 Worker بنجاح:', registration.scope);
-                    })
-                    .catch(error => {
-                        console.log('❌ فشل تسجيل Service Worker:', error);
-                    });
-            });
-        }
-    </script>
-		
+
+		<script>
+			const installBtn = document.getElementById("installBtn");
+
+			window.addEventListener("beforeinstallprompt", () => {
+				installBtn.style.display = "block";
+			});
+
+			installBtn.addEventListener("click", async () => {
+				if (!deferredPrompt) return;
+
+				deferredPrompt.prompt(); // 👈 هذا هو المطلوب
+				const choice = await deferredPrompt.userChoice;
+
+				console.log("اختيار المستخدم:", choice.outcome);
+
+				deferredPrompt = null;
+				installBtn.style.display = "none";
+			});
+		</script>
+
+		<script>
+			if ("serviceWorker" in navigator) {
+				navigator.serviceWorker
+					.register("/sw.js")
+					.then(registration => {
+						registration.addEventListener("updatefound", () => {
+							const newWorker = registration.installing;
+							if (!newWorker) return;
+
+							newWorker.addEventListener("statechange", () => {
+								if (
+									newWorker.state === "installed" &&
+									navigator.serviceWorker.controller
+								) {
+									console.log("🔄 تم تحديث الموقع");
+
+									// خيار 1: إعادة تحميل مباشرة
+									window.location.reload();
+
+									// خيار 2 (أفضل): إشعار المستخدم
+									// alert("تم تحديث الموقع، سيتم إعادة تحميل الصفحة");
+								}
+							});
+						});
+					})
+					.catch(err => console.error("SW Error:", err));
+			}
+		</script>
 
 		<script src="https://pricealerts.github.io/js.min.js"></script>
 	</body>

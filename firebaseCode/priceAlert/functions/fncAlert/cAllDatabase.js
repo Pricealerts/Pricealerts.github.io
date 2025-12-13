@@ -224,6 +224,8 @@ async function createdUser(data) {
 		chtId2: "",
 		chtId3: "",
 		paid: false,
+		lastLogin: new Date().toISOString(),
+		status: "online",
 	};
 	await db.ref(`users/${data.userId}`).set(infoUser);
 }

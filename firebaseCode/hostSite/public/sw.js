@@ -1,37 +1,13 @@
-// Cache name
-const cacheName = 'pwa-cache-v3.15';
+const cacheName = 'pwa-cache-v3.31';
 
-// Files to cache
 const filesToCache = [
   '/',
   '/index.html',
-  'https://pricealerts.github.io/js.min.js',
-  'https://pricealerts.github.io/style/style.css',
-  '/offline.html'
+  '/signin/index.html',
+  '/signin/jsCode.min.js',
+  '/offline.html',
 ];
 
-
-	self.addEventListener("fetch", event => {
-    event.respondWith(
-        fetch(event.request)
-            .catch(async() => {
-                // إذا فشل الاتصال بالإنترنت، نحاول البحث في الكاش
-                return caches.match(event.request).then(response => {
-                    if (response) {
-                        return response;
-                    }
-                    
-                    // إذا لم نجد الملف في الكاش، نتأكد هل الطلب هو "تصفح صفحة"؟
-                    // إذا نعم، نعيد صفحة عدم الاتصال. أما إذا كان صورة أو ملف آخر، فلا نعيد شيئاً
-                    if (event.request.mode === 'navigate') {
-                        return caches.match("/offline.html");
-                    }
-                });
-            })
-    );
-});
-
-// Install
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(cacheName)
@@ -40,19 +16,35 @@ self.addEventListener('install', event => {
   );
 });
 
-
-
-// Activate
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== cacheName) {
-            return caches.delete(key);
+    caches.keys().then(keys =>
+      Promise.all(
+        keys.map(key => key !== cacheName && caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', event => {
+  if (event.request.method !== 'GET') return;
+
+  event.respondWith(
+    fetch(event.request)
+      .then(response => {
+        const responseClone = response.clone();
+        caches.open(cacheName).then(cache => {
+          cache.put(event.request, responseClone);
+        });
+        return response;
+      })
+      .catch(() => {
+        return caches.match(event.request).then(response => {
+          if (response) return response;
+          if (event.request.mode === 'navigate') {
+            return caches.match('/offline.html');
           }
-        })
-      );
-    }).then(() => self.clients.claim())
+        });
+      })
   );
 });

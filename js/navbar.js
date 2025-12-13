@@ -51,15 +51,10 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا
 			<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
-			<a style="cursor:pointer"  onclick = "exsit()">
+			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
-	   <a href="https://pricealerts.web.app/accont"  style = "${dsplyCont} position: absolute; bottom:0;width: calc(100% - 40px);">
+	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} position: absolute; bottom:0;width: calc(100% - 40px);">
        ${localStorage.userName}</a>
-		
-
-
-
-
 `;
 
 document.body.prepend(sidebar);

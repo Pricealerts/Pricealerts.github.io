@@ -12,7 +12,7 @@ import {
 	set,
 	get,
 } from "https://pricealerts.github.io/firebaseCode.js";
-
+let userEntered;
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
 
@@ -29,7 +29,7 @@ window.handleCredentialResponse = response => {
 		.then(result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
 			const user = result.user;
-			updateUserData(user);
+			updateUserData(user, false);
 			// إخفاء الزر بعد النجاح (اختياري)
 			document.getElementById("buttonSignUp").style.display = "none";
 		})
@@ -76,22 +76,17 @@ window.onload = function () {
 	});
 };
 
-// مراقبة حالة تسجيل الدخول
-onAuthStateChanged(auth, user => {
-	if (user) {
-		console.log("User is signed in:", user);
-	} else {
-		console.log("User is signed out");
-	}
-});
 // تحديث بيانات المستخدم في Firebase DB
 let iLoup = 0;
-async function updateUserData(user) {
+async function updateUserData(user, isExist = true) {
 	iLoup++;
 	const userRef = ref(db, "users/" + user.uid);
-	
+
 	await get(userRef).then(snapshot => {
-		if (snapshot.exists()) {
+		const snp = snapshot.exists()
+		console.log("snapshot.exists() : " + snp);
+		
+		if (snp) {
 			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
 			for (const key in restUsr) {
 				localStorage[key] = restUsr[key];
@@ -104,47 +99,77 @@ async function updateUserData(user) {
 				console.log("تم التسجيل وتعديل البيانات ✔️");
 			});
 		} else {
-			setTimeout(() => {
-				if (iLoup < 5) {
-				 updateUserData(user);
-				 console.log('rah ydor : ' + iLoup);
-				 
-				} else {
-					alert('حدث خطأ أعد المحاولة')
-				}
-			}, 2000);
+			if (isExist) {
+				setTimeout(() => {
+					if (iLoup < 5) {
+						updateUserData(user);
+						console.log("rah ydor : " + iLoup);
+					} else {
+						alert("حدث خطأ أعد المحاولة ✔️");
+					}
+				}, 2000);
+			} else {
+				setData(userRef, user);
+			}
 		}
+	}).then(() => {
+		gebi('accountLink').style.display = 'block';
+		gebi('accountLink').innerHTML = localStorage.userName;
+		gebi('signOutOrInLink').innerHTML = ` تسجبل الخروج
+ 	 <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 	});
 }
 
 function setData(userRef, user) {
-	set(userRef, {
+	const infoUser = {
 		userEmail: user.email,
 		userName: user.displayName,
 		userPicture: user.photoURL,
-	}).then(() => {
-		console.log("تم التسجيل وتعديل البيانات ✔️");
-	});
+		chtId1: "",
+		chtId2: "",
+		chtId3: "",
+		paid: false,
+		lastLogin: new Date().toISOString(),
+		status: "online",
+	};
+	set(userRef, infoUser).then(() => {
+		console.log("تم  إنشاء البيانات ✔️");
 	console.log("الحساب غير موجود في قاعدة البيانات");
+	});
 }
-//sgnOUt();
 
-function sgnOUt() {
-	/* const id = btoa(user.email); */
-	const userRef = ref(db, "users/" + user.uid);
-	update(userRef, {
+// مراقبة حالة تسجيل الدخول
+onAuthStateChanged(auth, user => {
+	if (user) {
+		userEntered = user;
+		console.log("User is signed in:", user);
+	} else {
+		console.log("User is signed out");
+	}
+});
+setTimeout(() => {
+	if (!userEntered) return;
+	sgnOUt();
+}, 5000);
+
+async function sgnOUt() {
+	const userRef = ref(db, "users/" + userEntered.uid);
+	await update(userRef, {
 		lastLogout: new Date().toISOString(),
 		status: "outline",
 	}).then(() => {
-		console.log("تم التسجيل وتعديل البيانات ✔️");
+		console.log("تم  تعديل البيانات للخروج✔️");
 	});
-	signOut(auth)
-		.then(() => {
+	await signOut(auth)
+		.then(async () => {
 			console.log("تم تسجيل الخروج بنجاح");
-			//alert("تم تسجيل الخروج");
+			localStorage.clear();
 		})
 		.catch(error => {
 			console.error("خطأ في تسجيل الخروج:", error);
 		});
 }
+
+console.log('hadi jdida');
+
 export { auth };
