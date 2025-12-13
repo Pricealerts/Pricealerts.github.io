@@ -5,6 +5,8 @@ rmdir /s /q node_modules
 npm install
 firebase deploy --only functions
 
+
+
 رفع الملف functions
 cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\priceAlert
 firebase deploy --only functions
@@ -12,6 +14,8 @@ firebase deploy --only functions
 رفع الملف hosting
 cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\hostSite
 firebase deploy --only hosting
+
+
 
 باش نعرف واشمن بروجي راني فيه 
 gcloud config get-value project
@@ -24,13 +28,16 @@ gcloud config set account raki.chai3i@gmail.com
 
 باش نبدل القبول 
  gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
-  gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+
+
+
+
+نتاع باش تجيب الباسوورد من app gmail password
+https://myaccount.google.com/apppasswords
+
 
  تلمد الفنكشن 
 ctl + alt + s
-
-
-
 
 id my progects 
 hostsite-80e14

@@ -22,7 +22,16 @@ gebi("btnSignUp").addEventListener("click", async () => {
 	userName = acont[0].value;
 	userEmail = acont[1].value;
 	userPassword = acont[2].value;
-
+if (!userName || !userEmail || !userPassword) {
+		gebi("errmsgsgnUp").innerText = "جميع الحقول مطلوبة";
+		gebi("errmsgsgnUp").style.color = "red";
+		return false;
+	}
+	if (userPassword.length < 6) {
+		gebi("errmsgsgnUp").innerText = "كلمة المرور يجب أن تكون 6 رموز على الأقل";
+		gebi("errmsgsgnUp").style.color = "red";
+		return false;
+	}
 	gebi("errmsgsgnUp").innerText = "جاري التسجيل ...";
 	gebi("errmsgsgnUp").style.color = "black";
 	// cnfr cont is exist
@@ -88,6 +97,10 @@ async function adedUser() {
 	} else if (rspns.status == "overNmber") {
 		gebi("errmsgCnfrm").innerText =
 			"عدد المحاولات أكثر من اللازم أعد المحاولة بعد ساعة";
+		gebi("errmsgCnfrm").style.color = "red";
+	}else if (rspns.status == "notExist") {
+		gebi("errmsgCnfrm").innerText =
+			" رمز التحقق خاطئ أعد المحاولة";
 		gebi("errmsgCnfrm").style.color = "red";
 	}
 }

@@ -12,7 +12,6 @@ import {
 	set,
 	get,
 } from "https://pricealerts.github.io/firebaseCode.js";
-let userEntered;
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
 
@@ -82,42 +81,46 @@ async function updateUserData(user, isExist = true) {
 	iLoup++;
 	const userRef = ref(db, "users/" + user.uid);
 
-	await get(userRef).then(snapshot => {
-		const snp = snapshot.exists()
-		console.log("snapshot.exists() : " + snp);
-		
-		if (snp) {
-			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
-			for (const key in restUsr) {
-				localStorage[key] = restUsr[key];
-			}
-			saveImage(localStorage.userPicture);
-			update(userRef, {
-				lastLogin: new Date().toISOString(),
-				status: "online",
-			}).then(() => {
-				console.log("تم التسجيل وتعديل البيانات ✔️");
-			});
-		} else {
-			if (isExist) {
-				setTimeout(() => {
-					if (iLoup < 5) {
-						updateUserData(user);
-						console.log("rah ydor : " + iLoup);
-					} else {
-						alert("حدث خطأ أعد المحاولة ✔️");
-					}
-				}, 2000);
+	await get(userRef)
+		.then(snapshot => {
+			const snp = snapshot.exists();
+			console.log("snapshot.exists() : " + snp);
+
+			if (snp) {
+				const { lastLogin, paid, status, ...restUsr } = snapshot.val();
+				for (const key in restUsr) {
+					localStorage[key] = restUsr[key];
+				}
+				saveImage(localStorage.userPicture);
+				update(userRef, {
+					lastLogin: new Date().toISOString(),
+					status: "online",
+				}).then(() => {
+					console.log("تم التسجيل وتعديل البيانات ✔️");
+				});
 			} else {
-				setData(userRef, user);
+				if (isExist) {
+					setTimeout(() => {
+						if (iLoup < 3) {
+							updateUserData(user);
+							console.log("rah ydor : " + iLoup);
+						} else {
+							alert("حدث خطأ أعد المحاولة ✔️");
+						}
+					}, 2000);
+				} else {
+					setData(userRef, user);
+				}
 			}
-		}
-	}).then(() => {
-		gebi('accountLink').style.display = 'block';
-		gebi('accountLink').innerHTML = localStorage.userName;
-		gebi('signOutOrInLink').innerHTML = ` تسجبل الخروج
+		})
+		.then(() => {
+			gebi("accountLink").style.display = "block";
+			gebi(
+				"accountLink"
+			).innerHTML = ` ${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
+			gebi("signOutOrInLink").innerHTML = ` تسجبل الخروج
  	 <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
-	});
+		});
 }
 
 function setData(userRef, user) {
@@ -133,27 +136,28 @@ function setData(userRef, user) {
 		status: "online",
 	};
 	set(userRef, infoUser).then(() => {
+		for (const key in infoUser) {
+			localStorage[key] = infoUser[key];
+		}
+		saveImage(localStorage.userPicture);
 		console.log("تم  إنشاء البيانات ✔️");
-	console.log("الحساب غير موجود في قاعدة البيانات");
+		console.log("الحساب غير موجود في قاعدة البيانات");
 	});
 }
 
 // مراقبة حالة تسجيل الدخول
-onAuthStateChanged(auth, user => {
-	if (user) {
-		userEntered = user;
+let isPrmrEntr = true;
+onAuthStateChanged(auth, async user => {
+	if (user && isPrmrEntr) {
+		await sgnOUt(user);
 		console.log("User is signed in:", user);
-	} else {
-		console.log("User is signed out");
-	}
+	} 
+	isPrmrEntr = false;
 });
-setTimeout(() => {
-	if (!userEntered) return;
-	sgnOUt();
-}, 5000);
 
-async function sgnOUt() {
-	const userRef = ref(db, "users/" + userEntered.uid);
+
+async function sgnOUt(user) {
+	const userRef = ref(db, "users/" + user.uid);
 	await update(userRef, {
 		lastLogout: new Date().toISOString(),
 		status: "outline",
@@ -170,6 +174,6 @@ async function sgnOUt() {
 		});
 }
 
-console.log('hadi jdida');
+console.log("hadi jdida 1");
 
 export { auth };

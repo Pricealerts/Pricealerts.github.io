@@ -54,7 +54,8 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
 	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} position: absolute; bottom:0;width: calc(100% - 40px);">
-       ${localStorage.userName}</a>
+       ${localStorage.userName}
+	   <img src="${localStorage.base64Pctr}" alt=""></a>
 `;
 
 document.body.prepend(sidebar);

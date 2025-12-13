@@ -41,9 +41,7 @@ async function cAllDatabase(data) {
 			].includes(action)
 		) {
 			rspns = await sndEmail(data, db);
-		} else if (action == "creatUser") {
-			rspns = await createdUser(data);
-		}
+		} 
 
 		return rspns;
 	} catch (error) {
@@ -214,19 +212,5 @@ async function cntctUser(data, alrtAdd) {
 	}
 }
 
-async function createdUser(data) {
-	const userEmail = data.email;
-	const infoUser = {
-		userEmail: userEmail,
-		userName: data.displayName,
-		userPicture: data.photoURL,
-		chtId1: "",
-		chtId2: "",
-		chtId3: "",
-		paid: false,
-		lastLogin: new Date().toISOString(),
-		status: "online",
-	};
-	await db.ref(`users/${data.userId}`).set(infoUser);
-}
+
 export { cAllDatabase };

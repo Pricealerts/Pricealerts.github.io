@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { auth } from "firebase-functions/v1";
+//import { auth } from "firebase-functions/v1";
 import { cAllDatabase } from "./fncAlert/cAllDatabase.js";
 import { checkAndSendAlerts } from "./fncAlert/srchSmbls.js";
 
@@ -74,7 +74,7 @@ export const scheduledTask = onSchedule(
 
 //// on created
 
-
+/* 
 
 export const handleUserCreated = auth.user().onCreate(
   async (user) => {
@@ -95,7 +95,7 @@ export const handleUserCreated = auth.user().onCreate(
 
     return null;
   }
-);
+); */
 
 
 
