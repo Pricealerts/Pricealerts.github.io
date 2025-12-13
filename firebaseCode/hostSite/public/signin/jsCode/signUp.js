@@ -63,43 +63,38 @@ gebi("btnCnfrm").addEventListener("click", async () => {
 	await adedUser();
 });
 async function adedUser() {
-	if (gebi("codeCnfrm").value.length < 6) {
+	const codeCnfrm = gebi("codeCnfrm").value;
+	if (codeCnfrm.length < 6 || !Number(codeCnfrm)) {
 		gebi("errmsgCnfrm").innerText = "رمز التحقق خاطئ أعد المحاولة";
 		gebi("errmsgCnfrm").style.color = "red";
 		return false;
 	}
 	gebi("errmsgCnfrm").innerText = "جاري التحقق ...";
 	gebi("errmsgCnfrm").style.color = "black";
-	
-	const now = new Date();
-	const idUser = now.getTime();
-	
+
 	const bodyUp = {
 		action: "addAccont",
-		userId: idUser,
 		userName: userName,
 		userEmail: userEmail,
 		userPassword: userPassword,
-		userPicture: "/imgs/web/apple-touch-icon.png",
-		inputCode: gebi("codeCnfrm").value,
+		inputCode: codeCnfrm,
 		signUp: true,
 	};
 
 	const rspns = await ftchFirebase(bodyUp);
 	if (rspns.status == "success") {
-		const { userPassword, userId,inputCode,signUp, ...newbodyUp } = bodyUp;
-		for (const key in newbodyUp) {
-			localStorage[key] = newbodyUp[key];
-		}
-		 sgnIn('errmsgCnfrm' ,true)
-		
-		
+		await sgnIn("errmsgCnfrm");
+
+	} else if (rspns.status == "overNmber") {
+		gebi("errmsgCnfrm").innerText =
+			"عدد المحاولات أكثر من اللازم أعد المحاولة بعد ساعة";
+		gebi("errmsgCnfrm").style.color = "red";
 	}
 }
 
 async function ftchFirebase(body) {
 	try {
-		const urlFirebase = 
+		const urlFirebase =
 			"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2/";
 		const response = await fetch(urlFirebase, {
 			method: "POST",
@@ -114,9 +109,3 @@ async function ftchFirebase(body) {
 		console.error("kayn error ftchFirebase 115 : " + error);
 	}
 }
-
-
-
-
-
- 

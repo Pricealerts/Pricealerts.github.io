@@ -1,7 +1,8 @@
 //const functions = require("firebase-functions");
+import { initializeApp } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { initializeApp } from "firebase-admin/app";
+import { auth } from "firebase-functions/v1";
 import { cAllDatabase } from "./fncAlert/cAllDatabase.js";
 import { checkAndSendAlerts } from "./fncAlert/srchSmbls.js";
 
@@ -12,7 +13,6 @@ initializeApp();
 export const proxyRequestV2 = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
-
 		// تعيين رؤوس CORS
 		const origin = req.headers.origin;
 		const allowedOrigins = [
@@ -58,7 +58,6 @@ export const proxyRequestV2 = onRequest(
 	}
 );
 
-
 export const scheduledTask = onSchedule(
 	{
 		schedule: "every 5 minutes",
@@ -73,24 +72,29 @@ export const scheduledTask = onSchedule(
 	}
 );
 
+//// on created
 
 
 
+export const handleUserCreated = auth.user().onCreate(
+  async (user) => {
+    const userId = user.uid;
+    const email = user.email || "notexist@gmail.com";
+    const displayName = user.displayName || "notexistName";
+    const photoURL = user.photoURL || "/imgs/camera-square-svgrepo-com.svg";
 
+    const dataSet = {
+      action: "creatuser",
+      userId,
+      email,
+      displayName,
+      photoURL,
+    };
 
+    await cAllDatabase(dataSet);
 
-
-/* // دالة للتحقق من التوكن
-export const verifyIdToken = onRequest(
-  { region: "europe-west1" },  // اختر المنطقة
-  async (req, res) => {
-	try {
-	 const dd = await vrfIdToken(req) 
-	
-	  return res.status(200).send(dd);
-	} catch (error) {
-	  console.error("Error verifying ID token:", error);
-	  return res.status(401).send({ error: "توكن غير صالح أو منتهي" });
-	}
+    return null;
   }
-); */
+);
+
+

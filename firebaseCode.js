@@ -61,7 +61,7 @@ function setUpdtData(storUp, rfrnce, user) {
         // ---------------------------------------------------------
         
         // يُفضل طلب الإذن أولاً
-        function requestNotificationPermission() {
+      /*   function requestNotificationPermission() {
             console.log('جاري طلب إذن الإشعارات...');
             Notification.requestPermission().then((permission) => {
                 if (permission === 'granted') {
@@ -92,7 +92,7 @@ function setUpdtData(storUp, rfrnce, user) {
         requestNotificationPermission();
 
 
-
+ */
 
 
 

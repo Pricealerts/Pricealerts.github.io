@@ -29,7 +29,7 @@ window.handleCredentialResponse = response => {
 		.then(result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
 			const user = result.user;
-			updateUserData(user, false);
+			updateUserData(user);
 			// إخفاء الزر بعد النجاح (اختياري)
 			document.getElementById("buttonSignUp").style.display = "none";
 		})
@@ -52,11 +52,11 @@ window.onload = function () {
 
 	// 2. رسم الزر داخل الـ div
 	google.accounts.id.renderButton(document.getElementById("buttonSignUp"), {
-		theme: "outline", // الخيارات: "outline", "filled_blue", "filled_black"
-		size: "large", // الخيارات: "large", "medium", "small"
-		text: "signin_with", // النص: "signin_with", "signup_with", "continue_with"
-		shape: "rectangular", // الشكل: "rectangular", "pill"
-		width: "250", // عرض الزر بالبكسل
+		theme: "outline",
+		size: "large",
+		text: "signin_with",
+		shape: "rectangular",
+		width: "250",
 	});
 	google.accounts.id.renderButton(document.getElementById("buttonSignIn"), {
 		theme: "outline", // الخيارات: "outline", "filled_blue", "filled_black"
@@ -85,44 +85,43 @@ onAuthStateChanged(auth, user => {
 	}
 });
 // تحديث بيانات المستخدم في Firebase DB
-function updateUserData(user, isExst) {
-	// استخدام set بدلاً من update
-	const id = btoa(user.email);
-	const userRef = ref(db, "allAcconts/" + id);
-	if (isExst) {
-		get(userRef).then(snapshot => {
-			if (snapshot.exists()) {
-				const { lastLogin, paid, status, userPassword, ...restUsr } =
-					snapshot.val();
-				for (const key in restUsr) {
-					localStorage[key] = restUsr[key];
-				}
-				update(userRef, {
-					lastLogin: new Date().toISOString(),
-					status: "online",
-				}).then(() => {
-					console.log("تم التسجيل وتعديل البيانات ✔️");
-				});
-			} else {
-				setData(userRef, user);
+let iLoup = 0;
+async function updateUserData(user) {
+	iLoup++;
+	const userRef = ref(db, "users/" + user.uid);
+	
+	await get(userRef).then(snapshot => {
+		if (snapshot.exists()) {
+			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
+			for (const key in restUsr) {
+				localStorage[key] = restUsr[key];
 			}
-		});
-	} else {
-		setData(userRef, user);
-	}
+			saveImage(localStorage.userPicture);
+			update(userRef, {
+				lastLogin: new Date().toISOString(),
+				status: "online",
+			}).then(() => {
+				console.log("تم التسجيل وتعديل البيانات ✔️");
+			});
+		} else {
+			setTimeout(() => {
+				if (iLoup < 5) {
+				 updateUserData(user);
+				 console.log('rah ydor : ' + iLoup);
+				 
+				} else {
+					alert('حدث خطأ أعد المحاولة')
+				}
+			}, 2000);
+		}
+	});
 }
 
 function setData(userRef, user) {
 	set(userRef, {
 		userEmail: user.email,
-		lastLogin: new Date().toISOString(),
-		lastLogout: "non",
 		userName: user.displayName,
 		userPicture: user.photoURL,
-		chtId1: "",
-		chtId2: "",
-		chtId3: "",
-		status: "online",
 	}).then(() => {
 		console.log("تم التسجيل وتعديل البيانات ✔️");
 	});
@@ -130,10 +129,9 @@ function setData(userRef, user) {
 }
 //sgnOUt();
 
-
 function sgnOUt() {
-	const id = btoa(user.email);
-	const userRef = ref(db, "allAcconts/" + id);
+	/* const id = btoa(user.email); */
+	const userRef = ref(db, "users/" + user.uid);
 	update(userRef, {
 		lastLogout: new Date().toISOString(),
 		status: "outline",

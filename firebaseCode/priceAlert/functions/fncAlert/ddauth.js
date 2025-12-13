@@ -1,38 +1,29 @@
 import { getAuth } from "firebase-admin/auth"; // استيراد getAuth من firebase-admin
 
-async function chngePswrd(email, currentPassword, newPassword) {
+async function chngePswrd(email, newPassword) {
 	try {
-		// الحصول على مستخدم Firebase
-		const auth = getAuth();
-		const user = await auth.getUserByEmail(email);
+		const userRecord = await getAuth().getUserByEmail(email);
+		const userid = userRecord.uid;
+		await getAuth().updateUser(userid, { password: newPassword });
 
-		// إعادة توثيق المستخدم باستخدام البريد وكلمة السر الحالية
-		const credential = await auth.createUser({
-			email: email,
-			password: currentPassword,
-		});
-
-		// تحديث كلمة السر للمستخدم
-		await auth.updateUser(user.uid, { password: newPassword });
-
-		// إرسال الرد بعد تغيير كلمة السر
-		return true;
+		return { success: true };
 	} catch (error) {
 		console.error("Error changing password:", error);
-
-		return false;
+		return { success: false, message: error.message };
 	}
 }
 
-async function sgnUp(userEmail, userPassword) {
+async function sgnUp(userEmail, userPassword, userName) {
 	try {
-		if (!userEmail || !userPassword) {
+		if (!userEmail || !userPassword || !userName) {
 			return { error: "userEmail and userPassword are required" };
 		}
 
 		const user = await getAuth().createUser({
-			userEmail,
-			userPassword,
+			email: userEmail,
+			password: userPassword,
+			displayName: userName,
+			photoURL: "/imgs/camera-square-svgrepo-com.svg",
 		});
 
 		return {
@@ -46,53 +37,25 @@ async function sgnUp(userEmail, userPassword) {
 	}
 }
 
-async function vrfIdToken(req) {
+
+
+async function gtEmail(email) {
 	try {
-		const { idToken } = req.body.result;
+		const userRecord = await getAuth().getUserByEmail(email);
 
-		if (!idToken) {
-			console.log("mafihch idtpkn :");
-			console.log(idToken);
-
-			return { error: "يجب تقديم التوكن للتحقق" };
-		}
-
-		// التحقق من صحة التوكن
-		const decodedToken = await getAuth().verifyIdToken(idToken);
-		console.log("Decoded token:", decodedToken);
-
-		// إذا تم التحقق بنجاح، أرسل الرد بالموافقة
-		return { message: "تم التحقق من التوكن بنجاح", uid: decodedToken.uid };
+		return {
+			success: true,
+			exists: true,
+			uid: userRecord.uid,
+			email: userRecord.email,
+		};
 	} catch (error) {
-		console.error("Error verifying ID token:", error);
-		return { error: "توكن غير صالح أو منتهي" };
+		console.error("Error fetching emails:", error);
+		return {
+			success: false,
+			error: error.message,
+		};
 	}
 }
 
-
-
-
-
-
-async function  gtAllEmails(data){
-try {
-    const userRecord = await getAuth().getUserByEmail(email);
-
-        return res.status(200).json({
-          success: true,
-          exists: true,
-          uid: userRecord.uid,
-          email: userRecord.email,
-        });
-    } catch (error) {
-      console.error("Error fetching emails:", error);
-      return res.status(500).json({
-        success: false,
-        error: error.message,
-      });
-    }
-}
-
-
-
-export { chngePswrd, sgnUp, vrfIdToken ,gtAllEmails };
+export { chngePswrd, sgnUp, gtEmail };

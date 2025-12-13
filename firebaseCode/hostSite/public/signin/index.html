@@ -117,7 +117,7 @@
 			</div>
 
 			<div class="form-container sign-in-container">
-				<div class="frmSnd" id="frmSgnIn">
+				<form class="frmSnd" id="frmSgnIn" action="#">
 					<h1>تسجيل الدخول</h1>
 
 					<input
@@ -146,7 +146,7 @@
 					>
 						هل نسيت كلمة المرور؟
 					</div>
-					<button id="btnSignIn">دخول</button>
+					<button type="submit" id="btnSignIn">دخول</button>
 					<br />
 					
 					
@@ -167,19 +167,20 @@
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						ليس لديك حساب؟
 					</p>
-					<button type="button" class="ghost mobile-btn" id="mobileSignUp">
+					<!-- <input type="submit" value=""> -->
+					<button type="submit" class="ghost mobile-btn" id="mobileSignUp">
 						إنشاء حساب جديد
 					</button>
-				</div>
+				</form>
 
-				<div id="msgCnfrmInEmail" class="msgCnfrm">
+				<form id="msgCnfrmInEmail" class="msgCnfrm" action="#">
 					<h2>ضع ايميلك لإرسال رمز التحقق</h2>
 
 					<input type="email" placeholder="ايميلك" required />
 					<p id="errmsgCnfrmInEmail"></p>
-					<button id="btnCnfrmInEmail">إرسال</button>
-				</div>
-				<div id="msgCnfrmIn" class="msgCnfrm">
+					<button type="submit" id="btnCnfrmInEmail">إرسال</button>
+				</form>
+				<form action="#" id="msgCnfrmIn" class="msgCnfrm">
 					<h2>لقد تم إرسال رمز التحقق إلى بريدك الإلكتروني</h2>
 					<p>
 						<strong>ملاحظة:</strong> قد تجد الرسالة في صندوق المحظورات (Spam)
@@ -191,9 +192,9 @@
 						required
 					/>
 					<p id="errmsgCnfrmIn"></p>
-					<button id="btnCnfrmIn">تحقق</button>
-				</div>
-				<div id="newPswrd" class="msgCnfrm">
+					<button type="submit" id="btnCnfrmIn">تحقق</button>
+				</form>
+				<form action="#" id="newPswrd" class="msgCnfrm">
 					<h2>ضع كلمة المرور الجديدة</h2>
 					<div class="password-box">
 						<input
@@ -207,8 +208,8 @@
 						></span>
 					</div>
 					<p id="errNewPswrd"></p>
-					<button id="btnNewPswrd">إرسال</button>
-				</div>
+					<button type="submit" id="btnNewPswrd">إرسال</button>
+				</form>
 			</div>
 
 			<div class="overlay-container">
@@ -271,10 +272,10 @@
 				}
 			}
 		</script>
-		<script type="module" src="./jsCode/gogleCode.js"></script>
+		<!-- <script type="module" src="./jsCode/gogleCode.js"></script>
 		<script src="./jsCode/signUp.js"></script>
-		<script src="./jsCode/signIn.js"></script>
-		<!-- <script src="./jsCode.min.js" type="module"></script> -->
+		<script src="./jsCode/signIn.js"></script> -->
+		<script src="./jsCode.min.js" type="module"></script>
 
 		<!-- save image -->
 		<script>

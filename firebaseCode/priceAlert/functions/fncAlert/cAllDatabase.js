@@ -15,11 +15,11 @@ let db;
  */
 async function cAllDatabase(data) {
 	db = getDatabase();
-	data.userId = btoa(data.userEmail);
+	//data.uid = btoa(data.userEmail);
 	if (!data.userPassword) {
-		data.userPassword = 'qsfqzrqsqle7610dqsdepllpl'
+		data.userPassword = "qsfqzrqsqle7610dqsdepllpl";
 	}
-	if(!data.paid) data.paid = false
+	if (!data.paid) data.paid = false;
 	postsRef = db.ref("alerts");
 	try {
 		const action = data.action;
@@ -30,21 +30,20 @@ async function cAllDatabase(data) {
 			rspns = await setAlert(data);
 		} else if (action === "dltAlrt") {
 			rspns = await dltAlrt(data);
-		} else if (["addAccont", "addAccontGogl"].includes(action)) {
-			rspns = await addUser(data);
-		} else if (["getAccont", "updatePsw"].includes(action)) {
-			//
-			rspns = await gtUser(data);
-		} else if (["sndMsgCnferIn", "sndMsgCnfer"].includes(action)) {
-			rspns = await cnfrmExist(data);
-			/* } else if (action == "updatePsw") {   
-			rspns = await updtPsw(data); */
-		} else if (["updtPsw", "cnfrmCode","verifyIdToken"].includes(action)) {
+		} else if (
+			[
+				"sndMsgCnferIn",
+				"sndMsgCnfer",
+				"addAccont",
+				"updtPsw",
+				"cnfrmCode",
+				"verifyIdToken",
+			].includes(action)
+		) {
 			rspns = await sndEmail(data, db);
+		} else if (action == "creatUser") {
+			rspns = await createdUser(data);
 		}
-		/* if (action === "getAuth") {
-			rspns = await auth(data);
-		} */
 
 		return rspns;
 	} catch (error) {
@@ -101,7 +100,7 @@ async function setAlert(data) {
 	const rspns = {};
 
 	try {
-		const okUser = await contUser(data, alrtAdd);
+		const okUser = await cntctUser(data, alrtAdd);
 		if (!okUser.okRspns) {
 			return okUser;
 		}
@@ -154,7 +153,7 @@ async function dltAlrt(data) {
 	}
 }
 
-async function contUser(data, alrtAdd) {
+async function cntctUser(data, alrtAdd) {
 	const idChat = data.telegramChatId;
 	let rspns = {};
 
@@ -210,145 +209,22 @@ async function contUser(data, alrtAdd) {
 	} catch (error) {
 		rspns.status = "notSuccess";
 		rspns.okRspns = false;
-		console.error(`فشل إرسال في contUser    ${alrtAdd.symbol} : ${error}`);
+		console.error(`فشل إرسال في cntctUser    ${alrtAdd.symbol} : ${error}`);
 		return rspns;
 	}
 }
 
-async function addUser(data) {
-	const dd = {
-		userEmail: user.email,
-		lastLogin: new Date().toISOString(),
-		userName: user.userName,
-		userEmail: user.userEmail,
-		userPicture: user.photoURL,
+async function createdUser(data) {
+	const userEmail = data.email;
+	const infoUser = {
+		userEmail: userEmail,
+		userName: data.displayName,
+		userPicture: data.photoURL,
 		chtId1: "",
 		chtId2: "",
 		chtId3: "",
 		paid: false,
-		status: "online",
-	}
-	const userAdd = {
-		//userId: data.userId,
-		userName: data.userName,
-		userEmail: data.userEmail,
-		userPassword: data.userPassword || "",
-		userPicture: data.userPicture,
-		chtId1: data.chtId1 || "",
-		chtId2: data.chtId2 || "",
-		chtId3: data.chtId3 || "",
-		paid: data.paid || false,
-		lastLogin: new Date().toISOString(),
-		status: "online",
 	};
-
-	const rspns = {};
-
-	try {
-		if (data.action == "addAccont") {
-			const cnfrm = sndEmail(data, db);
-			if (cnfrm.status != "exist") {
-				return cnfrm.status;
-			}
-		}
-		const gtUserExist = db.ref(`allAcconts/${data.userId}`).get();
-
-		if (gtUserExist.exists()) {
-			
-			rspns.status = "exist";
-			rspns.message = "accont is exist";
-			return rspns;
-		}
-		await db.ref(`allAcconts/${data.userId}`).set(userAdd);
-		rspns.status = "success";
-		return rspns;
-	} catch (error) {
-		rspns.status = "notSuccess";
-		rspns.message = String(error);
-		// make sure we reference the symbol correctly
-		console.error(`فشل إرسال إشعار تيليجرام لـ ${data.userEmail} : `, error);
-		return rspns;
-	}
+	await db.ref(`users/${data.userId}`).set(infoUser);
 }
-
-async function gtUser(data) {
-	const rspns = {};
-	try {
-		if (data.action == "addAccontGogl") {
-			const gtUsr = await db.ref(`allAcconts/${data.userId}`).get();
-			if (gtUsr.exists()) {
-				const user = gtUsr.val();
-				const { userPassword, paid, ...newUser } = user;
-				return { status: "success", rslt: newUser };
-			}
-			return { status: "error", message: "error" };
-		}
-
-		const gtUsrs = await db.ref(`allAcconts/${data.userId}`).get();
-
-		if (gtUsrs.exists()) {
-			const user = gtUsrs.val();
-			if (
-				user.userPassword == data.userPassword ||
-				data.action == "updatePsw"
-			) {
-				const { userPassword, paid, ...newUser } = user;
-				if (data.action == "updatePsw") {
-					newUser.userId = data.userId;
-					newUser.userPassword = user.userPassword;
-					newUser.paid = user.paid;
-				}
-
-				//delete user.userPassword;
-				// fl signIn normal manjiboch userPassword userId paid
-				return { status: "success", rslt: newUser };
-			} else {
-				return { status: "NoPassword", message: "error Password" };
-			}
-		}
-
-		return { status: "notexsist", message: "not exist email" };
-	} catch (error) {
-		rspns.status = "notSuccess";
-		rspns.message = String(error);
-		// make sure we reference the symbol correctly
-		console.error(`فشل  لـ ${data.userEmail} : `, error);
-		return rspns;
-	}
-}
-
-async function cnfrmExist(data) {
-	const rspns = {};
-	try {
-		const gtUsrs = await db.ref(`allAcconts`).get();
-
-		if (gtUsrs.exists()) {
-			const allUsers = gtUsrs.val();
-			for (const userId in allUsers) {
-				if (allUsers[userId].userEmail == data.userEmail) {
-					data.userName = allUsers[userId].userName;
-					if (data.action == "sndMsgCnferIn") {
-						const rslt = await sndEmail(data, db);
-						return rslt;
-					}
-					return { status: "exist" };
-				}
-			}
-			if (data.action == "sndMsgCnfer") {
-				const rslt = await sndEmail(data, db);
-				return rslt;
-			}
-			return { status: "notexsist", message: "not exist email" };
-		}
-
-		return { status: "notexsist", message: "not exist email" };
-	} catch (error) {
-		rspns.status = "notSuccess";
-		rspns.message = String(error);
-		// make sure we reference the symbol correctly
-		console.error(`فشل  لـ ${data.userEmail} : `, error);
-		return rspns;
-	}
-}
-
 export { cAllDatabase };

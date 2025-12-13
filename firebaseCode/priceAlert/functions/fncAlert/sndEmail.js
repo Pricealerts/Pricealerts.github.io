@@ -1,6 +1,5 @@
-//import { defineSecret } from "firebase-functions/params";
-import { cAllDatabase } from "./cAllDatabase.js";
-import { chngePswrd, sgnUp /* ,vrfIdToken */ } from "./ddauth.js";
+
+import { chngePswrd, sgnUp, gtEmail  } from "./ddauth.js";
 
 let db;
 
@@ -13,7 +12,7 @@ async function sndEmail(data, dtbs) {
 		if (["sndMsgCnferIn", "sndMsgCnfer"].includes(action)) {
 			await rmovInArryDb(userEmail);
 
-			reponse = await sendVerificationEmail(userEmail, data.userName);
+			reponse = await sendVerificationEmail(userEmail, data.userName, action);
 		} else if (["cnfrmCode", "addAccont"].includes(action)) {
 			const ovrNmb = await overNmber(userEmail);
 			if (ovrNmb) {
@@ -28,9 +27,7 @@ async function sndEmail(data, dtbs) {
 				userPassword: data.userPassword,
 			};
 			reponse = await updtPswd(bdyFirebase);
-		}/* else if (action == "verifyIdToken") {
-			vrfIdToken(data)
-		} */
+		} 
 
 		return reponse;
 	} catch (err) {
@@ -39,25 +36,24 @@ async function sndEmail(data, dtbs) {
 		reponse = { status: "notSend is" + err };
 	}
 }
-
+// ida kan 3dd lmo7awlat bzaf
 async function overNmber(userEmail) {
 	try {
 		const arr = await gtDb();
 		if (!arr) return false;
 
 		const fltr = arr.filter(item => item[0] == userEmail);
-
+		if (fltr.length == 0) return false;
 		let data = fltr[0];
 		if (data[2] > 5) {
 			const now = new Date().getTime();
 			const oldTime = data[3];
 			const diff = (now - oldTime) / 1000 / 60;
 			if (diff >= 60) {
-				data[3] = 1;
+				data[2] = 1;
 				let dtSet = arr.filter(item => item[0] != userEmail);
 				dtSet.push(data);
-				const ref = db.ref("allSndEmails");
-				await ref.set(dtSet);
+				await db.ref("allSndEmails").set(dtSet);
 				return false;
 			}
 			return true;
@@ -68,9 +64,14 @@ async function overNmber(userEmail) {
 		return false;
 	}
 }
-async function sendVerificationEmail(userEmail, userName) {
-	const code = Math.floor(100000 + Math.random() * 900000);
+async function sendVerificationEmail(userEmail, userName, action) {
+	const emailexsist = await gtEmail(userEmail);
+	if (!emailexsist.success && action == "sndMsgCnferIn")
+		return { status: "notexsist" };
+	if (emailexsist.success && action == "sndMsgCnfer")
+		return { status: "exist" };
 
+	const code = Math.floor(100000 + Math.random() * 900000);
 	try {
 		const bodySnd = {
 			action: "sndMsgCnfer",
@@ -91,14 +92,14 @@ async function sendVerificationEmail(userEmail, userName) {
 
 		if (result.status == "success") {
 			const oldTime = new Date().getTime();
-			const stDt = [userEmail, code, 1, oldTime];
+			const stDt = [userEmail, code, 1, oldTime, false];
 			// append to database
 			const arr = await gtDb();
 			let arrFnl = [];
 			if (arr) arrFnl = arr;
 			arrFnl.push(stDt);
-			const rspns = await cAllDatabase('addAccont')
-			return rspns;
+			await db.ref(`allSndEmails`).set(arrFnl);
+			return { status: "success" };
 		}
 		return { status: "notsuccess" };
 	} catch (error) {
@@ -109,32 +110,35 @@ async function sendVerificationEmail(userEmail, userName) {
 }
 
 async function verifyCode(data) {
-	const userEmail = data.userEmail;
+	const userEmail = data.userEmail.toLowerCase();
 	try {
+		let respns = { status: "notExist" }; // by default
 		let gtData = await gtDb();
-		let respns = { status: "notExist" };
 		if (!gtData) return respns;
 		let fltr = gtData.filter(item => item[0] == userEmail);
 		if (fltr.length > 0) {
 			let arow = fltr[0];
-			arow[2] = arow[2] + 1;
-			arow[3] = new Date().getTime(); // oled date
 			if (arow[1] == data.inputCode) {
-				if (signUp) {
+				if (data.signUp) {
 					await rmovInArryDb(userEmail);
-					const auSignUp = await sgnUp(userEmail, data.userPassword);
+					const auSignUp = await sgnUp(
+						userEmail,
+						data.userPassword,
+						data.userName
+					);
 					if (auSignUp.status == "success") {
-						await db.ref(`allAcconts/${data.userId}`).set(data);
-						return { status: "exist" };
+						return { status: "success" };
 					}
 					return { status: "notExist" };
 				}
+
 				arow[4] = true;
-				respns = { status: "exist" };
+				respns = { status: "success" };
 			}
+			arow[2] = arow[2] + 1;
+			arow[3] = new Date().getTime(); // oled time
 			let dtSet;
 			dtSet = gtData.filter(item => item[0] != userEmail);
-
 			dtSet.push(arow);
 			await db.ref("allSndEmails").set(dtSet);
 		}
@@ -146,36 +150,21 @@ async function verifyCode(data) {
 }
 
 async function updtPswd(data) {
+	const userEmail = data.userEmail.toLowerCase();
 	try {
 		let gtData = await gtDb();
 		if (!gtData) return { status: "notSucsus" };
-		let fltr = gtData.filter(item => item[0] == data.userEmail);
+		let fltr = gtData.filter(item => item[0] == userEmail);
+		if (fltr.length == 0) return { status: "notSucsus" };
 		const data2 = fltr[0];
-		if (fltr.length > 0 && data2[4] == true) {
+		if (data2[4]) {
 			// حذف القيمة "abdou"
-			await rmovInArryDb(data.userEmail);
-			// كتابة المصفوفة بعد التعديل
-			const usrData = await cAllDatabase(data);
-			if (usrData.status == "success") {
-				const user = usrData.rslt;
-				//delete rslt.userId;
-				const nwPasword = data.userPassword;
-				const updt = await chngePswrd(
-					data.userEmail,
-					usrData.userPassword,
-					nwPasword
-				);
-				if (!updt) return { status: "notSuccess" };
-				let { userId, ...nwRslt } = user;
-				nwRslt.userPassword = nwPasword;
-				await db.ref(`allAcconts/${user.userId}`).set(nwRslt);
-				const { userPassword, paid, ...rslt } = nwRslt;
-				return { status: "success", rslt: rslt };
-			} else {
-				return { status: "notSuccess" };
-			}
+			await rmovInArryDb(userEmail);
+			const updt = await chngePswrd(userEmail, data.userPassword);
+			if (!updt) return { status: "notSuccess" };
+			return { status: "success" };
 		}
-		return;
+		return { status: "notSuccess" };
 	} catch (error) {
 		console.log(" error updtPsw is: " + error);
 
@@ -185,7 +174,7 @@ async function updtPswd(data) {
 async function rmovInArryDb(userEmail) {
 	let arr = await gtDb();
 
-	if (arr != false) {
+	if (arr) {
 		const fltr = arr.filter(item => item[0] == userEmail);
 		if (fltr.length == 0) {
 			return false;
