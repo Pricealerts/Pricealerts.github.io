@@ -16,7 +16,7 @@ for (let i = 0; i < lstLoclSrorge.length; i++) {
 	localStorage.removeItem(strg);
 }
 
-const drction = "../accont/";
+const drction = "../accont";
 gebi("frmSgnUp").addEventListener("submit", async (e) => {
 	e.preventDefault();
 	const acont = document.querySelectorAll("#frmSgnUp input");

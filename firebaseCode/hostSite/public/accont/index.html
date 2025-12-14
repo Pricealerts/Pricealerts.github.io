@@ -208,7 +208,7 @@
 	</head>
 	<body>
 		<div id="pirantCntynr" class="pirantCntynr"></div>
-		<div class="profile-container">
+		<form id="formSave" class="profile-container" action="#">
 			<div class="profile-photo">
 				<label for="input-file" id="drop-area">
 					<input type="file" accept="image/*" id="input-file" hidden />
@@ -216,12 +216,8 @@
 						<img src="/imgs/camera-square-svgrepo-com.svg" alt="" />
 					</div>
 				</label>
-				<div id="errImg">Error upload Image</div>
-				<img
-					id="uploadedImage"
-					src="/imgs/user-svgrepo-com.svg"
-					id="uploadedImage"
-				/>
+				<div id="errImg">خطأ في رفع الصورة</div>
+				<img id="uploadedImage" src="/imgs/user-svgrepo-com.svg" />
 			</div>
 
 			<h1 id="userName" class="user-name" contenteditable="true"></h1>
@@ -229,15 +225,6 @@
 			<p id="uesrEmail" class="user-email"></p>
 
 			<div class="chatIds">
-				<!-- <label for="userPassword">كلمة السر</label>
-				<br />
-
-				<div class="password-box">
-					<input id="userPassword" type="password" placeholder="كلمة السر" />
-					<span class="eye" onclick="togglePwd(this,'userPassword')"
-						><i class="fa-solid fa-eye"></i
-					></span>
-				</div> -->
 				<br /><br />
 
 				معرّفات دردشة التيليجرام (Chat ID) : الخاص بك
@@ -267,8 +254,8 @@
 				/>
 			</div>
 			<p id="rspns"></p>
-			<button id="saveBtn" class="saveBtn">حفظ التغيرات</button>
-		</div>
+			<button id="saveBtn" type="submit" class="saveBtn">حفظ التغيرات</button>
+		</form>
 
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 
@@ -276,222 +263,55 @@
 		<script>
 			function gebi(el) {
 				return document.getElementById(el);
-			} //   https://drive.google.com/file/d/1jCfKYWrJP462N840a5juX-H8Uwj_HxCR/view
-			//	UserImage
-			window.addEventListener("load", async () => {
-				await startpage();
-			});
-			//window.onload()
-
-			async function startpage() {
-				const userEmailCnt = localStorage.userEmail || "إيميلك";
+			}
+			startpage();
+			function startpage() {
 				gebi("uploadedImage").src =
 					UserImage || "/imgs/web/apple-touch-icon.png";
 				gebi("userName").innerText = localStorage.userName || "إسمك";
-				gebi("uesrEmail").innerHTML = userEmailCnt || "إيميلك";
-				/* if (localStorage.userPassword) {
-					gebi("userPassword").value = localStorage.userPassword;
-					localStorage.removeItem("userPassword");
-				} else {
-					if (userEmailCnt == "إيميلك") {
-						return false;
-					}
-					try {
-						const urlFirebase =
-							"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
-						const response = await fetch(urlFirebase, {
-							method: "POST",
-							headers: { "Content-Type": "application/json" },
-							body: JSON.stringify({
-								action: "forgetPswrd",
-								userEmail: userEmailCnt,
-							}),
-						});
-						const data = await response.json();
-						const rspns = JSON.parse(data);
-						if (rspns.status == "success") {
-							gebi("userPassword").value = rspns.rslt.userPassword;
-						}
-					} catch (error) {
-						console.error("kayn error :" + error);
-					}
-				} */
-
-				gebi("telegramChatId1").value = localStorage.chtId1;
-				gebi("telegramChatId2").value = localStorage.chtId2;
-				gebi("telegramChatId3").value = localStorage.chtId3;
+				gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
+				gebi("telegramChatId1").value = localStorage.chtId1 || "";
+				gebi("telegramChatId2").value = localStorage.chtId2 || "";
+				gebi("telegramChatId3").value = localStorage.chtId3 || "";
 			}
-
 			const inputFile = gebi("input-file");
-			let imgCntnt;
+			let imgUrlSrc;
 			let file;
 			inputFile.addEventListener("change", async e => {
 				file = e.target.files[0];
-
 				if (!file) {
 					gebi("errImg").style.display = "block";
 					return;
 				}
-				imgCntnt = URL.createObjectURL(file);
-				gebi("uploadedImage").src = imgCntnt;
+				imgUrlSrc = URL.createObjectURL(file);
+				gebi("uploadedImage").src = imgUrlSrc;
+				gebi("errImg").style.display = "none";
 			});
 		</script>
 		<!-- btn save -->
-		<script>
-			const WEB_APP_URL =
-				"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
+		<script type="module" src="./btnSave.js"></script>
 
-			gebi("saveBtn").addEventListener("click", async e => {
-				gebi("rspns").innerText = "جاري الحفظ ...";
-				gebi("rspns").style.color = "black";
-
-				/////////////////////////// jiht limage
-				let imgSrc = localStorage.userPicture;
-
-				if (gebi("userName").innerText.length < 2) {
-					gebi("rspns").innerText = "  خانة الإسم فارغة عليك ملأها ";
-					gebi("rspns").style.color = "red";
-					setTimeout(() => {
-						gebi("rspns").innerText = "";
-					}, 15000);
-					return false;
-				}
-				if (
-					gebi("telegramChatId1").value.length == 0 &&
-					gebi("telegramChatId2").value.length == 0 &&
-					gebi("telegramChatId3").value.length == 0
-				) {
-					gebi("rspns").innerText = "  لم تسجل أي chat Id ";
-					gebi("rspns").style.color = "red";
-					setTimeout(() => {
-						gebi("rspns").innerText = "";
-					}, 15000);
-					return false;
-				}
-				// 1 MB = 1,000,000 bytes (تقريبًا)
-				const MAX_SIZE = 1 * 1024 * 1024; // أو 1_000_000
-				if (file) {
-					if (file.size > MAX_SIZE) {
-						alert("حجم الصورة يجب أن يكون أقل من 1 MB");
-						return;
-					}
-					// تحويل الصورة Base64
-					const base64 = await toBase64(file);
-					localStorage.base64Pctr = base64;
-					const imgName = localStorage.userId || "dadi";
-					// إرسال الصورة عبر fetch
-					const response = await fetch(WEB_APP_URL, {
-						method: "POST",
-						// headers: { "Content-Type": "application/json" },
-						body: JSON.stringify({
-							action: "postImg",
-							image: base64,
-							name: imgName,
-						}),
-					});
-
-					const result = await response.json();
-					console.log(result);
-					if (result.status != "success") {
-						gebi("rspns").innerText = "حدث خطأ أعد المحاولة";
-						gebi("rspns").style.color = "red";
-						setTimeout(() => {
-							gebi("rspns").innerText = "";
-						}, 15000);
-						return false;
-					}
-					imgSrc = `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w800`;
-					localStorage.userPicture = imgSrc;
-				}
-				const bodySet = {
-					action: "upditAccont",
-					userId: localStorage.userId,
-					userName: gebi("userName").innerText,
-					userEmail: gebi("userEmail").innerText,
-					userPassword: gebi("userPassword").value,
-					userPicture: imgSrc || "/imgs/web/apple-touch-icon.png",
-					chtId1: gebi("telegramChatId1").value,
-					chtId2: gebi("telegramChatId2").value,
-					chtId3: gebi("telegramChatId3").value,
-					paid: false,
-				};
-
-				for (const key in bodySet) {
-					const element = bodySet[key];
-					localStorage[key] = element;
-				}
-				saveImage(imgSrc);
-
-				try {
-					const url =
-						"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
-					const response = await fetch(url, {
-						method: "POST",
-						headers: { "Content-Type": "application/json" },
-						body: JSON.stringify(bodySet),
-					});
-
-					const data = await response.json();
-
-					const rspns = JSON.parse(data);
-					if (rspns.status == "success") {
-						gebi("rspns").innerText = "تم التحديث بنجاح";
-						gebi("rspns").style.color = "green";
-						setTimeout(() => {
-							gebi("rspns").innerText = "";
-							window.location.href = "https://pricealerts.web.app";
-						}, 3000);
-						return false;
-					} else {
-					}
-				} catch (error) {
-					console.log("kayn error :" + error);
-				}
-
-				setTimeout(() => {
-					gebi("rspns").innerText = "";
-				}, 5000);
-
-				gebi("rspns").innerText = "تم الحفظ بنجاح";
-				gebi("rspns").style.color = "green";
-			});
-
-			function toBase64(file) {
-				return new Promise((resolve, reject) => {
-					const reader = new FileReader();
-					reader.onload = () => resolve(reader.result.split(",")[1]);
-					reader.onerror = reject;
-					reader.readAsDataURL(file);
-				});
-			}
-		</script>
 		<!-- save image and togglePwd -->
 		<script>
 			function saveImage(source) {
-				const img = document.getElementById("uploadedImage");
+				const img = new Image();
+				img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
+
+				img.onload = function () {
+					const canvas = document.createElement("canvas");
+					const ctx = canvas.getContext("2d");
+					canvas.width = img.naturalWidth;
+					canvas.height = img.naturalHeight;
+					ctx.drawImage(img, 0, 0);
+					const base64 = canvas.toDataURL("image/png");
+					localStorage.setItem("base64Pctr", base64);
+					console.log("تم حفظ الصورة بنجاح ✔️");
+				};
+				img.onerror = function () {
+					console.error("فشل تحميل الصورة");
+				};
 				img.src = source;
-
-				// إنشاء canvas مؤقت
-				const canvas = document.createElement("canvas");
-				const ctx = canvas.getContext("2d");
-
-				// ضبط حجم canvas على حجم الصورة
-				canvas.width = img.width;
-				canvas.height = img.height;
-
-				// رسم الصورة على canvas
-				ctx.drawImage(img, 0, 0, img.width, img.height);
-
-				// استخراج Base64
-				const base64 = canvas.toDataURL("image/png");
-
-				// حفظ Base64 في localStorage
-				localStorage.setItem("base64Pctr", base64);
-				//return base64;
-
-				//alert("تم تخزين الصورة في LocalStorage!");
 			}
-
 			function togglePwd(toggle, id) {
 				const password = gebi(id);
 				if (password.type === "password") {

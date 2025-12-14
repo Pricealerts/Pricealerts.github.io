@@ -58,7 +58,6 @@
 		<link rel="stylesheet" href="./style.css" />
 	</head>
 	<body>
-		
 		<div id="pirantCntynr" class="pirantCntynr"></div>
 		<div class="container" id="container">
 			<br />
@@ -101,7 +100,7 @@
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						لديك حساب بالفعل؟
 					</p>
-					<button id="mobileSignIn" class="ghost mobile-btn" >
+					<button id="mobileSignIn" class="ghost mobile-btn">
 						تسجيل الدخول
 					</button>
 				</form>
@@ -151,8 +150,7 @@
 					<div class="social-container">
 						<h5 class="">أو سجل الدخول ب</h5>
 						<div id="buttonSignIn"></div>
-						
-					</div> 
+					</div>
 					<p class="mobile-text" style="margin-bottom: 0; margin-top: 25px">
 						ليس لديك حساب؟
 					</p>
@@ -216,10 +214,10 @@
 				</div>
 			</div>
 		</div>
-		
+
 		<!--  Navbar -->
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
-		
+
 		<!--  front end log in  -->
 		<script>
 			let userName;
@@ -265,31 +263,25 @@
 		<script src="./jsCode/signUp.js"></script>
 		<script src="./jsCode/signIn.js"></script> -->
 		<script src="./jsCode.min.js" type="module"></script>
-
 		<!-- save image -->
 		<script>
-			function saveImage(source) {
-				const img = document.createElement("img");
+			  function saveImage(source) {
+				const img = new Image();
+				img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
+				img.onload = function () {
+					const canvas = document.createElement("canvas");
+					const ctx = canvas.getContext("2d");
+					canvas.width = img.naturalWidth;
+					canvas.height = img.naturalHeight;
+					ctx.drawImage(img, 0, 0);
+					const base64 = canvas.toDataURL("image/png");
+					localStorage.setItem("base64Pctr", base64);
+					console.log("تم حفظ الصورة بنجاح ✔️");
+				};
+				img.onerror = function () {
+					console.error("فشل تحميل الصورة");
+				};
 				img.src = source;
-
-				// إنشاء canvas مؤقت
-				const canvas = document.createElement("canvas");
-				const ctx = canvas.getContext("2d");
-
-				// ضبط حجم canvas على حجم الصورة
-				canvas.width = img.width;
-				canvas.height = img.height;
-
-				// رسم الصورة على canvas
-				ctx.drawImage(img, 0, 0, img.width, img.height);
-
-				// استخراج Base64
-				const base64 = canvas.toDataURL("image/png");
-
-				// حفظ Base64 في localStorage  UserPicture
-				localStorage.setItem("base64Pctr", base64);
-
-				//alert("تم تخزين الصورة في LocalStorage!");
 			}
 		</script>
 	</body>

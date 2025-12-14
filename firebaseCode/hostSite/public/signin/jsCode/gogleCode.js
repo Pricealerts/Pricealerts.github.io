@@ -83,14 +83,12 @@ async function updateUserData(user, isExist = true) {
 	await get(userRef)
 		.then(snapshot => {
 			const snp = snapshot.exists();
-			console.log("snapshot.exists() : " + snp);
-
 			if (snp) {
 				const { lastLogin, paid, status, ...restUsr } = snapshot.val();
 				for (const key in restUsr) {
 					localStorage[key] = restUsr[key];
 				}
-				saveImage(localStorage.userPicture);
+				
 				update(userRef, {
 					lastLogin: new Date().toISOString(),
 					status: "online",
@@ -111,17 +109,18 @@ async function updateUserData(user, isExist = true) {
 					setData(userRef, user);
 				}
 			}
-		})
-		.then(() => {
+			
 			gebi("accountLink").style.display = "block";
 			gebi(
 				"accountLink"
 			).innerHTML = ` ${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
 			gebi("signOutOrInLink").innerHTML = ` تسجبل الخروج
- 	 <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
+ 	 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
+				
+		saveImage(localStorage.userPicture);
 		});
 		
-		window.location.href = drction;
+		//window.location.href = drction;
 }
 
 function setData(userRef, user) {
@@ -140,7 +139,6 @@ function setData(userRef, user) {
 		for (const key in infoUser) {
 			localStorage[key] = infoUser[key];
 		}
-		saveImage(localStorage.userPicture);
 		console.log("تم  إنشاء البيانات ✔️");
 		console.log("الحساب غير موجود في قاعدة البيانات");
 	});
@@ -175,6 +173,6 @@ async function sgnOUt(user) {
 		});
 }
 
-console.log("hadi jdida 2");
+console.log("hadi jdida 4");
 
 export { auth };
