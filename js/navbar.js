@@ -1,4 +1,5 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
+let userNameDirction = localStorage.userName || "اسمك";
 let enteEsc = ` تسجبل الدخول
  <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
 let dsplyCont = 'display: none;'
@@ -54,8 +55,8 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
 	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} position: absolute; bottom:0;width: calc(100% - 40px);">
-       ${localStorage.userName}
-	   <img src="${localStorage.base64Pctr}" alt=""></a>
+       ${userNameDirction}
+	   <img src="${UserImage}" alt=""></a>
 `;
 
 document.body.prepend(sidebar);
