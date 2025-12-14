@@ -2,7 +2,10 @@
 <html lang="ar" dir="rtl">
 	<head>
 		<meta charset="UTF-8" />
-     <link rel="canonical" href="https://pricealerts.web.app/signin/index.html">
+		<link
+			rel="canonical"
+			href="https://pricealerts.web.app/signin/index.html"
+		/>
 		<meta
 			name="description"
 			content="منصة Price Alerts لتنبيه أسعار العملات الرقمية والأسهم العالمية من عشر منصات تداول و 11 بورصة. تنبيهات فورية وسريعة."
@@ -31,56 +34,52 @@
 		/>
 		<title>تسجيل الدخول عبر جوجل</title>
 		<script src="https://accounts.google.com/gsi/client" async defer></script>
-          <link
+		<link
 			rel="stylesheet"
 			href="https://pricealerts.github.io/style/navbar.css"
 		/>
 		<style>
 			.cntinerdd {
-				    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    max-width: 300px;
-    margin: auto;
-    margin-top: 20px;
-    border: 2px solid #ddd;
-    background-color: #eee;
-    padding: 20px;
-    border-radius: 10px;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				max-width: 300px;
+				margin: auto;
+				margin-top: 20px;
+				border: 2px solid #ddd;
+				background-color: #eee;
+				padding: 20px;
+				border-radius: 10px;
 			}
-            .rsltSignin{
-                display: none; 
-              justify-content: center;
-    align-items: center;
-    flex-direction: column; 
-    margin-top: 30px; 
-            }
+			.rsltSignin {
+				display: none;
+				justify-content: center;
+				align-items: center;
+				flex-direction: column;
+				margin-top: 30px;
+			}
 		</style>
 	</head>
 	<body>
-        <div id="pirantCntynr" class=" pirantCntynr"></div>
-        <div class="cntiner">
-<h2>تسجيل الدخول</h2>
+		<div id="pirantCntynr" class="pirantCntynr"></div>
+		<div class="cntiner">
+			<h2>تسجيل الدخول</h2>
 
-		<div id="buttonDiv"></div>
+			<div id="buttonDiv"></div>
 
-		<div
-			id="userInfo"
-			class="rsltSignin"
-		>
-			<img
-				id="userImage"
-				src=""
-				alt="صورة المستخدم"
-				style=" border-radius: 50%; width: 100px"
-			/>
-			<h3 id="userName"></h3>
-			<p id="userEmail"></p>
+			<div id="userInfo" class="rsltSignin">
+				<img
+					id="userImage"
+					src=""
+					alt="صورة المستخدم"
+					style="border-radius: 50%; width: 100px"
+				/>
+				<h3 id="userName"></h3>
+				<p id="userEmail"></p>
+			</div>
 		</div>
-        </div>
-		
-<script src="https://pricealerts.github.io/js/navbar.js"></script>
+
 		<script>
 			// دالة لفك تشفير الـ JWT Token الذي ترجعه جوجل
 			// هذه الدالة ضرورية لأن جوجل ترسل البيانات مشفرة
@@ -114,7 +113,6 @@
 				console.log("Image URL: " + responsePayload.picture);
 				console.log("Email: " + responsePayload.email);
 
-
 				// عرض البيانات في الصفحة
 				document.getElementById("userInfo").style.display = "flex";
 				document.getElementById("userName").innerText = responsePayload.name;
@@ -140,5 +138,34 @@
 				google.accounts.id.prompt();
 			};
 		</script>
+
+		<script type="module">
+			import {
+				getAuth,
+				updateProfile,
+			} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+
+			const auth = getAuth();
+
+			async function changePhoto() {
+				const user = auth.currentUser;
+
+				if (!user) {
+					alert("المستخدم غير مسجل الدخول");
+					return;
+				}
+
+				await updateProfile(user, {
+					photoURL: "https://example.com/myphoto.png",
+					displayName: userName,
+				});
+
+				console.log("✅ تم تغيير صورة المستخدم");
+			}
+		</script>
+
+		<button onclick="changePhoto()">تغيير الصورة</button>
+
+		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 	</body>
 </html>

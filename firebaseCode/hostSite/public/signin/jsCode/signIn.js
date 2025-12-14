@@ -8,7 +8,11 @@ gebi("frmSgnIn").addEventListener("submit", async e => {
 		gebi("errmsgsgnIn").style.color = "red";
 		return false;
 	}
-
+	if (userPassword.length < 6) {
+		gebi("errmsgsgnIn").innerText = " كلمة المرور خاطئة ";
+		gebi("errmsgsgnIn").style.color = "red";
+		return false;
+	}
 
 	await sgnIn("errmsgsgnIn");
 	
@@ -79,10 +83,15 @@ gebi("msgCnfrmIn").addEventListener("submit", async e => {
 			gebi("errmsgCnfrmIn").style.color = "red";
 			return false;
 		}
-		if (data.status == "exist") {
+		if (data.status == "success") {
 			gebi("errmsgCnfrmIn").innerText = "";
 			gebi("newPswrd").style.transform = "translateY(0%)";
 			return false;
+		}
+		else {
+			gebi("errmsgCnfrmIn").innerText = "حدث خطأ أعد المحاولة ";
+			gebi("errmsgCnfrmIn").style.color = "red";
+			return false;	
 		}
 	} catch (error) {
 		console.log("error appscript : " + error);
@@ -124,6 +133,7 @@ gebi("newPswrd").addEventListener("submit", async e => {
 	}
 });
 
+
 async function sgnIn(msgErr) {
 	try {
 		const userCredential = await signInWithEmailAndPassword(
@@ -131,13 +141,22 @@ async function sgnIn(msgErr) {
 			userEmail,
 			userPassword
 		);
+
 		await updateUserData(userCredential.user);
 		userPassword = "";
-		window.location.href = drction;
+
 	} catch (error) {
+
+		if (error.code === 'auth/invalid-credential' ||
+		    error.code === 'auth/wrong-password' ||
+		    error.code === 'auth/user-not-found') {
+
 			gebi(msgErr).innerText =
-			"  كلمة السر أو الإيميل خاطئ يرجى التأكد من الحساب";
-		gebi(msgErr).style.color = "red";
-		console.log('err sgnIn is : '+ error);
+				"كلمة السر أو الإيميل خاطئ، يرجى التأكد من الحساب";
+			gebi(msgErr).style.color = "red";
+		}
+
+		console.log('err sgnIn is:', error.code, error.message);
 	}
 }
+

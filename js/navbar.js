@@ -2,7 +2,7 @@ let UserImage = "/imgs/web/apple-touch-icon.png";
 let enteEsc = ` تسجبل الدخول
  <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
 let dsplyCont = 'display: none;'
-if (localStorage.userEmail) {
+if (localStorage.base64Pctr) {
 	UserImage = localStorage.base64Pctr;
 	enteEsc = ` تسجبل الخروج
  <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;

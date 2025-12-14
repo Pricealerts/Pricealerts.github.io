@@ -1,3 +1,4 @@
+//import { user } from "firebase-functions/v1/auth";
 import { chngePswrd, sgnUp, gtEmail } from "./ddauth.js";
 import nodemailer from "nodemailer";
 
@@ -12,7 +13,7 @@ async function sndEmail(data, dtbs) {
 		if (["sndMsgCnferIn", "sndMsgCnfer"].includes(action)) {
 			await rmovInArryDb(userEmail);
 
-			reponse = await sendVerificationEmail(userEmail, data.userName, action);
+			reponse = await sendVerificationEmail(userEmail, data, action);
 		} else if (["cnfrmCode", "addAccont"].includes(action)) {
 			const ovrNmb = await overNmber(userEmail);
 			if (ovrNmb) {
@@ -22,7 +23,7 @@ async function sndEmail(data, dtbs) {
 			}
 		} else if (action == "updtPsw") {
 			const bdyFirebase = {
-				action: "updatePsw",
+				//action: "updatePsw",
 				userEmail: userEmail,
 				userPassword: data.userPassword,
 			};
@@ -65,21 +66,22 @@ async function overNmber(userEmail) {
 	}
 }
 
-async function sendVerificationEmail(userEmail, userName, action) {
+async function sendVerificationEmail(userEmail, data, action) {
 	const code = Math.floor(100000 + Math.random() * 900000);
+	let userName = data.userName || "مستخدم منبه الأسعار";
 	try {
 		const emailexsist = await gtEmail(userEmail);
-		if (!emailexsist.exists && action == "sndMsgCnferIn")
-			return { status: "notexsist" };
+		if (!emailexsist.exists && action == "sndMsgCnferIn" ){
+			return { status: "notexsist" }}else {userName = emailexsist.displayName};
 		if (emailexsist.exists && action == "sndMsgCnfer")
 			return { status: "exist" };
 		const bodySnd = {
-			action: "sndMsgCnfer",
+			/* action: "sndMsgCnfer", */
 			userEmail: userEmail,
 			userName: userName,
 			code: code,
 		};
-		
+
 		/* const WEB_APP_URL = //
 			"https://script.google.com/macros/s/AKfycbyPSbiRBdAKQIQiV4eqMZZgb3IM1x_Fp89UPSkCvABNpp4BMOVnRh75_JblSB3Mx0Ls/exec"; // رابط apps script
 
@@ -125,25 +127,23 @@ async function verifyCode(data) {
 					const auSignUp = await sgnUp(
 						userEmail,
 						data.userPassword,
-						data.userName
+						data.userName,
+						db
 					);
-					if (auSignUp.status == "success") {
-						await createdUser(auSignUp.user);
-						return { status: "success" };
-					}
-					return { status: "mabghach ysjl" };
+					if (auSignUp.status) return {status: "success" };
+					console.log(auSignUp);
 				}
 				arow[4] = true;
 				respns = { status: "success" };
 			}
-			arow[2] = arow[2] + 1;
+			arow[2]++;
 			arow[3] = new Date().getTime(); // oled time
 			let dtSet;
 			dtSet = gtData.filter(item => item[0] != userEmail);
 			dtSet.push(arow);
 			await db.ref("allSndEmails").set(dtSet);
 		}
-		return { status: "KHRJ GA3" };
+		return respns;
 	} catch (error) {
 		console.log("verifyCode err : " + error);
 		return { status: "notExist" };
@@ -151,7 +151,7 @@ async function verifyCode(data) {
 }
 
 async function updtPswd(data) {
-	const userEmail = data.userEmail.toLowerCase();
+	const userEmail = data.userEmail;
 	try {
 		let gtData = await gtDb();
 		if (!gtData) return { status: "notSucsus" };
@@ -198,25 +198,10 @@ async function gtDb() {
 		return false;
 	}
 }
-async function createdUser(data) {
-	const infoUser = {
-		userEmail: data.email,
-		userName: data.displayName,
-		userPicture: data.photoURL,
-		chtId1: "",
-		chtId2: "",
-		chtId3: "",
-		paid: false,
-		/* 	lastLogin: new Date().toISOString(),
-		status: "online", */
-	};
-	await db.ref(`users/${data.uid}`).set(infoUser);
-}
 
 // رسال الإيميلات باستخدام Nodemailer
 const gmailEmail = process.env.GMAIL_EMAIL;
 const gmailPassword = process.env.GMAIL_PASSWORD;
-
 
 // إعداد Nodemailer مرة واحدة
 const transporter = nodemailer.createTransport({
@@ -228,14 +213,14 @@ const transporter = nodemailer.createTransport({
 });
 // Firebase Function (Gen 2)
 async function sndEmailToUser(bodySnd) {
-	const { userEmail, userName, code/* , text  */} = bodySnd;
+	const { userEmail, userName, code /* , text  */ } = bodySnd;
 
 	if (!userEmail) {
-		 console.log("البريد الإلكتروني مطلوب");
+		console.log("البريد الإلكتروني مطلوب");
 		return { status: "error", message: "البريد الإلكتروني مطلوب" };
 	}
-	const msgSend = `
-    <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+	const msgSend = `   
+    <div dir="rtl" style="font-family: Arial, sans-serif;text-align:right; line-height: 1.6; color: #333;">
       <h2 style="color:#1a73e8;">مرحباً ${userName} 👋</h2>
       <p>نشكرك لتسجيلك معنى في تطبيق منبه الأسعار .</p>
       <p>رمز التحقق الخاص بك هو:</p>

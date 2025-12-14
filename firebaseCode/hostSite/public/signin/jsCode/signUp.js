@@ -17,7 +17,8 @@ for (let i = 0; i < lstLoclSrorge.length; i++) {
 }
 
 const drction = "../accont/";
-gebi("btnSignUp").addEventListener("click", async () => {
+gebi("frmSgnUp").addEventListener("submit", async (e) => {
+	e.preventDefault();
 	const acont = document.querySelectorAll("#frmSgnUp input");
 	userName = acont[0].value;
 	userEmail = acont[1].value;
@@ -67,7 +68,8 @@ if (!userName || !userEmail || !userPassword) {
 });
 
 ///////////// conferm code
-gebi("btnCnfrm").addEventListener("click", async () => {
+gebi("msgCnfrm").addEventListener("submit", async (e) => {
+	e.preventDefault();
 	console.log("ddd");
 	await adedUser();
 });

@@ -13,36 +13,58 @@ async function chngePswrd(email, newPassword) {
 	}
 }
 
-async function sgnUp(userEmail, userPassword, userName) {
+async function sgnUp(userEmail, userPassword, userName, db) {
 	try {
 		if (!userEmail || !userPassword || !userName) {
 			return { error: "userEmail and userPassword and userName are required" };
 		}
 
-		const user = await getAuth().createUser({
-			email: userEmail,
-			password: userPassword,
-			displayName: userName,
-			photoURL: "https://pricealerts.web.app/imgs/user-svgrepo-com.svg",
-		})
-
-		return {
-			status: "success",
-			user : user
-		};
+		const rspns =await getAuth()
+			.createUser({
+				email: userEmail,
+				password: userPassword,
+				displayName: userName,
+			})
+			.then(async user => {
+				const infoUser = {
+					userEmail: user.email,
+					userName: user.displayName,
+					userPicture: "https://pricealerts.web.app/imgs/user-svgrepo-com.svg",
+					chtId1: "",
+					chtId2: "",
+					chtId3: "",
+					paid: false,
+					/* 	lastLogin: new Date().toISOString(),
+						status: "online", */
+				};
+				const rspnsDb =await db
+					.ref(`users/${user.uid}`)
+					.set(infoUser)
+					.then(() => {
+						return {
+							status: true,
+						};
+					})
+					.catch(error => {
+						console.log("Error setDt user:", error);
+						throw error;
+					});
+				return rspnsDb;
+			})
+			.catch(error => {
+				console.log("Error creating new user:", error);
+				throw error;
+			});
+			
+			return rspns;
 	} catch (error) {
-		
-		console.log('err sgnUp is : ' + error);
+		console.log("err sgnUp is : " + error);
 		return {
-			status: "error",
+			status: false,
 			message: error.message,
 		};
 	}
 }
-
-
-
-
 
 async function gtEmail(email) {
 	try {
@@ -53,9 +75,10 @@ async function gtEmail(email) {
 			exists: true,
 			uid: userRecord.uid,
 			email: userRecord.email,
+			displayName: userRecord.displayName,
 		};
 	} catch (error) {
-		if (error.code === 'auth/user-not-found') {
+		if (error.code === "auth/user-not-found") {
 			return {
 				success: true,
 				exists: false,
@@ -69,10 +92,5 @@ async function gtEmail(email) {
 		};
 	}
 }
-
-
-
-
-
 
 export { chngePswrd, sgnUp, gtEmail };

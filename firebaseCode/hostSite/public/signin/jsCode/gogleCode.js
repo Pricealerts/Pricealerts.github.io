@@ -80,7 +80,6 @@ let iLoup = 0;
 async function updateUserData(user, isExist = true) {
 	iLoup++;
 	const userRef = ref(db, "users/" + user.uid);
-
 	await get(userRef)
 		.then(snapshot => {
 			const snp = snapshot.exists();
@@ -121,6 +120,8 @@ async function updateUserData(user, isExist = true) {
 			gebi("signOutOrInLink").innerHTML = ` تسجبل الخروج
  	 <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 		});
+		
+		window.location.href = drction;
 }
 
 function setData(userRef, user) {
@@ -149,8 +150,8 @@ function setData(userRef, user) {
 let isPrmrEntr = true;
 onAuthStateChanged(auth, async user => {
 	if (user && isPrmrEntr) {
-		await sgnOUt(user);
 		console.log("User is signed in:", user);
+		await sgnOUt(user);
 	} 
 	isPrmrEntr = false;
 });
@@ -174,6 +175,6 @@ async function sgnOUt(user) {
 		});
 }
 
-console.log("hadi jdida 1");
+console.log("hadi jdida 2");
 
 export { auth };
