@@ -109,7 +109,7 @@ async function updateUserData(user, isExist = true) {
 					setData(userRef, user);
 				}
 			}
-			
+
 			gebi("accountLink").style.display = "block";
 			gebi(
 				"accountLink"
@@ -173,6 +173,6 @@ async function sgnOUt(user) {
 		});
 }
 
-console.log("hadi jdida 4");
+console.log("hadi jdida 5");
 
 export { auth };
