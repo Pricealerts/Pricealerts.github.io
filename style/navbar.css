@@ -19,24 +19,23 @@
 	justify-content: space-between;
 	position: sticky;
 	top: 0;
-    margin-bottom: 10px;
+	margin-bottom: 10px;
 	z-index: 100;
 }
-.hTitel{
-	 color: #007bff; /* لون أزرق جذاب للعناوين */
-    text-align: center;
-    font-weight: 700;
+.hTitel {
+	color: #007bff; /* لون أزرق جذاب للعناوين */
+	text-align: center;
+	font-weight: 700;
 }
 @media (max-width: 768px) {
-    hTitel {
-        font-size: 1.5em;
-    }
+	hTitel {
+		font-size: 1.5em;
+	}
 }
 @media (max-width: 480px) {
-    hTitel {
-        font-size: 1.3em;
-    }
-
+	hTitel {
+		font-size: 1.3em;
+	}
 }
 .nav-title {
 	display: flex;
@@ -48,8 +47,8 @@
 
 /* زر القائمة */
 .menu-btn {
-    width: auto;
-    margin: 0px;
+	width: auto;
+	margin: 0px;
 	font-size: 24px;
 	padding: 4px 10px 6px;
 	border-radius: 8px;
@@ -57,9 +56,9 @@
 	background: #bbb;
 	cursor: pointer;
 }
-.imgNavbar{
-    height: 80%;
-    border-radius: 50%;
+.imgNavbar {
+	height: 80%;
+	border-radius: 50%;
 }
 
 /*------------------------------------------------------
@@ -98,12 +97,11 @@
 	margin: 6px 0;
 }
 
-
 .sidebar a:hover {
 	background: #f0f0f0;
 }
-.sidebar a img{
-	width:20px ;
+.sidebar a img {
+	width: 20px;
 }
 /* Overlay */
 .overlay {
@@ -121,6 +119,14 @@
 	display: block;
 }
 
+.accountBtn {
+	position: absolute;
+	bottom: 40px;
+	width: calc(100% - 40px);
+	height: 30px;
+	left: 10px;
+}
+
 /*------------------------------------------------------
   المحتوى
 ------------------------------------------------------*/
@@ -134,11 +140,11 @@
 	border-radius: 10px;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 }
-.acont{
+.acont {
 	display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
 }
 
 /* تحسين الهاتف */

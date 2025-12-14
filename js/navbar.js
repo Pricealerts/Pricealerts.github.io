@@ -1,5 +1,5 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
-let userNameDirction = localStorage.userName || "اسمك";
+let userNameDirction = localStorage.userName || "حسابي";
 let enteEsc = ` تسجبل الدخول
  <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
 let dsplyCont = 'display: none;'
@@ -7,7 +7,7 @@ if (localStorage.base64Pctr) {
 	UserImage = localStorage.base64Pctr;
 	enteEsc = ` تسجبل الخروج
  <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
- dsplyCont = 'display: block;'
+ dsplyCont = 'display: flex;'
 }
  let enteEsc2 = `
  حسابي
@@ -54,7 +54,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
 			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
-	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} position: absolute; bottom:0;width: calc(100% - 40px);">
+	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} ">
        ${userNameDirction}
 	   <img src="${UserImage}" alt=""></a>
 `;
