@@ -80,47 +80,45 @@ let iLoup = 0;
 async function updateUserData(user, isExist = true) {
 	iLoup++;
 	const userRef = ref(db, "users/" + user.uid);
-	await get(userRef)
-		.then(snapshot => {
-			const snp = snapshot.exists();
-			if (snp) {
-				const { lastLogin, paid, status, ...restUsr } = snapshot.val();
-				for (const key in restUsr) {
-					localStorage[key] = restUsr[key];
-				}
-				
-				update(userRef, {
-					lastLogin: new Date().toISOString(),
-					status: "online",
-				}).then(() => {
-					console.log("تم التسجيل وتعديل البيانات ✔️");
-				});
-			} else {
-				if (isExist) {
-					setTimeout(() => {
-						if (iLoup < 3) {
-							updateUserData(user);
-							console.log("rah ydor : " + iLoup);
-						} else {
-							alert("حدث خطأ أعد المحاولة ✔️");
-						}
-					}, 2000);
-				} else {
-					setData(userRef, user);
-				}
+	await get(userRef).then(snapshot => {
+		const snp = snapshot.exists();
+		if (snp) {
+			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
+			for (const key in restUsr) {
+				localStorage[key] = restUsr[key];
 			}
 
-			gebi("accountLink").style.display = "block";
-			gebi(
-				"accountLink"
-			).innerHTML = `${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
-			gebi("signOutOrInLink").innerHTML = `تسجبل الخروج
- 	 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
-				
+			update(userRef, {
+				lastLogin: new Date().toISOString(),
+				status: "online",
+			}).then(() => {
+				console.log("تم التسجيل وتعديل البيانات ✔️");
+			});
+		} else {
+			if (isExist) {
+				setTimeout(() => {
+					if (iLoup < 3) {
+						updateUserData(user);
+						console.log("rah ydor : " + iLoup);
+					} else {
+						alert("حدث خطأ أعد المحاولة ✔️");
+					}
+				}, 2000);
+			} else {
+				setData(userRef, user);
+			}
+		}
+
 		saveImage(localStorage.userPicture);
-		});
-		
-		window.location.href = drction;
+		gebi("accountLink").style.display = "block";
+		gebi(
+			"accountLink"
+		).innerHTML = `${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
+		gebi("signOutOrInLink").innerHTML = `تسجبل الخروج
+ 	 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
+	});
+
+	window.location.href = drction;
 }
 
 function setData(userRef, user) {
@@ -150,10 +148,9 @@ onAuthStateChanged(auth, async user => {
 	if (user && isPrmrEntr) {
 		console.log("User is signed in:", user);
 		await sgnOUt(user);
-	} 
+	}
 	isPrmrEntr = false;
 });
-
 
 async function sgnOUt(user) {
 	const userRef = ref(db, "users/" + user.uid);
