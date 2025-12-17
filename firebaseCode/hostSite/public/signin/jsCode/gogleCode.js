@@ -113,14 +113,14 @@ async function updateUserData(user, isExist = true) {
 			gebi("accountLink").style.display = "block";
 			gebi(
 				"accountLink"
-			).innerHTML = ` ${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
-			gebi("signOutOrInLink").innerHTML = ` تسجبل الخروج
+			).innerHTML = `${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
+			gebi("signOutOrInLink").innerHTML = `تسجبل الخروج
  	 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 				
 		saveImage(localStorage.userPicture);
 		});
 		
-		//window.location.href = drction;
+		window.location.href = drction;
 }
 
 function setData(userRef, user) {

@@ -1,7 +1,6 @@
 import {
 	auth,
 	onAuthStateChanged,
-	/* jiht db */
 	db,
 	ref,
 	update,
@@ -22,9 +21,7 @@ gebi("formSave").addEventListener("submit", async e => {
 	e.preventDefault();
 	gebi("rspns").innerText = "جاري الحفظ ...";
 	gebi("rspns").style.color = "black";
-
 	/////////////////////////// jiht limage
-
 	if (gebi("userName").innerText.length < 2) {
 		gebi("rspns").innerText = "  خانة الإسم فارغة عليك ملأها ";
 		gebi("rspns").style.color = "red";
@@ -52,22 +49,13 @@ gebi("formSave").addEventListener("submit", async e => {
 		chtId2: gebi("telegramChatId2")?.value || "",
 		chtId3: gebi("telegramChatId3")?.value || "",
 	};
-	// 1 MB = 1,000,000 bytes (تقريبًا)
-	const MAX_SIZE = 50 * 1024 * 1.37; // أو 1_000_000
-	let base64;
-	if (imgUrlSrc) {
-		if (file.size > MAX_SIZE) {
-			base64 = cmprsImg(imgUrlSrc);
-		}
-		// تحويل الصورة Base64
-		//const base64 = await toBase64(file);
-
+	let base64 = file;
+	if (base64) {
 		const idTime = new Date().getTime().toString();
 		const imgName = userId || idTime;
 		// إرسال الصورة عبر fetch
 		const response = await fetch(WEB_APP_URL, {
 			method: "POST",
-			// headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({
 				action: "postImg",
 				image: base64,
@@ -85,8 +73,7 @@ gebi("formSave").addEventListener("submit", async e => {
 			}, 15000);
 			return false;
 		}
-		const imgSrc = `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w800`;
-
+		let imgSrc = `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w800`;
 		bodySet.userPicture = imgSrc;
 		localStorage.base64Pctr = base64;
 		//saveImage(imgSrc);
@@ -95,7 +82,6 @@ gebi("formSave").addEventListener("submit", async e => {
 	for (const key in bodySet) {
 		localStorage[key] = bodySet[key];
 	}
-
 	try {
 		const resUpdate = await updateUserData(bodySet);
 		if (resUpdate) {
@@ -127,6 +113,7 @@ async function updateUserData(bodySet) {
 	}
 }
 
+/* 
 function toBase64(file) {
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
@@ -135,3 +122,4 @@ function toBase64(file) {
 		reader.readAsDataURL(file);
 	});
 }
+ */
