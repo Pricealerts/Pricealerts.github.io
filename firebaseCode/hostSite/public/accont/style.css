@@ -5,7 +5,7 @@
 	--height-img: 100;
 	--bkg-clr: #eee;
 	--mnCl: #0289f5;
-	--gr: #028679;
+	--gr: #01544c;
 }
 * {
 	margin: 0;
@@ -274,7 +274,7 @@ body {
 	top: 50%;
 	transform: translateY(-50%);
 	font-size: 40px;
-	color: blue;
+	color: var(--gr);
 	font-weight: bold;
 	pointer-events: none; /* لا تعيق السحب */
 }
@@ -290,7 +290,7 @@ body {
 	position: absolute;
 	top: 50%;
 	left: 50%;
-	border: 5px dashed blue;
+	border: 5px dashed var(--gr);
 	border-radius: 50%;
 	cursor: grab;
 	width: 250px;
@@ -315,7 +315,7 @@ body {
 	position: absolute;
     width: 30px;
     height: 30px;
-	background: blue;
+	background: var(--gr);
 	border-radius: 50%;
 	bottom: -9px;
 	right: -9px;
@@ -333,7 +333,7 @@ canvas {
 		touch-action: initial;
 	}
 	#cropCircle {
-    border: 3px dashed blue;
+    border: 3px dashed var(--gr);
 	}
 	.arrow {
 		display: inline;

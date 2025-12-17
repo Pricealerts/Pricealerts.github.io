@@ -49,7 +49,7 @@ gebi("input-file").addEventListener("change", async e => {
 	} */
 	file = e.target.files[0];
 	if (!file) {
-		gebi("errImg").style.display = "block";
+		// gebi("errImg").style.display = "block";
 		return;
 	}
 	const reader = new FileReader();
@@ -222,9 +222,7 @@ function crop() {
 			if (bestBlob) {
 				const url = URL.createObjectURL(bestBlob);
 				document.getElementById("uploadedImage").src = url;
-
 				console.log("الحجم النهائي:", Math.round(bestBlob.size / 1024), "KB");
-
 				// 🔹 تحويل إلى Base64
 				const reader = new FileReader();
 				reader.onloadend = function () {
@@ -237,9 +235,7 @@ function crop() {
 			}
 			return;
 		}
-
 		const q = (minQ + maxQ) / 2;
-
 		canvas.toBlob(
 			blob => {
 				const sizeKB = blob.size / 1024;
