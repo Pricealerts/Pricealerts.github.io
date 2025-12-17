@@ -332,8 +332,15 @@ canvas {
 	#containerImg {
 		touch-action: initial;
 	}
+	#cropCircle {
+    border: 3px dashed blue;
+	}
 	.arrow {
 		display: inline;
+	}
+	#resizeHandle {
+    width: 10px;
+    height: 10px;
 	}
 }
 

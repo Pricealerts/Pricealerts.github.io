@@ -35,7 +35,6 @@ let imgUrlSrc;
 let file;
 
 gebi("drop-area").addEventListener("click", e => {
-
 	if (!file) {
 		gebi("input-file").click();
 		return;
@@ -178,13 +177,14 @@ function crop() {
 	const srcY = (rect.top - imgRect.top) * scaleX;
 
 	// حجم الإخراج النهائي
-	const OUTPUT_SIZE = 500;
+	const OUTPUT_SIZE = 700;
 
 	canvas.width = OUTPUT_SIZE;
 	canvas.height = OUTPUT_SIZE;
 
 	ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
 
+	// قص دائري
 	ctx.save();
 	ctx.beginPath();
 	ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
@@ -204,21 +204,64 @@ function crop() {
 
 	ctx.restore();
 
-	// عرض النتيجة داخل img
-	//const rsltImg = document.getElementById("resultImg");
-	 file = canvas.toDataURL("image/png");
-	document.getElementById("uploadedImage").src = file;
-	
-		const myImmmg = document.getElementById("uploadedImage");
+	/* ===============================
+	   ضغط الصورة ≈ 100KB بأعلى جودة
+	================================ */
 
-	console.log(file.length);
-	//console.log(myImmmg.size);
-	
-	
-	
+	const TARGET_KB = 100;
+	const MIN_QUALITY = 0.4;
+	const MAX_QUALITY = 0.95;
+	const TOLERANCE = 1;
+
+	let minQ = MIN_QUALITY;
+	let maxQ = MAX_QUALITY;
+	let bestBlob = null;
+
+	function compress() {
+		if (maxQ - minQ < 0.005) {
+			if (bestBlob) {
+				const url = URL.createObjectURL(bestBlob);
+				document.getElementById("uploadedImage").src = url;
+
+				console.log("الحجم النهائي:", Math.round(bestBlob.size / 1024), "KB");
+
+				// 🔹 تحويل إلى Base64
+				const reader = new FileReader();
+				reader.onloadend = function () {
+					const base64 = reader.result;
+					file = bestBlob;
+					console.log("Base64:");
+					console.log(base64);
+				};
+				reader.readAsDataURL(bestBlob);
+			}
+			return;
+		}
+
+		const q = (minQ + maxQ) / 2;
+
+		canvas.toBlob(
+			blob => {
+				const sizeKB = blob.size / 1024;
+
+				if (sizeKB > TARGET_KB + TOLERANCE) {
+					maxQ = q;
+				} else {
+					minQ = q;
+					bestBlob = blob;
+				}
+
+				compress();
+			},
+			"image/jpeg",
+			q
+		);
+	}
+
+	compress();
 }
 
-function cmprsImg(imgSrc) {
+/* function cmprsImg(imgSrc) {
 	const img = imgSrc;
 	if (!img.complete) {
 		alert("الصورة لم تُحمّل بعد");
@@ -252,8 +295,6 @@ function cmprsImg(imgSrc) {
 	} while (base64.length > 50 * 1024 * 1.37 && quality > 0.1);
 	// 1.37 تقريب لتحويل Base64 إلى حجم فعلي
 
-	
-
 	return base64;
 	// عرض الصورة
 	//document.getElementById("outpotimg").src = base64;
@@ -261,3 +302,4 @@ function cmprsImg(imgSrc) {
 	// عرض النص
 	//document.getElementById("base64Output").value = base64;
 }
+ */
