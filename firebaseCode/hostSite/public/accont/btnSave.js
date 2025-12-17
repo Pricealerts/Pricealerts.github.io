@@ -24,7 +24,6 @@ gebi("formSave").addEventListener("submit", async e => {
 	gebi("rspns").style.color = "black";
 
 	/////////////////////////// jiht limage
-	
 
 	if (gebi("userName").innerText.length < 2) {
 		gebi("rspns").innerText = "  خانة الإسم فارغة عليك ملأها ";
@@ -62,7 +61,7 @@ gebi("formSave").addEventListener("submit", async e => {
 		}
 		// تحويل الصورة Base64
 		//const base64 = await toBase64(file);
-		
+
 		const idTime = new Date().getTime().toString();
 		const imgName = userId || idTime;
 		// إرسال الصورة عبر fetch
@@ -90,7 +89,7 @@ gebi("formSave").addEventListener("submit", async e => {
 
 		bodySet.userPicture = imgSrc;
 		localStorage.base64Pctr = base64;
-		//saveImage(imgSrc); 
+		//saveImage(imgSrc);
 	}
 
 	for (const key in bodySet) {

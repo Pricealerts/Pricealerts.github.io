@@ -63,48 +63,38 @@
 			<div id="divplac" class="dvPlc">
 				<span class="clrear cler">×</span>
 				<hr />
-				<!-- <h3>قص دائري من الصورة</h3> -->
-
-				<!-- <input type="file" id="upload" accept="image/*" /> --><br /><br />
-
-				<div id="mydv"></div>
 				<div id="containerImg">
+					
 					<img id="imagePr" />
 					<div id="cropCircle">
 						<span class="arrow arrow-left">⇔</span>
 						<span class="arrow arrow-right">⇔</span>
-
-						<button class="okbtn cler btnCrop" onclick="crop()">قص</button>
+						<button class="okbtn cler btnCrop" style="padding: 7px;" 
+						 onclick="crop()">حدد </button>
 						<div id="resizeHandle"></div>
 					</div>
+					<button 
+					class=" okbtn  "
+					onclick="document.getElementById('input-file').click()"
+				>
+					أعد التحميل
+				</button>
 				</div>
 				<canvas id="result" style="display: none"></canvas>
-				<!-- <img
-					id="resultImg"
-					width="300"
-					height="300"
-					style="
-						display: block;
-						border-radius: 50%;
-						border: 1px solid #ccc;
-						margin-top: 20px;	"
-				/> -->
-
 				<br />
-				<!-- <button class="okbtn cler">Ok</button> -->
-				<!-- <button class="opnFile">أعد التحميل</button> -->
+				
+				
 			</div>
 		</div>
 		<!-- End Bubebe -->
 
 		<form id="formSave" class="profile-container" action="#">
 			<div class="profile-photo">
-				<label for="input-filed" id="drop-area">
+				<label for="qdfd" id="drop-area">
 					<input
 						type="file"
 						accept="image/*"
 						id="input-file"
-						class="opnFile"
 						hidden
 					/>
 					<div class="imgCv">
@@ -112,7 +102,11 @@
 					</div>
 				</label>
 				<div id="errImg">خطأ في رفع الصورة</div>
-				<img id="uploadedImage" src="/imgs/user-svgrepo-com.svg" draggable="false"/>
+				<img
+					id="uploadedImage"
+					src="/imgs/user-svgrepo-com.svg"
+					draggable="false"
+				/>
 			</div>
 
 			<h1 id="userName" class="user-name" contenteditable="true"></h1>
