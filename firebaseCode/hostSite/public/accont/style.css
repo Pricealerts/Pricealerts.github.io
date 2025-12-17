@@ -1,0 +1,340 @@
+:root {
+	--font-size: 10;
+	--height-width-profile: 160;
+	--border-radius-profile: 50;
+	--height-img: 100;
+	--bkg-clr: #eee;
+	--mnCl: #0289f5;
+	--gr: #028679;
+}
+* {
+	margin: 0;
+	padding: 0;
+	-webkit-tap-highlight-color: transparent;
+}
+body {
+	font-family: "Roboto", sans-serif; /* الخط المستخدم */
+	background-color: #f0f2f5; /* لون الخلفية الفاتح */
+	direction: rtl;
+}
+
+/* تنسيق الصورة */
+.profile-photo {
+	display: flex;
+	width: calc(var(--height-width-profile) * 1px);
+	height: calc(var(--height-width-profile) * 1px);
+	border-radius: calc(var(--border-radius-profile) * 1%);
+	object-fit: cover;
+	overflow: hidden;
+	background: linear-gradient(45deg, #1a3a6c, #4cc9f0);
+	align-items: center;
+	justify-content: center;
+	color: white;
+	font-size: calc(var(--font-size) * 7px);
+	cursor: pointer;
+	position: relative;
+	margin-bottom: 10px;
+}
+.profile-photo img {
+	height: calc(var(--height-img) * 1%);
+}
+.profile-photo:hover .imgCv {
+	display: flex;
+	flex-direction: column;
+}
+.imgCv {
+	position: absolute;
+	display: none;
+	justify-content: center;
+	align-items: center;
+	border-radius: 50%;
+	height: 100%;
+	width: 100%;
+	top: 0;
+	left: 0;
+	z-index: 3;
+	cursor: pointer;
+	background-color: #0000009e;
+}
+.imgCv img {
+	height: 60px;
+}
+#errImg {
+	color: red;
+	display: none;
+	font-size: calc(var(--font-size) * 2px);
+	position: absolute;
+	text-align: center;
+}
+.password-box {
+	position: relative;
+	width: 100%;
+}
+
+.password-box .eye {
+	position: absolute;
+	left: calc(10% - 12px);
+	top: calc(50% - 9px);
+	transform: translateY(-50%);
+	cursor: pointer;
+	font-size: 18px;
+	user-select: none;
+}
+@media (max-width: 768px) {
+	.profile-container {
+		width: 100%;
+		margin: 0;
+		padding: 0;
+	}
+	.chatIds {
+		width: 93%;
+	}
+	.password-box .eye {
+		left: 15px;
+	}
+}
+.navbar {
+	padding: 20px;
+}
+
+.profile-container {
+	display: flex;
+	text-align: center; /* جعل النص في المنتصف */
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	/* margin: 40px; */
+	margin: 60px 0;
+	/* padding: 20px; */
+}
+
+/* تنسيق الاسم */
+.user-name {
+	font-size: 28px; /* حجم الخط كبير */
+	font-weight: 500; /* سمك الخط متوسط إلى عريض */
+	color: #202124; /* لون أسود داكن (ليس أسود تماماً) */
+
+	margin: 10px;
+	padding: 10px;
+	/* border: 1px solid #ccc;;
+               border-radius: 5px; */
+}
+
+/* تنسيق البريد الإلكتروني */
+.user-email {
+	font-size: 16px; /* حجم خط أصغر */
+	color: #5f6368; /* لون رمادي */
+	margin: 0;
+	font-weight: 400; /* خط عادي غير عريض */
+}
+.chatIds {
+	width: 70%;
+	text-align: right;
+	direction: rtl;
+	font-size: 18px;
+	margin: 20px;
+}
+.chatIds input {
+	width: 90%;
+	padding: 12px 15px;
+	margin-bottom: 15px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	font-size: 1em;
+	direction: rtl;
+	text-align: right;
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.saveBtn {
+	font-size: 20px;
+	background: #007bff;
+	border: none;
+	border-radius: 5px;
+	padding: 8px;
+	color: white;
+}
+
+/* start pupab */
+
+#cntnr {
+	display: none;
+	position: fixed;
+	background-color: #7473739e;
+	width: 100%;
+	height: 100%;
+	flex-wrap: wrap;
+	align-content: center;
+	justify-content: center;
+	background-size: cover;
+	cursor: pointer;
+	top: 0;
+	z-index: 151;
+}
+.cler {
+	display: block;
+}
+.dvPlc {
+	width: 90%;
+	position: relative;
+	background-color: #fff;
+	border-radius: 7px;
+	text-align: center;
+	overflow-y: visible;
+	cursor: auto;
+	border: 3px solid var(--mnCl);
+	transform: scaleY(0);
+	transition: 0.3s;
+	margin: auto;
+	user-select: none;
+    padding-bottom: 50px;
+	z-index: 2;
+}
+
+.opPlc {
+	transform: scaleY(1);
+}
+.clrear {
+	position: relative;
+	display: flex;
+	font-size: 5vh;
+	color: #555;
+	align-items: center;
+	justify-content: center;
+	background-color: rgb(236, 232, 232, 0);
+	margin: 5px 2px;
+	border-radius: 50%;
+	width: 50px;
+	height: 50px;
+	/* left: calc(100% - 55px); */
+	cursor: pointer;
+	transition: 0.3s;
+}
+
+.clrear:hover {
+	background-color: rgb(236, 232, 232, 1);
+}
+.exist {
+	display: block;
+	font-size: 35px;
+	padding: 15px;
+	border-radius: 0 0 7px 7px;
+	font-weight: bold;
+}
+
+.exist span {
+	color: var(--gr);
+}
+.okbtn {
+	display: block;
+	color: white;
+	width: fit-content;
+	font-size: 4vh;
+	background: var(--mnCl);
+	margin: 2vh auto 3vh;
+	padding: 5px 20px;
+	border: 1px;
+	border-radius: 5px;
+	outline: none;
+	cursor: pointer;
+}
+@media (max-width: 700px) {
+	.dvPlc {
+		width: 90%;
+	}
+}
+/*  and pupab */
+
+/* image cut */
+
+#containerImg {
+	position: relative;
+	display: inline-block;
+	touch-action: none;
+}
+#upload {
+	position: absolute;
+	top: 30px;
+	left: 30px;
+	width: 150px;
+	height: 30px;
+}
+
+#imagePr {
+	display: block;
+	max-width: 90%;
+	max-height: 80vh;
+	display: block;
+	margin: auto;
+	 -webkit-user-drag: none; /* Chrome, Safari */
+  user-select: none;
+}
+.arrow {
+	position: absolute;
+	display: none;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 40px;
+	color: blue;
+	font-weight: bold;
+	pointer-events: none; /* لا تعيق السحب */
+}
+
+.arrow-left {
+	left: -30px;
+}
+
+.arrow-right {
+	right: -30px;
+}
+#cropCircle {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	border: 5px dashed blue;
+	border-radius: 50%;
+	cursor: grab;
+	width: 250px;
+	height: 250px;
+	min-width: 80px;
+	min-height: 80px;
+	/* transition: 0.3s; */
+}
+.trnsCrcl {
+	transform: translate(-50%, -50%);
+}
+.btnCrop {
+	position: absolute;
+	top: 100%;
+	font-size: 10ox;
+	padding: 10px;
+	transform: translateX(50%);
+	right: 50%;
+}
+/* مقبض التكبير */
+#resizeHandle {
+	position: absolute;
+    width: 30px;
+    height: 30px;
+	background: blue;
+	border-radius: 50%;
+	bottom: -9px;
+	right: -9px;
+	cursor: nwse-resize;
+}
+
+canvas {
+	margin-top: 20px;
+	border: 1px solid #ccc;
+}
+
+/* تحسين الهاتف */
+@media (max-width: 600px) {
+	#containerImg {
+		touch-action: initial;
+	}
+	.arrow {
+		display: inline;
+	}
+}
+
+/* end image cut */

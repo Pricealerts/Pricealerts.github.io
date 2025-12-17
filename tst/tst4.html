@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>قص دائري (هاتف + كمبيوتر)</title>
+
+		<style>
+			body {
+				font-family: Arial;
+				text-align: center;
+				background: #f5f5f5;
+			}
+
+			#container {
+				position: relative;
+				display: inline-block;
+				touch-action: none;
+			}
+            #upload{
+                position: absolute;
+                top: 30px;
+                left: 30px;
+                width: 150px;
+                height: 30px;
+            }
+
+			#image {
+				display: block;
+				max-width: 90%;
+				max-height: 80vh;
+				display: block;
+				margin: auto;
+			}
+			.arrow {
+				position: absolute;
+				display: none;
+				top: 50%;
+				transform: translateY(-50%);
+				font-size: 40px;
+				color: blue;
+				font-weight: bold;
+				pointer-events: none; /* لا تعيق السحب */
+				user-select: none;
+			}
+
+
+			.arrow-left {
+				left: -30px;
+			}
+
+			.arrow-right {
+				right: -30px;
+			}
+			#cropCircle {
+				position: absolute;
+				top: 50%;
+				right: 50%;
+				border: 5px dashed blue;
+				border-radius: 50%;
+				cursor: grab;
+				width: 250px;
+				height: 250px;
+				min-width: 80px;
+				min-height: 80px;
+                /* transition: 0.3s; */
+			}
+            .trnsCrcl{
+				transform: translate(50%, -50%);
+            }
+			.btnCrop {
+				position: absolute;
+				top: calc(100% + 10px);
+				font-size: 10ox;
+				padding: 10px;
+				transform: translateX(-50%);
+			}
+			/* مقبض التكبير */
+			#resizeHandle {
+				position: absolute;
+				width: 18px;
+				height: 18px;
+				background: blue;
+				border-radius: 50%;
+				bottom: -9px;
+				right: -9px;
+				cursor: nwse-resize;
+			}
+
+			canvas {
+				margin-top: 20px;
+				border: 1px solid #ccc;
+			}
+
+			/* تحسين الهاتف */
+			@media (max-width: 600px) {
+				#container {
+					touch-action: initial;
+				}
+				.arrow {
+					display: inline;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<h3>قص دائري (تحريك + تكبير)</h3>
+
+		<input  type="file" id="upload" accept="image/*" /><br /><br />
+
+		<div id="mydv"></div>
+		<div id="container">
+			<img id="image" />
+			<div id="cropCircle">
+				<span class="arrow arrow-left">⇔</span>
+				<span class="arrow arrow-right">⇔</span>
+
+				<button class="btnCrop" onclick="crop()">قص</button>
+				<div id="resizeHandle"></div>
+			</div>
+		</div>
+		<canvas id="result" style="display: none"></canvas>
+		<img
+			id="resultImg"
+			width="300"
+			height="300"
+			style="
+				display: block;
+				border-radius: 50%;
+				border: 1px solid #ccc;
+				margin-top: 20px;
+			"
+		/>
+		<script>
+			const upload = document.getElementById("upload");
+			const image = document.getElementById("image");
+			const circle = document.getElementById("cropCircle");
+			const handle = document.getElementById("resizeHandle");
+			const canvas = document.getElementById("result");
+			const ctx = canvas.getContext("2d");
+
+			let dragging = false;
+			let resizing = false;
+			let startX, startY, startSize;
+			let startDist = null;
+
+			// تحميل الصورة
+			upload.onchange = e => {
+				const file = e.target.files[0];
+				if (!file) return;
+				const reader = new FileReader();
+				reader.onload = () => {
+					image.src = reader.result;
+					//  image.onload = () => centerElements(); // توسيط العناصر بعد تحميل الصورة
+				};
+				reader.readAsDataURL(file);
+				//centerElements();
+                //circle.classList.add("trnsCrcl");
+			};
+
+			// -------- أدوات مساعدة --------
+			function point(e) {
+				if (e.touches) return e.touches[0];
+				return e;
+			}
+
+			function distance(t1, t2) {
+				return Math.hypot(t2.clientX - t1.clientX, t2.clientY - t1.clientY);
+			}
+
+			// -------- تحريك --------
+			circle.addEventListener("mousedown", e => {
+				if (e.target === handle) return;
+				dragging = true;
+				startX = e.clientX - circle.offsetLeft;
+				startY = e.clientY - circle.offsetTop;
+			});
+
+			document.addEventListener("mousemove", e => {
+				if (!dragging) return;
+				circle.style.left = e.clientX - startX + "px";
+				circle.style.top = e.clientY - startY + "px";
+			});
+
+			document.addEventListener("mouseup", () => (dragging = false));
+
+			// -------- تكبير بالماوس --------
+			handle.addEventListener("mousedown", e => {
+				e.stopPropagation();
+				resizing = true;
+				startX = e.clientX;
+				startSize = circle.offsetWidth;
+			});
+
+			document.addEventListener("mousemove", e => {
+				if (!resizing) return;
+				let newSize = startSize + (e.clientX - startX);
+				newSize = Math.max(80, newSize);
+				circle.style.width = circle.style.height = newSize + "px";
+			});
+
+			document.addEventListener("mouseup", () => (resizing = false));
+
+			// -------- Pinch Zoom (لمس) --------
+			circle.addEventListener("touchstart", e => {
+				if (e.touches.length === 1) {
+					dragging = true;
+					startX = e.touches[0].clientX - circle.offsetLeft;
+					startY = e.touches[0].clientY - circle.offsetTop;
+				}
+				if (e.touches.length === 2) {
+					startDist = distance(e.touches[0], e.touches[1]);
+					startSize = circle.offsetWidth;
+				}
+			});
+
+			circle.addEventListener("touchmove", e => {
+				e.preventDefault();
+				if (e.touches.length === 1 && dragging) {
+					circle.style.left = e.touches[0].clientX - startX + "px";
+					circle.style.top = e.touches[0].clientY - startY + "px";
+				}
+				if (e.touches.length === 2) {
+					let d = distance(e.touches[0], e.touches[1]);
+					let scale = d / startDist;
+					let newSize = startSize * scale;
+					newSize = Math.max(80, newSize);
+					circle.style.width = circle.style.height = newSize + "px";
+				}
+			});
+
+			circle.addEventListener("touchend", () => {
+				dragging = false;
+				startDist = null;
+			});
+
+			// -------- القص --------
+			function crop() {
+				const rect = circle.getBoundingClientRect();
+				const imgRect = image.getBoundingClientRect();
+
+				const scaleX = image.naturalWidth / image.width;
+
+				const srcSize = rect.width * scaleX;
+				const srcX = (rect.left - imgRect.left) * scaleX;
+				const srcY = (rect.top - imgRect.top) * scaleX;
+
+				// حجم الإخراج النهائي
+				const OUTPUT_SIZE = 300;
+
+				canvas.width = OUTPUT_SIZE;
+				canvas.height = OUTPUT_SIZE;
+
+				ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+				ctx.save();
+				ctx.beginPath();
+				ctx.arc(
+					OUTPUT_SIZE / 2,
+					OUTPUT_SIZE / 2,
+					OUTPUT_SIZE / 2,
+					0,
+					Math.PI * 2
+				);
+				ctx.clip();
+
+				ctx.drawImage(
+					image,
+					srcX,
+					srcY,
+					srcSize,
+					srcSize,
+					0,
+					0,
+					OUTPUT_SIZE,
+					OUTPUT_SIZE
+				);
+
+				ctx.restore();
+
+				// عرض النتيجة داخل img
+				const rsltImg = document.getElementById("resultImg");
+				const imgFnl = canvas.toDataURL("image/png");
+				document.getElementById("resultImg").src = imgFnl;
+
+				//  console.log(imgFnl)
+			}
+		</script>
+	</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>تحويل صورة إلى Base64</title>
+
+<style>
+  body {
+    font-family: Arial;
+    text-align: center;
+    padding: 20px;
+  }
+  img {
+    margin-top: 20px;
+    max-width: 90%;
+    border: 1px solid #ccc;
+  }
+  textarea {
+    width: 90%;
+    height: 150px;
+    margin-top: 20px;
+  }
+</style>
+</head>
+
+<body>
+
+<h3>تصغير صورة موجودة وتحويلها إلى Base64</h3>
+
+<!-- الصورة الأصلية -->
+<img id="sourceImg" src="../imgs/تنبيه أسعار العملات_pwabuilder_score.png" crossorigin="anonymous">
+
+<br><br>
+<button id="convertBtn">تحويل إلى Base64</button>
+
+<br><br>
+
+<!-- الصورة الناتجة -->
+<img id="outpotimg">
+
+<!-- نص Base64 -->
+<textarea id="base64Output" placeholder="سيظهر هنا Base64"></textarea>
+
+<script>
+document.getElementById("convertBtn").addEventListener("click", () => {
+
+ 
+});
+
+function cmprsImg(params) {
+   const img = document.getElementById("sourceImg");
+
+  if (!img.complete) {
+    alert("الصورة لم تُحمّل بعد");
+    return;
+  }
+
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d");
+
+  // 1️⃣ تصغير الأبعاد
+  const MAX_WIDTH = 1200;
+  let width = img.naturalWidth;
+  let height = img.naturalHeight;
+
+  if (width > MAX_WIDTH) {
+    height = height * (MAX_WIDTH / width);
+    width = MAX_WIDTH;
+  }
+
+  canvas.width = width;
+  canvas.height = height;
+  ctx.drawImage(img, 0, 0, width, height);
+
+  // 2️⃣ تحويل إلى Base64 مع ضغط
+  let quality = 0.9;
+  let base64;
+
+  do {
+    base64 = canvas.toDataURL("image/jpeg", quality);
+    quality -= 0.05;
+  } while (base64.length > 50 * 1024 * 1.37 && quality > 0.1);
+  // 1.37 تقريب لتحويل Base64 إلى حجم فعلي
+
+  // عرض الصورة
+  document.getElementById("outpotimg").src = base64;
+
+  // عرض النص
+  document.getElementById("base64Output").value = base64;
+
+  console.log("Base64 length:", base64.length);
+}
+</script>
+
+</body>
+</html>

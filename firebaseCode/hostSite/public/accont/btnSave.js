@@ -54,14 +54,14 @@ gebi("formSave").addEventListener("submit", async e => {
 		chtId3: gebi("telegramChatId3")?.value || "",
 	};
 	// 1 MB = 1,000,000 bytes (تقريبًا)
-	const MAX_SIZE = 1 * 1024 * 1024; // أو 1_000_000
+	const MAX_SIZE = 50 * 1024 * 1.37; // أو 1_000_000
+	let base64;
 	if (imgUrlSrc) {
 		if (file.size > MAX_SIZE) {
-			alert("حجم الصورة يجب أن يكون أقل من 1 MB");
-			return;
+			base64 = cmprsImg(imgUrlSrc);
 		}
 		// تحويل الصورة Base64
-		const base64 = await toBase64(file);
+		//const base64 = await toBase64(file);
 		
 		const idTime = new Date().getTime().toString();
 		const imgName = userId || idTime;
