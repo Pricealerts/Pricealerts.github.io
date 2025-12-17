@@ -138,7 +138,6 @@ function setData(userRef, user) {
 			localStorage[key] = infoUser[key];
 		}
 		console.log("تم  إنشاء البيانات ✔️");
-		console.log("الحساب غير موجود في قاعدة البيانات");
 	});
 }
 
