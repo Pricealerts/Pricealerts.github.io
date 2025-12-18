@@ -28,6 +28,13 @@ window.handleCredentialResponse = response => {
 		.then(async result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
 			const user = result.user;
+			const imgUrl = user.photoURL;
+			const index = imgUrl.lastIndexOf("=") + 1;
+			const newImgUrl =
+				index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
+			user.photoURL = newImgUrl;
+			console.log("تم تسجيل الدخول بنجاح:", user);
+			// تحديث بيانات المستخدم في قاعدة البيانات
 			await updateUserData(user, false);
 			// إخفاء الزر بعد النجاح (اختياري)
 			document.getElementById("buttonSignUp").style.display = "none";
@@ -80,7 +87,7 @@ let iLoup = 0;
 async function updateUserData(user, isExist = true) {
 	iLoup++;
 	const userRef = ref(db, "users/" + user.uid);
-	await get(userRef).then( async snapshot => {
+	await get(userRef).then(async snapshot => {
 		const snp = snapshot.exists();
 		if (snp) {
 			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
@@ -88,7 +95,7 @@ async function updateUserData(user, isExist = true) {
 				localStorage[key] = restUsr[key];
 			}
 
-			 await update(userRef, {
+			await update(userRef, {
 				lastLogin: new Date().toISOString(),
 				status: "online",
 			}).then(() => {
@@ -108,18 +115,16 @@ async function updateUserData(user, isExist = true) {
 				await setData(userRef, user);
 			}
 		}
-
-		await saveImage(localStorage.userPicture);
-		gebi("accountLink").style.display = "block";
-			gebi(
-				"accountLink"
-			).innerHTML = `${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
-		gebi("signOutOrInLink").innerHTML = `تسجبل الخروج
- 	 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 	});
-
+	const srcImg = localStorage.userPicture;
+	if (srcImg == user.photoURL) {
+		await saveImage(srcImg);
+	} else {
+		await loadImageViaPost(srcImg);
+	}
 	window.location.href = drction;
 }
+
 
 async function setData(userRef, user) {
 	const infoUser = {
@@ -139,7 +144,6 @@ async function setData(userRef, user) {
 		}
 		console.log("تم  إنشاء البيانات ✔️");
 	});
-
 }
 
 // مراقبة حالة تسجيل الدخول
@@ -170,61 +174,102 @@ async function sgnOUt(user) {
 		});
 }
 
-console.log("hadi jdida 9");
-
-/* function saveImage(source) {
-	const img = new Image();
-	img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
-	img.onload = function () {
-		const canvas = document.createElement("canvas");
-		const ctx = canvas.getContext("2d");
-		canvas.width = img.naturalWidth;
-		canvas.height = img.naturalHeight;
-		ctx.drawImage(img, 0, 0);
-		const base64 = canvas.toDataURL("image/png");
-		localStorage.setItem("base64Pctr", base64);
-		console.log("تم حفظ الصورة بنجاح ✔️");
-	};
-	img.onerror = function () {
-		console.error("فشل تحميل الصورة");
-	};
-	img.src = source;
-}
- */
-
-
-
 async function saveImage(source) {
-  try {
-    const img = new Image();
-    img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
+	try {
+		const img = new Image();
+		img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
 
-    // استخدم Promise لتحويل event onload إلى عملية غير متزامنة
-    const base64 = await new Promise((resolve, reject) => {
-      img.onload = function () {
-        const canvas = document.createElement("canvas");
-        const ctx = canvas.getContext("2d");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        ctx.drawImage(img, 0, 0);
-        const base64Image = canvas.toDataURL("image/png");
-        resolve(base64Image); // أعد النتيجة بعد الرسم
-      };
+		// استخدم Promise لتحويل event onload إلى عملية غير متزامنة
+		const base64 = await new Promise((resolve, reject) => {
+			img.onload = function () {
+				const canvas = document.createElement("canvas");
+				const ctx = canvas.getContext("2d");
+				canvas.width = img.naturalWidth;
+				canvas.height = img.naturalHeight;
+				ctx.drawImage(img, 0, 0);
+				const base64Image = canvas.toDataURL("image/png");
+				resolve(base64Image); // أعد النتيجة بعد الرسم
+			};
 
-      img.onerror = function () {
-        reject("فشل تحميل الصورة"); // أعد خطأ إذا فشل التحميل
-      };
+			img.onerror = function () {
+				reject("فشل تحميل الصورة"); // أعد خطأ إذا فشل التحميل
+			};
 
-      img.src = source; // ابدأ تحميل الصورة
-    });
+			img.src = source; // ابدأ تحميل الصورة
+		});
 
-    // بعد تحميل الصورة وتحويلها إلى Base64، يمكنك حفظها في localStorage
-    localStorage.setItem("base64Pctr", base64);
-    console.log("تم حفظ الصورة بنجاح ✔️");
-  } catch (error) {
-    console.error(error); // التعامل مع الأخطاء في حالة فشل تحميل الصورة
-  }
+		// بعد تحميل الصورة وتحويلها إلى Base64، يمكنك حفظها في localStorage
+		localStorage.setItem("base64Pctr", base64);
+		console.log("تم حفظ الصورة بنجاح  في locale storg✔️");
+	} catch (error) {
+		console.error(error); // التعامل مع الأخطاء في حالة فشل تحميل الصورة
+	}
 }
 
+async function loadImageViaPost(fileId) {
+	try {
+		const proxyUrl =
+			"https://europe-west1-pricealert-31787.cloudfunctions.net/imageProxyPost";
+
+		const response = await fetch(proxyUrl, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({
+				action: "gtImage",
+				idImg: fileId,
+			}),
+		});
+		console.log('respons is :' + response);
+		
+		if (!response.ok) {
+			throw new Error("فشل جلب الصورة");
+		}
+
+		const blob = await response.blob();
+
+		const img = new Image();
+		img.onload = () => {
+			const canvas = document.createElement("canvas");
+			const ctx = canvas.getContext("2d");
+
+			canvas.width = img.naturalWidth;
+			canvas.height = img.naturalHeight;
+
+			ctx.drawImage(img, 0, 0);
+
+			localStorage.setItem("base64Pctr", canvas.toDataURL("image/png"));
+
+			URL.revokeObjectURL(img.src);
+			console.log("تم حفظ الصورة بنجاح ✔️");
+		};
+
+		img.onerror = () => {
+			console.error("فشل تحميل الصورة داخل المتصفح");
+		};
+
+		img.src = URL.createObjectURL(blob);
+	} catch (err) {
+		console.error("خطأ:", err.message);
+	}
+}
+
+/* function saveImageFromImg() {
+	const img = document.getElementById("imgImemail");
+	img.src = localStorage.userPicture;
+	const canvas = document.createElement("canvas");
+	const ctx = canvas.getContext("2d");
+
+	canvas.width = img.naturalWidth;
+	canvas.height = img.naturalHeight;
+
+	ctx.drawImage(img, 0, 0);
+
+	const base64 = canvas.toDataURL("image/png"); // أو jpeg
+	localStorage.setItem("base64Pctr", base64);
+
+	console.log("تم حفظ الصورة من الصفحة ✔️");
+} */
+
+console.log("hadi jdida 15");
 
 export { auth };

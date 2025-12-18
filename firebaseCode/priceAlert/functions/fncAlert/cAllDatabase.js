@@ -41,7 +41,7 @@ async function cAllDatabase(data) {
 			].includes(action)
 		) {
 			rspns = await sndEmail(data, db);
-		} 
+		}
 
 		return rspns;
 	} catch (error) {

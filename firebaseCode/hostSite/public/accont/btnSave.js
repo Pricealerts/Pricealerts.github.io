@@ -73,7 +73,7 @@ gebi("formSave").addEventListener("submit", async e => {
 			}, 15000);
 			return false;
 		}
-		let imgSrc = `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w800`;
+		let imgSrc =  result.fileId ;
 		bodySet.userPicture = imgSrc;
 		localStorage.base64Pctr = file;// machi base64
 		//saveImage(imgSrc);

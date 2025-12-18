@@ -29,10 +29,10 @@
 		<!-- الصورة الأصلية -->
 		<img
 			id="sourceImg"
-			src="../imgs/تنبيه أسعار العملات_pwabuilder_score.png"
-			crossorigin="anonymous"
+			alt="Google Drive Image"
+			src="https://drive.google.com/thumbnail?id=1Swxr6FwLG3xFqOyyYs_xjxCkMzQUnFgz&sz=w800"
 		/>
-
+		<!-- 		https://drive.google.com/thumbnail?id=1Swxr6FwLG3xFqOyyYs_xjxCkMzQUnFgz&sz=w800 -->
 		<br /><br />
 		<button id="convertBtn">تحويل إلى Base64</button>
 
@@ -179,23 +179,28 @@
 					canvas.toBlob(
 						blob => {
 							const sizeKB = blob.size / 1024;
-
 							if (sizeKB > TARGET_KB + TOLERANCE) {
 								maxQ = q;
 							} else {
 								minQ = q;
 								bestBlob = blob;
 							}
-
 							compress();
 						},
 						"image/jpeg",
 						q
 					);
 				}
-
 				compress();
 			}
+			const url =
+				"https://lh3.googleusercontent.com/a/ACg8ocIjyWfbbXlsfUWR9x-fkKLDgnKFiO2j0IxnO0z89s2ThPc8nvKoPA=s500-c";
+
+			const index = url.lastIndexOf("=") + 1;
+
+			const newUrl = index !== -1 ? url.substring(0, index) + "s700-c" : url;
+
+			console.log(newUrl);
 		</script>
 	</body>
 </html>
