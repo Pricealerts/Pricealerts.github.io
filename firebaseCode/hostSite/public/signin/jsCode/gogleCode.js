@@ -253,7 +253,8 @@ async function loadImageViaPost(fileId) {
 	}
 }
 
-/* function saveImageFromImg() {
+/* 
+function saveImageFromImg() {
 	const img = document.getElementById("imgImemail");
 	img.src = localStorage.userPicture;
 	const canvas = document.createElement("canvas");
@@ -268,7 +269,8 @@ async function loadImageViaPost(fileId) {
 	localStorage.setItem("base64Pctr", base64);
 
 	console.log("تم حفظ الصورة من الصفحة ✔️");
-} */
+} 
+*/
 
 console.log("hadi jdida 15");
 
