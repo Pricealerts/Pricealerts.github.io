@@ -3,6 +3,7 @@ let userNameDirction = localStorage.userName || "حسابي";
 let enteEsc = ` تسجبل الدخول
  <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
 let dsplyCont = "display: none;";
+
 if (localStorage.base64Pctr) {
 	UserImage = localStorage.base64Pctr;
 	enteEsc = ` تسجبل الخروج
@@ -78,9 +79,7 @@ navbar.innerHTML = `
 			<img class="imgNavbar" src="${UserImage}" alt="">
 				<h1 class="hTitel">
 				منبه الأسعار </h1 >
-
 			<div class="nav-title">
-				
                 <button class="menu-btn" id="openSidebar">☰</button>
 			</div>
 		</div>
