@@ -11,7 +11,7 @@ if (localStorage.base64Pctr) {
 }
 let enteEsc2 = `
  حسابي
- <img src=${UserImage} alt="">
+ <img src=${UserImage} alt="" style="width: auto">
  `;
 
 function exsit() {
