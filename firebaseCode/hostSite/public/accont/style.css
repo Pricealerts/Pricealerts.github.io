@@ -93,7 +93,9 @@ body {
 		left: 15px;
 	}
 }
-
+.navbar {
+	padding: 0 16px; 
+}
 
 .profile-container {
 	display: flex;
