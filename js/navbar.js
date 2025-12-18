@@ -1,19 +1,21 @@
 let UserImage = "/imgs/web/apple-touch-icon.png";
-let userNameDirction = localStorage.userName || "حسابي";
+let accont = "";
+
 let enteEsc = ` تسجبل الدخول
  <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
-let dsplyCont = "display: none;";
+
 
 if (localStorage.base64Pctr) {
 	UserImage = localStorage.base64Pctr;
 	enteEsc = ` تسجبل الخروج
- <img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
-	dsplyCont = "display: flex;";
+ 				<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
+
+	accont = `<a id="accountLink" class="accountBtn" href="https://pricealerts.web.app/accont"
+				style = "display: flex;">
+				${localStorage.userName || "حسابي"}
+				<img src="${UserImage}" alt="img" style="width: auto">
+			</a>`;
 }
-let enteEsc2 = `
- حسابي
- <img src=${UserImage} alt="" >
- `;
 
 function exsit() {
 	if (localStorage.email) {
@@ -59,11 +61,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
         		${enteEsc}
 			</a>
-			<a id="accountLink" class="accountBtn" href="https://pricealerts.web.app/accont"
-				style = "${dsplyCont} ">
-				${userNameDirction}
-				<img src="${UserImage}" alt="img" style="width: auto">
-			</a>
+			${accont}
 `;
 
 document.body.prepend(sidebar);
