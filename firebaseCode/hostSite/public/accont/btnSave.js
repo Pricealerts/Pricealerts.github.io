@@ -17,6 +17,20 @@ onAuthStateChanged(auth, async user => {
 	}
 });
 
+async function updateUserData(bodySet) {
+	const userRef = ref(db, "users/" + userId);
+	try {
+		await update(userRef, bodySet);
+		console.log("تم التسجيل وتعديل البيانات ✔️");
+		return true;
+	} catch (error) {
+		console.error("حدث خطأ في التحديث:", error);
+		gebi("rspns").innerText = "حدث خطأ أعد المحاولة";
+		gebi("rspns").style.color = "red";
+		return false;
+	}
+}
+
 gebi("formSave").addEventListener("submit", async e => {
 	e.preventDefault();
 	gebi("rspns").innerText = "جاري الحفظ ...";
@@ -73,10 +87,8 @@ gebi("formSave").addEventListener("submit", async e => {
 			}, 15000);
 			return false;
 		}
-		let imgSrc =  result.fileId ;
-		bodySet.userPicture = imgSrc;
+		bodySet.userPicture = result.fileId;
 		localStorage.base64Pctr = file;// machi base64
-		//saveImage(imgSrc);
 	}
 
 	for (const key in bodySet) {
@@ -99,19 +111,7 @@ gebi("formSave").addEventListener("submit", async e => {
 	}
 });
 
-async function updateUserData(bodySet) {
-	const userRef = ref(db, "users/" + userId);
-	try {
-		await update(userRef, bodySet);
-		console.log("تم التسجيل وتعديل البيانات ✔️");
-		return true;
-	} catch (error) {
-		console.error("حدث خطأ في التحديث:", error);
-		gebi("rspns").innerText = "حدث خطأ أعد المحاولة";
-		gebi("rspns").style.color = "red";
-		return false;
-	}
-}
+
 
 /* 
 function toBase64(file) {
