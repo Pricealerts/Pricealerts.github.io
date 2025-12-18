@@ -9,9 +9,7 @@
 	--bg-color: #f0f2f5;
 }
 
-* {
-	box-sizing: border-box;
-}
+
 
 body {
 	background: var(--bg-color);

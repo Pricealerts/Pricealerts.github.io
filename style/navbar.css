@@ -5,7 +5,12 @@
 	--text: #111;
 	--sidebar-width: 260px;
 }
-
+* {
+	margin: 0;
+	padding: 0;
+	-webkit-tap-highlight-color: transparent;
+    box-sizing: border-box;
+}
 /*------------------------------------------------------
   Navbar
 ------------------------------------------------------*/
@@ -118,7 +123,11 @@
 .overlay.show {
 	display: block;
 }
-
+.avont{
+	position: absolute;
+    bottom: 40px;
+    width: calc(100% - 60px)
+}
 .accountBtn {
 	position: absolute;
 	bottom: 40px;

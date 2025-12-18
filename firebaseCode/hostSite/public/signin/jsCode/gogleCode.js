@@ -25,10 +25,10 @@ window.handleCredentialResponse = response => {
 	const credential = GoogleAuthProvider.credential(response.credential);
 
 	signInWithCredential(auth, credential)
-		.then(result => {
+		.then(async result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
 			const user = result.user;
-			updateUserData(user, false);
+			await updateUserData(user, false);
 			// إخفاء الزر بعد النجاح (اختياري)
 			document.getElementById("buttonSignUp").style.display = "none";
 		})
@@ -80,7 +80,7 @@ let iLoup = 0;
 async function updateUserData(user, isExist = true) {
 	iLoup++;
 	const userRef = ref(db, "users/" + user.uid);
-	await get(userRef).then(snapshot => {
+	await get(userRef).then( async snapshot => {
 		const snp = snapshot.exists();
 		if (snp) {
 			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
@@ -88,7 +88,7 @@ async function updateUserData(user, isExist = true) {
 				localStorage[key] = restUsr[key];
 			}
 
-			update(userRef, {
+			 await update(userRef, {
 				lastLogin: new Date().toISOString(),
 				status: "online",
 			}).then(() => {
@@ -96,24 +96,24 @@ async function updateUserData(user, isExist = true) {
 			});
 		} else {
 			if (isExist) {
-				setTimeout(() => {
+				setTimeout(async () => {
 					if (iLoup < 3) {
-						updateUserData(user);
+						await updateUserData(user);
 						console.log("rah ydor : " + iLoup);
 					} else {
 						alert("حدث خطأ أعد المحاولة ✔️");
 					}
 				}, 2000);
 			} else {
-				setData(userRef, user);
+				await setData(userRef, user);
 			}
 		}
 
-		saveImage(localStorage.userPicture);
+		await saveImage(localStorage.userPicture);
 		gebi("accountLink").style.display = "block";
-		gebi(
-			"accountLink"
-		).innerHTML = `${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
+			gebi(
+				"accountLink"
+			).innerHTML = `${localStorage.userName} <img src="${localStorage.base64Pctr}" alt="">`;
 		gebi("signOutOrInLink").innerHTML = `تسجبل الخروج
  	 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
 	});
@@ -121,7 +121,7 @@ async function updateUserData(user, isExist = true) {
 	window.location.href = drction;
 }
 
-function setData(userRef, user) {
+async function setData(userRef, user) {
 	const infoUser = {
 		userEmail: user.email,
 		userName: user.displayName,
@@ -133,12 +133,13 @@ function setData(userRef, user) {
 		lastLogin: new Date().toISOString(),
 		status: "online",
 	};
-	set(userRef, infoUser).then(() => {
+	await set(userRef, infoUser).then(() => {
 		for (const key in infoUser) {
 			localStorage[key] = infoUser[key];
 		}
 		console.log("تم  إنشاء البيانات ✔️");
 	});
+
 }
 
 // مراقبة حالة تسجيل الدخول
@@ -169,6 +170,61 @@ async function sgnOUt(user) {
 		});
 }
 
-console.log("hadi jdida 5");
+console.log("hadi jdida 9");
+
+/* function saveImage(source) {
+	const img = new Image();
+	img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
+	img.onload = function () {
+		const canvas = document.createElement("canvas");
+		const ctx = canvas.getContext("2d");
+		canvas.width = img.naturalWidth;
+		canvas.height = img.naturalHeight;
+		ctx.drawImage(img, 0, 0);
+		const base64 = canvas.toDataURL("image/png");
+		localStorage.setItem("base64Pctr", base64);
+		console.log("تم حفظ الصورة بنجاح ✔️");
+	};
+	img.onerror = function () {
+		console.error("فشل تحميل الصورة");
+	};
+	img.src = source;
+}
+ */
+
+
+
+async function saveImage(source) {
+  try {
+    const img = new Image();
+    img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
+
+    // استخدم Promise لتحويل event onload إلى عملية غير متزامنة
+    const base64 = await new Promise((resolve, reject) => {
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        const base64Image = canvas.toDataURL("image/png");
+        resolve(base64Image); // أعد النتيجة بعد الرسم
+      };
+
+      img.onerror = function () {
+        reject("فشل تحميل الصورة"); // أعد خطأ إذا فشل التحميل
+      };
+
+      img.src = source; // ابدأ تحميل الصورة
+    });
+
+    // بعد تحميل الصورة وتحويلها إلى Base64، يمكنك حفظها في localStorage
+    localStorage.setItem("base64Pctr", base64);
+    console.log("تم حفظ الصورة بنجاح ✔️");
+  } catch (error) {
+    console.error(error); // التعامل مع الأخطاء في حالة فشل تحميل الصورة
+  }
+}
+
 
 export { auth };

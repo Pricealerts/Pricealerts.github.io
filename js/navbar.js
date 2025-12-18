@@ -21,6 +21,11 @@ function exsit() {
 	window.location.href = "https://pricealerts.web.app/signin";
 }
 
+
+/* 
+width: auto;
+    height: 35px;
+*/
 ///////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////
@@ -54,7 +59,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
 			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
        ${enteEsc}</a>
-	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} ">
+	   <a id="accountLink" href="https://pricealerts.web.app/accont"  style = "${dsplyCont} width: auto; height: 35px;">
        ${userNameDirction}
 	   <img src="${UserImage}" alt=""></a>
 `;

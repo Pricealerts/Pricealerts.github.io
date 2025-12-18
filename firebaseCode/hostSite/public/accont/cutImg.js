@@ -44,12 +44,8 @@ gebi("drop-area").addEventListener("click", e => {
 });
 
 gebi("input-file").addEventListener("change", async e => {
-	/* if (file) {
-		return;
-	} */
 	file = e.target.files[0];
 	if (!file) {
-		// gebi("errImg").style.display = "block";
 		return;
 	}
 	const reader = new FileReader();
@@ -59,7 +55,6 @@ gebi("input-file").addEventListener("change", async e => {
 
 	gebi("cntnr").style.display = "block";
 	gebi("divplac").classList.add("opPlc");
-	gebi("errImg").style.display = "none";
 	circle.classList.add("trnsCrcl");
 
 	reader.onload = function (e) {
@@ -226,10 +221,8 @@ function crop() {
 				// 🔹 تحويل إلى Base64
 				const reader = new FileReader();
 				reader.onloadend = function () {
-					const base64 = reader.result;
-					file = bestBlob;
-					console.log("Base64:");
-					console.log(base64);
+					 file = reader.result; // هنا الصورة النهائية بالصيغة Base64
+					console.log(file.length/1024, "حجم الأحرف");
 				};
 				reader.readAsDataURL(bestBlob);
 			}
@@ -256,6 +249,7 @@ function crop() {
 
 	compress();
 }
+console.log('hadi jdida 7');
 
 /* function cmprsImg(imgSrc) {
 	const img = imgSrc;

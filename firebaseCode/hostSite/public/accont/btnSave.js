@@ -49,10 +49,10 @@ gebi("formSave").addEventListener("submit", async e => {
 		chtId2: gebi("telegramChatId2")?.value || "",
 		chtId3: gebi("telegramChatId3")?.value || "",
 	};
-	let base64 = file;
-	if (base64) {
-		const idTime = new Date().getTime().toString();
-		const imgName = userId || idTime;
+	
+	if (file) {
+		 let base64 = file.split(",")[1]; // 7ta file rah base64
+		const imgName = userId || new Date().getTime().toString();
 		// إرسال الصورة عبر fetch
 		const response = await fetch(WEB_APP_URL, {
 			method: "POST",
@@ -75,7 +75,7 @@ gebi("formSave").addEventListener("submit", async e => {
 		}
 		let imgSrc = `https://drive.google.com/thumbnail?id=${result.fileId}&sz=w800`;
 		bodySet.userPicture = imgSrc;
-		localStorage.base64Pctr = base64;
+		localStorage.base64Pctr = file;// machi base64
 		//saveImage(imgSrc);
 	}
 
@@ -122,4 +122,8 @@ function toBase64(file) {
 		reader.readAsDataURL(file);
 	});
 }
+
+
+base64 = base64.replace(/^data:image\/(png|jpeg);base64,/, "");
+reader.result.split(",")[1]
  */

@@ -264,25 +264,6 @@
 		<script src="./jsCode/signIn.js"></script> -->
 		<script src="./jsCode.min.js" type="module"></script>
 		<!-- save image -->
-		<script>
-			  function saveImage(source) {
-				const img = new Image();
-				img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
-				img.onload = function () {
-					const canvas = document.createElement("canvas");
-					const ctx = canvas.getContext("2d");
-					canvas.width = img.naturalWidth;
-					canvas.height = img.naturalHeight;
-					ctx.drawImage(img, 0, 0);
-					const base64 = canvas.toDataURL("image/png");
-					localStorage.setItem("base64Pctr", base64);
-					console.log("تم حفظ الصورة بنجاح ✔️");
-				};
-				img.onerror = function () {
-					console.error("فشل تحميل الصورة");
-				};
-				img.src = source;
-			}
-		</script>
+		
 	</body>
 </html>
