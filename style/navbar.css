@@ -161,4 +161,7 @@
 	.nav-title {
 		font-size: 18px;
 	}
+	.accountBtn {
+		bottom: 10px;
+	}
 }
