@@ -110,20 +110,20 @@ const EXCHANGES = {
 		usdDsply: "inline-block",
 	},
 };
-multiExchange();
-function multiExchange() {
-	const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other"];
-	exchs.forEach(ex => {
-		EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
-		EXCHANGES[ex].name = ex; //.toLowerCase()
-	});
-}
 
-/* function clone(obj) {
-    return { ...obj };
-}
+const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other"];
+exchs.forEach(ex => {
+	EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
+	EXCHANGES[ex].name = ex; //.toLowerCase()
+});
 
-EXCHANGES.nyse  = clone(EXCHANGES.nasdaq); */
+/* 
+	function clone(obj) {
+		return { ...obj };
+	}
+
+	EXCHANGES.nyse  = clone(EXCHANGES.nasdaq); 
+*/
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -132,7 +132,8 @@ EXCHANGES.nyse  = clone(EXCHANGES.nasdaq); */
 ////////////////////////////////////////////////////////
 
 const otherPrpos = [
-	/* 'BMW.DE', */ "XAUT-USD",
+	"BMW.DE",
+	"XAUT-USD",
 	"XAGX-USD",
 	"CL=F",
 	"SI=F",
@@ -148,5 +149,5 @@ async function ftchFnctn(url, body) {
 		body: JSON.stringify(body),
 	});
 	const data = await response.json();
-	return data 
+	return data;
 }

@@ -59,7 +59,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
         		${enteEsc}
 			</a>
 			<a id="accountLink" href="https://pricealerts.web.app/accont"
-				style = "${dsplyCont} width: auto; height: 35px;border-radius: 50%;">
+				style = "${dsplyCont} ">
 				${userNameDirction}
 				<img src="${UserImage}" alt="">
 			</a>

@@ -9,7 +9,7 @@
 	margin: 0;
 	padding: 0;
 	-webkit-tap-highlight-color: transparent;
-    box-sizing: border-box;
+	box-sizing: border-box;
 }
 /*------------------------------------------------------
   Navbar
@@ -123,17 +123,18 @@
 .overlay.show {
 	display: block;
 }
-.avont{
-	position: absolute;
-    bottom: 40px;
-    width: calc(100% - 60px)
-}
+
+/* زر الحساب في الأسفل */
 .accountBtn {
 	position: absolute;
 	bottom: 40px;
-	width: calc(100% - 40px);
-	height: 30px;
-	left: 10px;
+	width: calc(100% - 60px);
+}
+
+.accountBtn img {
+	width: auto;
+	height: 35px;
+	border-radius: 50%;
 }
 
 /*------------------------------------------------------
