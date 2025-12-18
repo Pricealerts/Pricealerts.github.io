@@ -12,7 +12,7 @@ if (localStorage.base64Pctr) {
 }
 let enteEsc2 = `
  حسابي
- <img src=${UserImage} alt="" style="width: auto">
+ <img src=${UserImage} alt="" >
  `;
 
 function exsit() {
@@ -62,7 +62,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a id="accountLink" class="accountBtn" href="https://pricealerts.web.app/accont"
 				style = "${dsplyCont} ">
 				${userNameDirction}
-				<img src="${UserImage}" alt="">
+				<img src="${UserImage}" alt="img" style="width: auto">
 			</a>
 `;
 
