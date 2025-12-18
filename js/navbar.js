@@ -58,7 +58,7 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
         		${enteEsc}
 			</a>
-			<a id="accountLink" href="https://pricealerts.web.app/accont"
+			<a id="accountLink" class="accountBtn" href="https://pricealerts.web.app/accont"
 				style = "${dsplyCont} ">
 				${userNameDirction}
 				<img src="${UserImage}" alt="">
