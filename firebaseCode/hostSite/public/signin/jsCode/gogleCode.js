@@ -118,6 +118,8 @@ async function updateUserData(user, isExist = true) {
 	});
 	const srcImg = localStorage.userPicture;
 	if (srcImg == user.photoURL) {
+		gebi("imgNavbar").src = "/imgs/web/apple-touch-icon.png";
+		gebi("signOutLink").style.display = "none";
 		await saveImage(srcImg);
 	} else {
 		await loadImageViaPost(srcImg);

@@ -2,7 +2,7 @@
 let UserImage =localStorage.base64Pctr || "/imgs/web/apple-touch-icon.png";
 let accont = "";
 
-let enteEsc =	`<a  id="signOutOrInLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
+let enteEsc =	`<a  id="signOutLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
         			تسجبل الدخول
  					<img src="/imgs/web/signin-svgrepo-com.svg" alt="">
 				</a> `;
@@ -24,7 +24,7 @@ function exsit() {
 
 /* 
 
-<a  id="signOutOrInLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
+<a  id="signOutLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
 	تسجبل الخروج
 	<img src="/imgs/web/signout-svgrepo-com.svg" alt="">
 </a>
@@ -76,7 +76,7 @@ navbar.innerHTML = `
 		<!-- Navbar -->
 		<div class="navbar">
 			<a href="https://pricealerts.web.app" style= "height: 100%; display: flex; align-items: center;">
-				<img class="imgNavbar" src="${UserImage}" alt="">
+				<img id="imgNavbar" class="imgNavbar" src="${UserImage}" alt="">
 			</a>
 			<h1 class="hTitel">
 				منبه الأسعار 
@@ -106,9 +106,4 @@ overlay.onclick = () => {
 	overlay.classList.remove("show");
 };
 
-/* 
 
-https://lh3.googleusercontent.com/a/ACg8ocIm6um8AyIy5fKgxVSN9SsDq--QbsLf66NK54GxPDJKsk14x68=s200-c
-
-https://lh3.googleusercontent.com/a/ACg8ocIjyWfbbXlsfUWR9x-fkKLDgnKFiO2j0IxnO0z89s2ThPc8nvKoPA=s200-c
-*/
