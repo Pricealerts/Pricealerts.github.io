@@ -64,26 +64,28 @@
 				<span class="clrear cler">×</span>
 				<hr />
 				<div id="containerImg">
-					
 					<img id="imagePr" />
 					<div id="cropCircle">
 						<span class="arrow arrow-left">⇔</span>
 						<span class="arrow arrow-right">⇔</span>
-						<button class="okbtn cler btnCrop" style="padding: 7px; background-color: #01544c;" 
-						 onclick="crop()">حدد </button>
+						<button
+							class="okbtn cler btnCrop"
+							style="padding: 7px; background-color: #01544c"
+							onclick="crop()"
+						>
+							حدد
+						</button>
 						<div id="resizeHandle"></div>
 					</div>
-					<button 
-					class=" okbtn  "
-					onclick="document.getElementById('input-file').click()"
-				>
-					أعد التحميل
-				</button>
+					<button
+						class="okbtn"
+						onclick="document.getElementById('input-file').click()"
+					>
+						أعد التحميل
+					</button>
 				</div>
 				<canvas id="result" style="display: none"></canvas>
 				<br />
-				
-				
 			</div>
 		</div>
 		<!-- End Bubebe -->
@@ -91,12 +93,7 @@
 		<form id="formSave" class="profile-container" action="#">
 			<div class="profile-photo">
 				<label for="qdfd" id="drop-area">
-					<input
-						type="file"
-						accept="image/*"
-						id="input-file"
-						hidden
-					/>
+					<input type="file" accept="image/*" id="input-file" hidden />
 					<div class="imgCv">
 						<img src="/imgs/camera-square-svgrepo-com.svg" alt="" />
 					</div>
@@ -116,7 +113,17 @@
 				<br /><br />
 
 				معرّفات دردشة التيليجرام (Chat ID) : الخاص بك
-				<br /><br />
+				<br />
+				<br />
+				<p id="telegramChatIdNote" class="small-note">
+					<strong>ملاحظة:</strong> إذا لم يكن لديك معرف دردشة تيليجرام،
+					<a href="https://t.me/Crypto_prices_alerts_bot" target="_blank"
+						>أدخل الى هذا البوت</a
+					>
+					للحصول على معرف دردشتك.
+					<br />
+				</p>
+				<br />
 				<label for="telegramChatId1">Chat ID 1</label>
 				<br />
 				<input
@@ -144,6 +151,10 @@
 			<p id="rspns"></p>
 			<button id="saveBtn" type="submit" class="saveBtn">حفظ التغيرات</button>
 		</form>
+		<div id="signOutOrInLink" class="gtchIdMsg">
+			<a href="https://pricealerts.web.app/signin"> تسجبل الخروج</a>
+			<img src="/imgs/web/signout-svgrepo-com.svg" alt="" />
+		</div>
 
 		<script src="https://pricealerts.github.io/js/navbar.js"></script>
 
