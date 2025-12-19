@@ -117,7 +117,7 @@ body {
 	text-align: right;
 	direction: rtl;
 	font-size: 18px;
-	margin: 20px;
+	margin: auto;
 }
 .gtchIdMsg {
 	cursor: pointer;

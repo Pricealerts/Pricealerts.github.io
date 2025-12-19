@@ -27,7 +27,7 @@ window.handleCredentialResponse = response => {
 	signInWithCredential(auth, credential)
 		.then(async result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
-			const user = result.user;
+			let user = result.user;
 			const imgUrl = user.photoURL;
 			const index = imgUrl.lastIndexOf("=") + 1;
 			const newImgUrl =
@@ -55,7 +55,6 @@ window.onload = function () {
 		// 👇 أضف هذا السطر لتمكين FedCM
 		use_fedcm_for_logins: true,
 	});
-
 	// 2. رسم الزر داخل الـ div
 	google.accounts.id.renderButton(document.getElementById("buttonSignUp"), {
 		theme: "outline",
@@ -71,7 +70,6 @@ window.onload = function () {
 		shape: "rectangular", // الشكل: "rectangular", "pill"
 		width: "250", // عرض الزر بالبكسل
 	});
-
 	// 3. إظهار النافذة المنبثقة (One Tap) أيضاً
 	google.accounts.id.prompt(notification => {
 		if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
@@ -117,9 +115,7 @@ async function updateUserData(user, isExist = true) {
 		}
 	});
 	const srcImg = localStorage.userPicture;
-	if (srcImg == user.photoURL) {
-		gebi("imgNavbar").src = "/imgs/web/apple-touch-icon.png";
-		gebi("signOutLink").style.display = "none";
+	if (srcImg == user.photoURL && !isExist) {
 		await saveImage(srcImg);
 	} else {
 		await loadImageViaPost(srcImg);
@@ -151,6 +147,8 @@ async function setData(userRef, user) {
 let isPrmrEntr = true;
 onAuthStateChanged(auth, async user => {
 	if (user && isPrmrEntr) {
+		gebi("imgNavbar").src = "/imgs/web/apple-touch-icon.png";
+		gebi("signOutLink").style.display = "none";
 		console.log("User is signed in:", user);
 		await sgnOUt(user);
 	}
@@ -272,6 +270,6 @@ function saveImageFromImg() {
 } 
 */
 
-console.log("hadi jdida 18");
+console.log("hadi jdida 19");
 
 export { auth };

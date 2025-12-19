@@ -1,5 +1,5 @@
-const cacheName = 'pwa-cache-v1.0.31';
-console.log('sw js loaded 1.0.31');
+const cacheName = 'pwa-cache-v1.0.34';
+console.log('sw js loaded 1.0.34');
 const filesToCache = [
   '/',
   '/index.html',
