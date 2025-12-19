@@ -126,6 +126,7 @@
 
 /* زر الحساب في الأسفل */
 .accountBtn {
+	display: flex;
 	position: absolute;
 	bottom: 40px;
 	width: calc(100% - 40px);

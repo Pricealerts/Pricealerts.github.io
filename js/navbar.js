@@ -1,20 +1,18 @@
-let UserImage = "/imgs/web/apple-touch-icon.png";
+
+let UserImage =localStorage.base64Pctr || "/imgs/web/apple-touch-icon.png";
 let accont = "";
 
-let enteEsc = ` تسجبل الدخول
- <img src="/imgs/web/signin-svgrepo-com.svg" alt="">`;
-
+let enteEsc =	`<a  id="signOutOrInLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
+        			تسجبل الدخول
+ 					<img src="/imgs/web/signin-svgrepo-com.svg" alt="">
+				</a> `;
 
 if (localStorage.base64Pctr) {
-	UserImage = localStorage.base64Pctr;
-	enteEsc = ` تسجبل الخروج
- 				<img src="/imgs/web/signout-svgrepo-com.svg" alt="">`;
-
-	accont = `<a id="accountLink" class="accountBtn" href="https://pricealerts.web.app/accont"
-				style = "display: flex;">
+	enteEsc = ``;
+	accont = `<a id="accountLink" class="accountBtn" href="https://pricealerts.web.app/accont">
 				${localStorage.userName || "حسابي"}
 				<img src="${UserImage}" alt="img" style="width: auto">
-			</a>`;
+			 </a>`;
 }
 
 function exsit() {
@@ -25,8 +23,11 @@ function exsit() {
 }
 
 /* 
-width: auto;
-    height: 35px;
+
+<a  id="signOutOrInLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
+	تسجبل الخروج
+	<img src="/imgs/web/signout-svgrepo-com.svg" alt="">
+</a>
 */
 ///////////////////////////////////////////////////////////////
 
@@ -74,9 +75,12 @@ navbar.innerHTML = `
 
 		<!-- Navbar -->
 		<div class="navbar">
-			<img class="imgNavbar" src="${UserImage}" alt="">
-				<h1 class="hTitel">
-				منبه الأسعار </h1 >
+			<a href="https://pricealerts.web.app" style= "height: 100%; display: flex; align-items: center;">
+				<img class="imgNavbar" src="${UserImage}" alt="">
+			</a>
+			<h1 class="hTitel">
+				منبه الأسعار 
+			</h1 >
 			<div class="nav-title">
                 <button class="menu-btn" id="openSidebar">☰</button>
 			</div>
