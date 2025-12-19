@@ -125,7 +125,6 @@ async function updateUserData(user, isExist = true) {
 	window.location.href = drction;
 }
 
-
 async function setData(userRef, user) {
 	const infoUser = {
 		userEmail: user.email,
@@ -208,8 +207,7 @@ async function saveImage(source) {
 
 async function loadImageViaPost(fileId) {
 	try {
-		const proxyUrl =
-			"https://imageproxypost-wgqzo7cltq-ew.a.run.app";
+		const proxyUrl = "https://imageproxypost-wgqzo7cltq-ew.a.run.app";
 
 		const response = await fetch(proxyUrl, {
 			method: "POST",
@@ -219,8 +217,8 @@ async function loadImageViaPost(fileId) {
 				idImg: fileId,
 			}),
 		});
-		console.log('respons is :' + response);
-		
+		console.log("respons is :" + response);
+
 		if (!response.ok) {
 			throw new Error("فشل جلب الصورة");
 		}
@@ -272,6 +270,6 @@ function saveImageFromImg() {
 } 
 */
 
-console.log("hadi jdida 17");
+console.log("hadi jdida 18");
 
 export { auth };

@@ -79,19 +79,7 @@ body {
 	font-size: 18px;
 	user-select: none;
 }
-@media (max-width: 768px) {
-	.profile-container {
-		width: 100%;
-		margin: 0;
-		padding: 0;
-	}
-	.chatIds {
-		width: 93%;
-	}
-	.password-box .eye {
-		left: 15px;
-	}
-}
+
 .navbar {
 	padding: 0 16px;
 }
@@ -137,6 +125,7 @@ body {
 	align-items: center;
 	justify-content: space-between;
 	width: 330px;
+	max-width: 80%;
 	font-size: 30px;
 	background-color: #09877b;
 	padding: 15px;
@@ -171,7 +160,17 @@ body {
 	padding: 8px;
 	color: white;
 }
-
+@media (max-width: 768px) {
+	.profile-container {
+		width: 100%;
+	}
+	.chatIds {
+		width: 93%;
+	}
+	.password-box .eye {
+		left: 15px;
+	}
+}
 /* start pupab */
 
 #cntnr {
