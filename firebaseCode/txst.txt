@@ -27,7 +27,7 @@ gcloud config set project hostsite-80e14
 gcloud config set account raki.chai3i@gmail.com
 
 باش نبدل القبول 
- gcloud functions add-iam-policy-binding proxyRequest  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+ gcloud functions add-iam-policy-binding telegramWebhook  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
 
 
 
@@ -74,3 +74,17 @@ https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWe
 
 
 
+
+
+
+    
+    
+    
+  * 20.19.6 (Currently using 64-bit executable)
+    
+    
+
+
+
+
+    nvm uninstall 22.11.0

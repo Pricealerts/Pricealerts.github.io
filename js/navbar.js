@@ -59,9 +59,9 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا
 				<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
-			<a id="signOutOrInLink" style="cursor:pointer"  onclick = "exsit()">
+		
         		${enteEsc}
-			</a>
+			
 			${accont}
 `;
 

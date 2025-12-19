@@ -13,7 +13,6 @@
 	-webkit-tap-highlight-color: transparent;
 }
 body {
-	font-family: "Roboto", sans-serif; /* الخط المستخدم */
 	background-color: #f0f2f5; /* لون الخلفية الفاتح */
 	direction: rtl;
 }

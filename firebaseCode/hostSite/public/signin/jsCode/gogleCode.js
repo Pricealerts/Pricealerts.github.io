@@ -209,7 +209,7 @@ async function saveImage(source) {
 async function loadImageViaPost(fileId) {
 	try {
 		const proxyUrl =
-			"https://europe-west1-pricealert-31787.cloudfunctions.net/imageProxyPost";
+			"https://imageproxypost-wgqzo7cltq-ew.a.run.app";
 
 		const response = await fetch(proxyUrl, {
 			method: "POST",
@@ -272,6 +272,6 @@ function saveImageFromImg() {
 } 
 */
 
-console.log("hadi jdida 16");
+console.log("hadi jdida 17");
 
 export { auth };

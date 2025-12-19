@@ -1,12 +1,10 @@
 /* style.css */
 
-/* --- الخطوط الأساسية وإعادة التعيين --- */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
+
 
 
 
 body {
-    font-family: 'Cairo', sans-serif;
     background-color: #f0f2f5; /* لون خلفية فاتح */
     color: #333;
     line-height: 1.6;
@@ -18,10 +16,6 @@ body {
 
 /* --- الحاوية الرئيسية --- */
 .container {
-   /*   display: flex;
-    justify-content: center;
- align-items: flex-start;
-    min-height: 100vh; */
     background-color: #ffffff;
     padding: 30px;
     border-radius: 12px;
@@ -35,7 +29,6 @@ body {
 h1, h2 {
     color: #007bff; /* لون أزرق جذاب للعناوين */
     text-align: center;
-    /* margin-bottom: 25px; */
     font-weight: 700;
 }
 
@@ -346,18 +339,6 @@ button:active {
       width: 100%;
       z-index: 1; /* لضمان ظهورها فوق العناصر الأخرى */
     }
-    /* .dropdown-container::before{
-        content: "‹";
-        position: absolute;
-        width: 0px;
-        font-size: 25px;
-        top: 10px;
-        left: 12px;
-        bottom: 10px;
-        color: #000; 
-        transform: rotate(90deg);
-        z-index: 1;
-    } */
     .dropdown-container input {
         position: relative;
         background-color: transparent;
