@@ -24,12 +24,13 @@ async function sgnUp(userEmail, userPassword, userName, db) {
 				email: userEmail,
 				password: userPassword,
 				displayName: userName,
+				photoURL : "https://pricealerts.web.app/imgs/web/icon-512-maskable.png",
 			})
 			.then(async user => {
 				const infoUser = {
 					userEmail: user.email,
 					userName: user.displayName,
-					userPicture: "https://pricealerts.web.app/imgs/user-svgrepo-com.svg",
+					userPicture: "./imgs/web/icon-512-maskable.png",
 					chtId1: "",
 					chtId2: "",
 					chtId3: "",
@@ -46,19 +47,16 @@ async function sgnUp(userEmail, userPassword, userName, db) {
 						};
 					})
 					.catch(error => {
-						console.log("Error setDt user:", error);
 						throw error;
 					});
 				return rspnsDb;
 			})
 			.catch(error => {
-				console.log("Error creating new user:", error);
 				throw error;
 			});
 			
 			return rspns;
 	} catch (error) {
-		console.log("err sgnUp is : " + error);
 		return {
 			status: false,
 			message: error.message,

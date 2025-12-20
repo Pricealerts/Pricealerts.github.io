@@ -67,7 +67,7 @@ export const scheduledTask = onSchedule(
 		try {
 			await checkAndSendAlerts();
 		} catch (error) {
-			console.log("error " + error);
+		return error;
 		}
 	}
 );

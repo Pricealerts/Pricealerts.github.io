@@ -1,5 +1,5 @@
 //import { user } from "firebase-functions/v1/auth";
-import { chngePswrd, sgnUp, gtEmail } from "./ddauth.js";
+import { chngePswrd, sgnUp, gtEmail } from "./authnt.js";
 import nodemailer from "nodemailer";
 
 let db;
@@ -32,7 +32,6 @@ async function sndEmail(data, dtbs) {
 
 		return reponse;
 	} catch (err) {
-		console.log("err sndEmail is : " + err);
 
 		reponse = { status: "notSend is" + err };
 	}
@@ -61,7 +60,6 @@ async function overNmber(userEmail) {
 		}
 		return false;
 	} catch (error) {
-		console.log("error overNmber is : " + error);
 		return false;
 	}
 }
@@ -106,7 +104,6 @@ async function sendVerificationEmail(userEmail, data, action) {
 		}
 		return { status: "notsuccess" };
 	} catch (error) {
-		console.log("error sendVerificationEmail is : " + error);
 
 		return { status: "notsuccess" };
 	}
@@ -131,7 +128,6 @@ async function verifyCode(data) {
 						db
 					);
 					if (auSignUp.status) return {status: "success" };
-					console.log(auSignUp);
 				}
 				arow[4] = true;
 				respns = { status: "success" };
@@ -145,7 +141,6 @@ async function verifyCode(data) {
 		}
 		return respns;
 	} catch (error) {
-		console.log("verifyCode err : " + error);
 		return { status: "notExist" };
 	}
 }
@@ -167,7 +162,6 @@ async function updtPswd(data) {
 		}
 		return { status: "notSuccess" };
 	} catch (error) {
-		console.log(" error updtPsw is: " + error);
 
 		return { status: "notexsist", message: "not exist email" };
 	}
@@ -194,7 +188,6 @@ async function gtDb() {
 		}
 		return snapshot.val();
 	} catch (error) {
-		console.log("err gtDb :" + error);
 		return false;
 	}
 }
@@ -216,7 +209,6 @@ async function sndEmailToUser(bodySnd) {
 	const { userEmail, userName, code /* , text  */ } = bodySnd;
 
 	if (!userEmail) {
-		console.log("البريد الإلكتروني مطلوب");
 		return { status: "error", message: "البريد الإلكتروني مطلوب" };
 	}
 	const msgSend = `   

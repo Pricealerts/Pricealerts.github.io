@@ -135,6 +135,8 @@ gebi("newPswrd").addEventListener("submit", async e => {
 
 
 async function sgnIn(msgErr) {
+	gebi(msgErr).innerText = "جاري التسجيل...";
+	gebi(msgErr).style.color = "black";
 	try {
 		const userCredential = await signInWithEmailAndPassword(
 			auth,
@@ -156,7 +158,9 @@ async function sgnIn(msgErr) {
 			gebi(msgErr).style.color = "red";
 		}
 
-		console.log('err sgnIn is:', error.code, error.message);
+		console.log('err sgnIn is:');
+		console.log(error);
+		
 	}
 }
 

@@ -14,28 +14,16 @@ import {
 // ⭐ يجب أن يتم قبل استيراد أي ملف يستخدم الـ Admin SDK
 initializeApp();
 
-function acspt(req, res) {
-	const origin = req.headers.origin;
-	const allowedOrigins = [
-		"https://pricealerts.github.io",
-		"https://hostsite-80e14.web.app",
-		"https://pricealerts.web.app",
-		"http://127.0.0.1:4808",
-	];
-	if (allowedOrigins.includes(origin)) {
-		res.set("Access-Control-Allow-Origin", origin);
-	} else if (origin === undefined && req.body.orgn === "appsScriptDadi") {
-		res.set("Access-Control-Allow-Origin", "*");
-	} else {
-		return false;
-	}
-	res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-	res.set("Access-Control-Allow-Headers", "Content-Type");
-	return true;
-}
-
 export const proxyRequestV2 = onRequest(
-	{ region: "europe-west1" },
+	{
+		region: "europe-west1",
+		memory: "128MiB", // أقل ذاكرة
+		cpu: 1, // افتراضي (لا ترفعها)
+		maxInstances: 1, // Instance واحدة فقط
+		minInstances: 0, // لا تبقى شغالة
+		concurrency: 1, // طلب واحد فقط
+		timeoutSeconds: 15, // لا تنتظر كثيرًا
+	},
 	async (req, res) => {
 		// تعيين رؤوس CORS
 		const origin = req.headers.origin;
@@ -48,17 +36,18 @@ export const proxyRequestV2 = onRequest(
 		];
 		if (allowedOrigins.includes(origin)) {
 			res.set("Access-Control-Allow-Origin", origin);
-		} else if (origin === undefined && req.body.orgn === "appsScriptDadi") {
-			res.set("Access-Control-Allow-Origin", "*");
 		} else {
 			return res.status(403).send("Forbidden" + origin);
 		}
-		res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-		res.set("Access-Control-Allow-Headers", "Content-Type");
-		/* let acs = acspt(req, res) ;
-		if (!acs) {
-			 return res.status(403).send("Forbidden" + origin);
-		} */
+		// ⚠️ أخرج مباشرة لطلبات OPTIONS (CORS)
+		if (req.method === "OPTIONS") {
+			res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+			res.set("Access-Control-Allow-Headers", "Content-Type");
+			return res.status(204).send("");
+		}
+		if (req.method === "OPTIONS") {
+			return res.status(204).send("");
+		}
 
 		const action = req.method === "POST" ? req.body.action : req.query.action;
 		try {
@@ -106,13 +95,15 @@ export const proxyRequestV2 = onRequest(
 // ------------------------
 export const updateSymbolsWeekly = onSchedule(
 	{
-		schedule: "every 168 hours", // كل أسبوع
+		schedule: "every 168 hours",
 		region: "europe-west1",
+		memory: "128MiB",
+		cpu: 1,
+		maxInstances: 1,
+		timeoutSeconds: 60, // لا تتركها مفتوحة
 	},
 	async () => {
 		await getExchangeSymbols();
-
-		console.log("✔ تم تحديث رموز الأسهم الأسبوعية");
 	}
 );
 

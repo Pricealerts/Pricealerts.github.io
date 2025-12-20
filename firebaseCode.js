@@ -8,7 +8,7 @@ import {
 	onAuthStateChanged,
 	signInWithCredential,
 	signInWithEmailAndPassword,
-	updateProfile
+	updateProfile,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import {
 	getDatabase,
@@ -17,6 +17,12 @@ import {
 	set,
 	get,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+import {
+	getStorage,
+	uploadBytes,
+	getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
@@ -35,6 +41,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 const auth = getAuth(app);
+const storage = getStorage(app);
 //const provider = new GoogleAuthProvider();
 const apdtOrSet = { set: set, updt: update };
 function setUpdtData(storUp, rfrnce, user) {
@@ -58,11 +65,11 @@ function setUpdtData(storUp, rfrnce, user) {
 }
 
 // ---------------------------------------------------------
-        // 4. كود الإشعارات (Notification Logic) - الكود الذي سألت عنه
-        // ---------------------------------------------------------
-        
-        // يُفضل طلب الإذن أولاً
-      /*   function requestNotificationPermission() {
+// 4. كود الإشعارات (Notification Logic) - الكود الذي سألت عنه
+// ---------------------------------------------------------
+
+// يُفضل طلب الإذن أولاً
+/*   function requestNotificationPermission() {
             console.log('جاري طلب إذن الإشعارات...');
             Notification.requestPermission().then((permission) => {
                 if (permission === 'granted') {
@@ -95,14 +102,11 @@ function setUpdtData(storUp, rfrnce, user) {
 
  */
 
-
-
 export {
 	getAuth,
 	signInWithPopup,
 	signOut,
 	auth,
-	
 	setUpdtData,
 	onAuthStateChanged,
 	signInWithEmailAndPassword,
@@ -114,4 +118,8 @@ export {
 	update,
 	set,
 	get,
+	updateProfile,
+	storage,
+	uploadBytes,
+	getDownloadURL,
 };

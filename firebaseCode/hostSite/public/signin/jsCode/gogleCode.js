@@ -28,11 +28,7 @@ window.handleCredentialResponse = response => {
 		.then(async result => {
 			// يمكنك هنا الحصول على بيانات المستخدم (مثل الاسم والبريد الإلكتروني)
 			let user = result.user;
-			const imgUrl = user.photoURL;
-			const index = imgUrl.lastIndexOf("=") + 1;
-			const newImgUrl =
-				index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
-			user.photoURL = newImgUrl;
+
 			console.log("تم تسجيل الدخول بنجاح:", user);
 			// تحديث بيانات المستخدم في قاعدة البيانات
 			await updateUserData(user, false);
@@ -114,12 +110,23 @@ async function updateUserData(user, isExist = true) {
 			}
 		}
 	});
-	const srcImg = localStorage.userPicture;
-	if (srcImg == user.photoURL && !isExist) {
-		await saveImage(srcImg);
+
+	
+	let imgUrl = user.photoURL;
+	if (imgUrl == "https://pricealerts.web.app/imgs/web/icon-512-maskable.png") {
+		localStorage.setItem("base64Pctr", imgUrl);
 	} else {
-		await loadImageViaPost(srcImg);
+		let srcImg = localStorage.userPicture;
+		const index = imgUrl.lastIndexOf("=") + 1;
+		const newImgUrl =
+			index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
+		if (srcImg == newImgUrl) {
+			await saveImage(srcImg);
+		} else {// ki ydi image mn 3ndh
+			await loadImageViaPost(srcImg);
+		}
 	}
+
 	window.location.href = drction;
 }
 
@@ -196,7 +203,6 @@ async function saveImage(source) {
 
 			img.src = source; // ابدأ تحميل الصورة
 		});
-
 		// بعد تحميل الصورة وتحويلها إلى Base64، يمكنك حفظها في localStorage
 		localStorage.setItem("base64Pctr", base64);
 		console.log("تم حفظ الصورة بنجاح  في locale storg✔️");
@@ -208,7 +214,6 @@ async function saveImage(source) {
 async function loadImageViaPost(fileId) {
 	try {
 		const proxyUrl = "https://imageproxypost-wgqzo7cltq-ew.a.run.app";
-
 		const response = await fetch(proxyUrl, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
@@ -251,9 +256,8 @@ async function loadImageViaPost(fileId) {
 	}
 }
 
-/* 
-function saveImageFromImg() {
-	const img = document.getElementById("imgImemail");
+/* function saveImageFromImg() {
+	const img = document.getElementById("imgNavbar");
 	img.src = localStorage.userPicture;
 	const canvas = document.createElement("canvas");
 	const ctx = canvas.getContext("2d");
@@ -267,9 +271,8 @@ function saveImageFromImg() {
 	localStorage.setItem("base64Pctr", base64);
 
 	console.log("تم حفظ الصورة من الصفحة ✔️");
-} 
-*/
+} */
 
-console.log("hadi jdida 19");
+console.log("hadi jdida 26");
 
 export { auth };

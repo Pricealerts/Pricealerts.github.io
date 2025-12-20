@@ -1,8 +1,7 @@
 import { getDatabase } from "firebase-admin/database";
-import logger from "firebase-functions/logger";
 import axios from "axios";
 
-const TELEGRAM_BOT_TOKEN = "8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE";
+const TELEGRAM_BOT_TOKEN =  process.env.BOT_TOKEN;
 const chatIdAbdelhadi = "5399098591";
 let db;
 // ------------------------
@@ -32,7 +31,6 @@ async function getExchangeSymbols() {
 		for (let i = 0; i < rsltsPr.length; i++) {
 			if (rsltsPr[i].length > 5) {
 				result[exchanges[i]] = rsltsPr[i];
-				//console.log(`exchanges for ${exchanges[i]} is ${rsltsPr[i].length}`);
 			} else {
 				const messageText = `slam 3likm Abdelhadi ${exchanges[i]} rah khawi 3awd chofah `;
 				await sendTelegramMessage(chatIdAbdelhadi, messageText);
@@ -55,8 +53,7 @@ async function getExchangeSymbols() {
 		}
 		await Promise.all(promisesDb);
 	} catch (error) {
-		console.log(" error ");
-		console.log(error);
+		return 'حدث خطأ' + error;
 	}
 }
 
@@ -70,8 +67,7 @@ async function exchangeSymbols(exchange) {
 		if (!data) return [];
 		return data;
 	} catch (error) {
-		console.log("exchangeSymbols is ");
-		console.log(error);
+	return error
 	}
 }
 
@@ -133,7 +129,6 @@ async function stocksExchange(exchange) {
 		const data = snap.val();
 		return data;
 	} catch (error) {
-		console.log("حدث خطأ" + error);
 		return "حدث خطأ" + error;
 	}
 }
@@ -155,7 +150,7 @@ async function srchSmbls(querySmble) {
 			responseFnl.push(estCandle);
 		}
 	} catch (error) {
-		logger.error("Axios error:", error.message);
+		
 		return {
 			error: "Failed to fetch data1",
 			details: error.message,
@@ -167,9 +162,6 @@ async function srchSmbls(querySmble) {
 
 /////// nta3 message
 async function sendMesageFn(messageText) {
-	console.log('messageText is :');
-	console.log(messageText);
-	
 	
 	try {
 		const msag = `عبدالهادي جائتك رسالة من ${messageText.nameUser } 
@@ -180,7 +172,6 @@ async function sendMesageFn(messageText) {
 	await sendTelegramMessage(chatIdAbdelhadi, msag);
 	return{statusMsge : 'ok'}
 	} catch (error) {
-		console.log('lmssage mafatch : '+ error);
 		return{statusMsge : 'no'}
 		
 	}
@@ -190,7 +181,7 @@ async function sendMesageFn(messageText) {
 /////// nta3 telegram
 async function sendTelegramMessage(chatId, messageText) {
 	if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
-		console.error("TELEGRAM_BOT_TOKEN غير معرّف أو غير صالح في Apps Script.");
+	
 		return { success: false, error: "توكن بوت تيليجرام غير موجود." };
 	}
 	let rspns = {};

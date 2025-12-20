@@ -4,9 +4,18 @@ import {
 	db,
 	ref,
 	update,
+	updateProfile,
+	storage,
+	uploadBytes,
+	getDownloadURL,
 } from "https://pricealerts.github.io/firebaseCode.js";
 const WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
+
+
+
+
+
 
 let userId;
 onAuthStateChanged(auth, async user => {
@@ -64,7 +73,44 @@ gebi("formSave").addEventListener("submit", async e => {
 		chtId3: gebi("telegramChatId3")?.value || "",
 	};
 	
+
+
+
+
+
+
+
+
 	if (file) {
+		
+		// ===== تغيير الصورة من Base64 =====
+		
+		  const user = auth.currentUser;
+		  if (!user) return alert("يجب تسجيل الدخول");
+		
+		  const blob = base64ToBlob(file);
+		  const fileRef = ref(storage, `avatars/${user.uid}.jpg`);
+		
+		  // رفع الصورة
+		  await uploadBytes(fileRef, blob);
+		
+		  // جلب الرابط
+		  const photoURL = await getDownloadURL(fileRef);
+		
+		  // تحديث Firebase Auth
+		  await updateProfile(user, { photoURL });
+		
+		  // تحديث العرض
+		  //document.getElementById("avatar").src = photoURL;
+		
+		  console.log("تم تغيير الصورة بنجاح ✅");
+
+
+
+
+
+
+/* 
 		 let base64 = file.split(",")[1]; // 7ta file rah base64
 		const imgName = userId || new Date().getTime().toString();
 		// إرسال الصورة عبر fetch
@@ -86,9 +132,9 @@ gebi("formSave").addEventListener("submit", async e => {
 				gebi("rspns").innerText = "";
 			}, 15000);
 			return false;
-		}
-		bodySet.userPicture = result.fileId;
-		localStorage.base64Pctr = file;// machi base64
+		} */
+		bodySet.userPicture = photoURL;
+		localStorage.base64Pctr = file;//  base64
 	}
 
 	for (const key in bodySet) {
@@ -112,6 +158,21 @@ gebi("formSave").addEventListener("submit", async e => {
 });
 
 
+
+
+// ===== تحويل Base64 إلى Blob =====
+function base64ToBlob(base64) {
+  const parts = base64.split(",");
+  const mime = parts[0].match(/:(.*?);/)[1];
+  const binary = atob(parts[1]);
+  const array = [];
+
+  for (let i = 0; i < binary.length; i++) {
+	array.push(binary.charCodeAt(i));
+  }
+
+  return new Blob([new Uint8Array(array)], { type: mime });
+}
 
 /* 
 function toBase64(file) {
