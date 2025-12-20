@@ -39,9 +39,9 @@ const firebaseConfig = {
 	measurementId: "G-L693265WLN",
 };
 const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
 const auth = getAuth(app);
 const storage = getStorage(app);
+const db = getDatabase(app);
 //const provider = new GoogleAuthProvider();
 const apdtOrSet = { set: set, updt: update };
 function setUpdtData(storUp, rfrnce, user) {

@@ -111,23 +111,24 @@ async function updateUserData(user, isExist = true) {
 		}
 	});
 
-	
 	let imgUrl = user.photoURL;
 	if (imgUrl == "https://pricealerts.web.app/imgs/web/icon-512-maskable.png") {
 		localStorage.setItem("base64Pctr", imgUrl);
 	} else {
-		let srcImg = localStorage.userPicture;
-		const index = imgUrl.lastIndexOf("=") + 1;
-		const newImgUrl =
-			index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
-		if (srcImg == newImgUrl) {
+	//	let srcImg = localStorage.userPicture;
+		//const index = imgUrl.lastIndexOf("=") + 1;
+		//const newImgUrl = index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
+		console.log(imgUrl);
+
+		await saveImage(imgUrl);
+		/* if (srcImg == newImgUrl) {
 			await saveImage(srcImg);
 		} else {// ki ydi image mn 3ndh
 			await loadImageViaPost(srcImg);
-		}
+		} */
 	}
 
-	window.location.href = drction;
+	//window.location.href = drction;
 }
 
 async function setData(userRef, user) {
@@ -273,6 +274,6 @@ async function loadImageViaPost(fileId) {
 	console.log("تم حفظ الصورة من الصفحة ✔️");
 } */
 
-console.log("hadi jdida 26");
+console.log("hadi jdida 27");
 
 export { auth };

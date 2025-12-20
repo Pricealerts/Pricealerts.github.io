@@ -70,7 +70,6 @@ if (!userName || !userEmail || !userPassword) {
 ///////////// conferm code
 gebi("msgCnfrm").addEventListener("submit", async (e) => {
 	e.preventDefault();
-	console.log("ddd");
 	await adedUser();
 });
 async function adedUser() {

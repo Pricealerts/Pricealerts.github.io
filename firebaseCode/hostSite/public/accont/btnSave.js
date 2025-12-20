@@ -12,11 +12,6 @@ import {
 const WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
 
-
-
-
-
-
 let userId;
 onAuthStateChanged(auth, async user => {
 	if (user) {
@@ -72,45 +67,31 @@ gebi("formSave").addEventListener("submit", async e => {
 		chtId2: gebi("telegramChatId2")?.value || "",
 		chtId3: gebi("telegramChatId3")?.value || "",
 	};
-	
-
-
-
-
-
-
-
 
 	if (file) {
-		
 		// ===== تغيير الصورة من Base64 =====
-		
-		  const user = auth.currentUser;
-		  if (!user) return alert("يجب تسجيل الدخول");
-		
-		  const blob = base64ToBlob(file);
-		  const fileRef = ref(storage, `avatars/${user.uid}.jpg`);
-		
-		  // رفع الصورة
-		  await uploadBytes(fileRef, blob);
-		
-		  // جلب الرابط
-		  const photoURL = await getDownloadURL(fileRef);
-		
-		  // تحديث Firebase Auth
-		  await updateProfile(user, { photoURL });
-		
-		  // تحديث العرض
-		  //document.getElementById("avatar").src = photoURL;
-		
-		  console.log("تم تغيير الصورة بنجاح ✅");
 
+		const user = auth.currentUser;
+		if (!user) return alert("يجب تسجيل الدخول");
 
+		const blob = base64ToBlob(file);
+		const fileRef = ref(storage, `avatars/${user.uid}.jpg`);
 
+		// رفع الصورة
+		await uploadBytes(fileRef, blob);
 
+		// جلب الرابط
+		const photoURL = await getDownloadURL(fileRef);
 
+		// تحديث Firebase Auth
+		await updateProfile(user, { photoURL });
 
-/* 
+		// تحديث العرض
+		//document.getElementById("avatar").src = photoURL;
+
+		console.log("تم تغيير الصورة بنجاح ✅");
+
+		/* 
 		 let base64 = file.split(",")[1]; // 7ta file rah base64
 		const imgName = userId || new Date().getTime().toString();
 		// إرسال الصورة عبر fetch
@@ -134,7 +115,7 @@ gebi("formSave").addEventListener("submit", async e => {
 			return false;
 		} */
 		bodySet.userPicture = photoURL;
-		localStorage.base64Pctr = file;//  base64
+		localStorage.base64Pctr = file; //  base64
 	}
 
 	for (const key in bodySet) {
@@ -157,21 +138,18 @@ gebi("formSave").addEventListener("submit", async e => {
 	}
 });
 
-
-
-
 // ===== تحويل Base64 إلى Blob =====
 function base64ToBlob(base64) {
-  const parts = base64.split(",");
-  const mime = parts[0].match(/:(.*?);/)[1];
-  const binary = atob(parts[1]);
-  const array = [];
+	const parts = base64.split(",");
+	const mime = parts[0].match(/:(.*?);/)[1];
+	const binary = atob(parts[1]);
+	const array = [];
 
-  for (let i = 0; i < binary.length; i++) {
-	array.push(binary.charCodeAt(i));
-  }
+	for (let i = 0; i < binary.length; i++) {
+		array.push(binary.charCodeAt(i));
+	}
 
-  return new Blob([new Uint8Array(array)], { type: mime });
+	return new Blob([new Uint8Array(array)], { type: mime });
 }
 
 /* 
