@@ -15,12 +15,7 @@ if (localStorage.base64Pctr) {
 			 </a>`;
 }
 
-function exsit() {
-	if (localStorage.email) {
-		localStorage.removeItem("base64Pctr");
-	}
-	window.location.href = "https://pricealerts.web.app/signin";
-}
+
 
 /* 
 

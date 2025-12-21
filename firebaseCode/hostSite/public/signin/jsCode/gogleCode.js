@@ -131,7 +131,8 @@ async function updateUserData(user, isExist = true) {
 				index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
 
 			if (srcImg == "frbsStrg") {
-				await storgImg(user);
+				const imgBase64 = await storgImgBase64(user.uid);
+				localStorage.setItem("base64Pctr", imgBase64);
 			} else {
 				await gogleImg(newImgUrl);
 			}
@@ -223,51 +224,8 @@ async function gogleImg(source) {
 	}
 }
 
-async function loadImageViaPost(fileId) {
-	try {
-		const proxyUrl = "https://imageproxypost-wgqzo7cltq-ew.a.run.app";
-		const response = await fetch(proxyUrl, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({
-				action: "gtImage",
-				idImg: fileId,
-			}),
-		});
-		console.log("respons is :" + response);
 
-		if (!response.ok) {
-			throw new Error("فشل جلب الصورة");
-		}
-
-		const blob = await response.blob();
-
-		const img = new Image();
-		img.onload = () => {
-			const canvas = document.createElement("canvas");
-			const ctx = canvas.getContext("2d");
-
-			canvas.width = img.naturalWidth;
-			canvas.height = img.naturalHeight;
-
-			ctx.drawImage(img, 0, 0);
-
-			localStorage.setItem("base64Pctr", canvas.toDataURL("image/png"));
-
-			URL.revokeObjectURL(img.src);
-			console.log("تم حفظ الصورة بنجاح ✔️");
-		};
-
-		img.onerror = () => {
-			console.error("فشل تحميل الصورة داخل المتصفح");
-		};
-
-		img.src = URL.createObjectURL(blob);
-	} catch (err) {
-		console.error("خطأ:", err.message);
-	}
-}
-async function getAvatarBase64(userId) {
+async function storgImgBase64(userId) {
 	try {
 		// إنشاء المرجع للملف
 		const avatarRef = storageRef(storage, `avatars/${userId}`);
@@ -292,61 +250,8 @@ async function getAvatarBase64(userId) {
 	}
 }
 
-async function storgImg(user) {
-	if (!user) return;
 
-	const avatarRef = storageRef(storage, `avatars/${user.uid}`);
 
-	try {
-		// الحصول على رابط تحميل آمن من Firebase
-		const url = await getDownloadURL(avatarRef);
-
-		const img = document.getElementById("avatarImg");
-		img.crossOrigin = "anonymous"; // مهم لتجنب مشاكل canvas مع CORS
-		img.src = url;
-
-		img.onload = () => {
-			// إنشاء canvas بنفس حجم الصورة
-			const canvas = document.createElement("canvas");
-			canvas.width = img.width;
-			canvas.height = img.height;
-			const ctx = canvas.getContext("2d");
-			ctx.drawImage(img, 0, 0);
-
-			// تحويل الصورة إلى Base64
-			const base64 = canvas.toDataURL("image/png");
-			//console.log("Base64:", base64);
-
-			// حفظها في LocalStorage
-			localStorage.setItem("base64Pctr", base64);
-
-			// عرض الصورة على الصفحة إذا أحببت
-			const displayImg = document.createElement("img");
-			displayImg.src = base64;
-			document.body.appendChild(displayImg);
-		};
-	} catch (err) {
-		console.error("حدث خطأ في جلب الصورة:", err);
-	}
-}
-
-/* function gogleImgFromImg() {
-	const img = document.getElementById("imgNavbar");
-	img.src = localStorage.userPicture;
-	const canvas = document.createElement("canvas");
-	const ctx = canvas.getContext("2d");
-
-	canvas.width = img.naturalWidth;
-	canvas.height = img.naturalHeight;
-
-	ctx.drawImage(img, 0, 0);
-
-	const base64 = canvas.toDataURL("image/png"); // أو jpeg
-	localStorage.setItem("base64Pctr", base64);
-
-	console.log("تم حفظ الصورة من الصفحة ✔️");
-} */
-
-console.log("hadi jdida 35");
+console.log("hadi jdida 38");
 
 //export { auth };

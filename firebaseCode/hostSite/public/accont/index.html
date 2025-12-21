@@ -97,12 +97,13 @@
 					<div class="imgCv">
 						<img src="/imgs/camera-square-svgrepo-com.svg" alt="" />
 					</div>
-				</label>
-				<img
+					<img
 					id="uploadedImage"
 					src="/imgs/user-svgrepo-com.svg"
 					draggable="false"
 				/>
+				</label>
+				
 			</div>
 
 			<h1 id="userName" class="user-name" contenteditable="true"></h1>
@@ -151,8 +152,8 @@
 			<p id="rspns"></p>
 			<button id="saveBtn" type="submit" class="saveBtn">حفظ التغيرات</button>
 		</form>
-		<div id="signOutOrInLink" class="gtchIdMsg">
-			<a href="https://pricealerts.web.app/signin"> تسجبل الخروج</a>
+		<div id="signOutOrInLink" onclick="exitAccont()" class="gtchIdMsg">
+			تسجبل الخروج
 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="" />
 		</div>
 
@@ -160,6 +161,10 @@
 
 		<!-- front and script -->
 		<script>
+			function exitAccont() {
+				localStorage.clear();
+				window.location.href = "https://pricealerts.web.app/signin";
+			}
 			function gebi(el) {
 				return document.getElementById(el);
 			}

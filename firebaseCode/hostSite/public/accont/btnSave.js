@@ -19,12 +19,11 @@ onAuthStateChanged(auth, async user => {
 		userBr = user;
 		userId = user.uid;
 	} else {
-			window.location.href = "/signin";
+		window.location.href = "/signin";
 	}
 });
 
 async function updateUserData(bodySet) {
-	
 	const userRef = ref(db, "users/" + userId);
 	try {
 		await update(userRef, bodySet);
@@ -74,8 +73,6 @@ gebi("formSave").addEventListener("submit", async e => {
 	if (file) {
 		// ===== تغيير الصورة من Base64 =====
 
-
-		
 		if (!userBr) return alert("يجب تسجيل الدخول");
 
 		const blob = base64ToBlob(file);
@@ -95,15 +92,22 @@ gebi("formSave").addEventListener("submit", async e => {
 		//document.getElementById("avatar").src = photoURL;
 
 		console.log("تم تغيير الصورة بنجاح ✅");
-		bodySet.userPicture = 'frbsStrg';
+		bodySet.userPicture = "frbsStrg";
 		localStorage.base64Pctr = file; //  base64
 	}
-
+	let notChng = true;
 	for (const key in bodySet) {
-		localStorage[key] = bodySet[key];
+		if (localStorage[key] != bodySet[key]) {
+			localStorage[key] = bodySet[key];
+			notChng = false;
+		}
+	}
+	if(notChng && !file){
+			gebi("rspns").innerText = "لم تغير شيء لحفظه";
+	gebi("rspns").style.color = "black";
 	}
 	try {
-		bodySet.userPicturec= '';
+		bodySet.userPicturec = "";
 		const resUpdate = await updateUserData(bodySet);
 		if (resUpdate) {
 			gebi("rspns").innerText = "تم الحفظ بنجاح";
@@ -134,5 +138,4 @@ function base64ToBlob(base64) {
 	return new Blob([new Uint8Array(array)], { type: mime });
 }
 
-console.log('hadi jdida 4');
-
+console.log("hadi jdida 6");

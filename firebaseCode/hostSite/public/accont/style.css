@@ -25,7 +25,11 @@ body {
 	border-radius: calc(var(--border-radius-profile) * 1%);
 	object-fit: cover;
 	overflow: hidden;
-	background: linear-gradient(45deg, #1a3a6c, #4cc9f0);
+	background: linear-gradient(
+		45deg,
+		rgb(26 58 108 / 50%),
+		rgb(76 201 240 / 50%)
+	);
 	align-items: center;
 	justify-content: center;
 	color: white;
@@ -34,16 +38,24 @@ body {
 	position: relative;
 	margin-bottom: 10px;
 }
-.profile-photo img {
+.profile-photo #uploadedImage {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 1;
 	height: calc(var(--height-img) * 1%);
+	transition: opacity 0.3s ease;
 }
 .profile-photo:hover .imgCv {
-	display: flex;
-	flex-direction: column;
+	opacity: 0.8;
+}
+.profile-photo:hover #uploadedImage {
+	opacity: 0.2;
 }
 .imgCv {
 	position: absolute;
-	display: none;
+	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	border-radius: 50%;
@@ -51,20 +63,15 @@ body {
 	width: 100%;
 	top: 0;
 	left: 0;
-	z-index: 3;
+	z-index: 0;
 	cursor: pointer;
 	background-color: #0000009e;
+	opacity: 0;
 }
 .imgCv img {
 	height: 60px;
 }
-#errImg {
-	color: red;
-	display: none;
-	font-size: calc(var(--font-size) * 2px);
-	position: absolute;
-	text-align: center;
-}
+
 .password-box {
 	position: relative;
 	width: 100%;
@@ -132,6 +139,7 @@ body {
 	border-radius: 6px;
 	margin: auto;
 	margin-bottom: 30px;
+	color: white;
 }
 .gtchIdMsg a {
 	text-decoration: none;
