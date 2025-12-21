@@ -5,19 +5,23 @@ import {
 	ref,
 	update,
 	updateProfile,
-	storage,
+	storage,/* 
+	getStorage, */
+	storageRef,
 	uploadBytes,
 	getDownloadURL,
 } from "https://pricealerts.github.io/firebaseCode.js";
 const WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
-
+//const storage = getStorage(); 
 let userId;
+let userBr;
 onAuthStateChanged(auth, async user => {
 	if (user) {
+		userBr = user;
 		userId = user.uid;
 	} else {
-		//	window.location.href = "/signin";
+			window.location.href = "/signin";
 	}
 });
 
@@ -71,11 +75,13 @@ gebi("formSave").addEventListener("submit", async e => {
 	if (file) {
 		// ===== تغيير الصورة من Base64 =====
 
-		const user = auth.currentUser;
-		if (!user) return alert("يجب تسجيل الدخول");
+
+		
+		if (!userBr) return alert("يجب تسجيل الدخول");
 
 		const blob = base64ToBlob(file);
-		const fileRef = ref(storage, `avatars/${user.uid}.jpg`);
+
+		const fileRef = storageRef(storage, `avatars/${userBr.uid}`);
 
 		// رفع الصورة
 		await uploadBytes(fileRef, blob);
@@ -84,7 +90,7 @@ gebi("formSave").addEventListener("submit", async e => {
 		const photoURL = await getDownloadURL(fileRef);
 
 		// تحديث Firebase Auth
-		await updateProfile(user, { photoURL });
+		await updateProfile(userBr, { photoURL });
 
 		// تحديث العرض
 		//document.getElementById("avatar").src = photoURL;
@@ -166,3 +172,5 @@ function toBase64(file) {
 base64 = base64.replace(/^data:image\/(png|jpeg);base64,/, "");
 reader.result.split(",")[1]
  */
+console.log('hadi jdida 2');
+

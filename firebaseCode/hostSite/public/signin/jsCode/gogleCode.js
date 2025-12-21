@@ -128,7 +128,7 @@ async function updateUserData(user, isExist = true) {
 		} */
 	}
 
-	//window.location.href = drction;
+	window.location.href = drction;
 }
 
 async function setData(userRef, user) {
@@ -274,6 +274,6 @@ async function loadImageViaPost(fileId) {
 	console.log("تم حفظ الصورة من الصفحة ✔️");
 } */
 
-console.log("hadi jdida 27");
+console.log("hadi jdida 29");
 
-export { auth };
+//export { auth };

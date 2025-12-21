@@ -249,7 +249,6 @@ function crop() {
 
 	compress();
 }
-console.log('hadi jdida 7');
 
 /* function cmprsImg(imgSrc) {
 	const img = imgSrc;

@@ -22,10 +22,12 @@ import {
 	getStorage,
 	uploadBytes,
 	getDownloadURL,
+	ref as storageRef,
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
 const firebaseConfig = {
 	apiKey: "AIzaSyDIR4H7Jk3bJN_QZp-Cs4CbqpRmsKkUTxc",
@@ -120,6 +122,7 @@ export {
 	get,
 	updateProfile,
 	storage,
+	storageRef,
 	uploadBytes,
 	getDownloadURL,
 };
