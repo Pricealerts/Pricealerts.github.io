@@ -16,7 +16,7 @@ import {
 	update,
 	set,
 	get,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"; 
 
 import {
 	getStorage,
@@ -36,6 +36,7 @@ const firebaseConfig = {
 		"https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
 	projectId: "pricealert-31787",
 	storageBucket: "pricealert-31787.appspot.com",
+		//"pricealert-31787.firebasestorage.app",
 	messagingSenderId: "200237716010",
 	appId: "1:200237716010:web:65a9e33254d2302339a953",
 	measurementId: "G-L693265WLN",

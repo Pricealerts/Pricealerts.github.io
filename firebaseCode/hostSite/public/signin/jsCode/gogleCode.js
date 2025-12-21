@@ -11,7 +11,7 @@ import {
 	update,
 	set,
 	get,
-	/* jiht storag */
+	/* jiht storag */ 
 	getDownloadURL,
 	storageRef,
 	storage,
