@@ -2,15 +2,19 @@ import {
 	signOut,
 	auth,
 	onAuthStateChanged,
-	signInWithEmailAndPassword,
 	signInWithCredential,
 	GoogleAuthProvider,
+	signInWithEmailAndPassword,// rah f signin
 	/* jiht db */
 	db,
 	ref,
 	update,
 	set,
 	get,
+	/* jiht storag */
+	getDownloadURL,
+	storageRef,
+	storage,
 } from "https://pricealerts.github.io/firebaseCode.js";
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
@@ -115,12 +119,13 @@ async function updateUserData(user, isExist = true) {
 	if (imgUrl == "https://pricealerts.web.app/imgs/web/icon-512-maskable.png") {
 		localStorage.setItem("base64Pctr", imgUrl);
 	} else {
-	//	let srcImg = localStorage.userPicture;
+		//	let srcImg = localStorage.userPicture;
 		//const index = imgUrl.lastIndexOf("=") + 1;
 		//const newImgUrl = index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
 		console.log(imgUrl);
-
-		await saveImage(imgUrl);
+		const imgCont = await getAvatarBase64(user.uid)
+		localStorage.setItem("base64Pctr", imgCont);
+		//await saveImage(imgUrl);
 		/* if (srcImg == newImgUrl) {
 			await saveImage(srcImg);
 		} else {// ki ydi image mn 3ndh
@@ -128,7 +133,7 @@ async function updateUserData(user, isExist = true) {
 		} */
 	}
 
-	window.location.href = drction;
+	//window.location.href = drction;
 }
 
 async function setData(userRef, user) {
@@ -156,7 +161,7 @@ let isPrmrEntr = true;
 onAuthStateChanged(auth, async user => {
 	if (user && isPrmrEntr) {
 		gebi("imgNavbar").src = "/imgs/web/apple-touch-icon.png";
-		gebi("signOutLink").style.display = "none";
+		//gebi("signOutLink").style.display = "none";
 		console.log("User is signed in:", user);
 		await sgnOUt(user);
 	}
@@ -256,7 +261,30 @@ async function loadImageViaPost(fileId) {
 		console.error("خطأ:", err.message);
 	}
 }
+async function getAvatarBase64(userId) {
+  try {
+    // إنشاء المرجع للملف
+    const avatarRef = storageRef(storage, `avatars/${userId}`);
 
+    // جلب رابط التحميل
+    const url = await getDownloadURL(avatarRef);
+
+    // جلب الصورة كـ Blob
+    const response = await fetch(url);
+    const blob = await response.blob();
+
+    // تحويل Blob إلى Base64
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result); // النتيجة ستكون: "data:image/png;base64,..."
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("خطأ في جلب الصورة:", error);
+    return null;
+  }
+}
 /* function saveImageFromImg() {
 	const img = document.getElementById("imgNavbar");
 	img.src = localStorage.userPicture;
@@ -274,6 +302,6 @@ async function loadImageViaPost(fileId) {
 	console.log("تم حفظ الصورة من الصفحة ✔️");
 } */
 
-console.log("hadi jdida 29");
+console.log("hadi jdida 32");
 
 //export { auth };

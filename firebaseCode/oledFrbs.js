@@ -1,46 +1,51 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+import { auth, storage } from './firebaseCode.js';
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { ref as storageRef, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
-const firebaseConfig = {
-  apiKey: "XXX",
-  authDomain: "XXX",
-  projectId: "XXX",
-  storageBucket: "XXX.appspot.com",
-};
+async function getAvatarBase64(userId) {
+  try {
+    // المرجع للملف في Storage
+    const avatarRef = storageRef(storage, `avatars/${userId}`);
+    
+    // جلب رابط التحميل
+    const url = await getDownloadURL(avatarRef);
+    
+    // جلب الصورة كـ Blob
+    const response = await fetch(url);
+    const blob = await response.blob();
+    
+    // تحويل Blob إلى Base64
+    return await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => resolve(reader.result); // "data:image/png;base64,..."
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (error) {
+    console.error("خطأ في جلب الصورة:", error);
+    return null;
+  }
+}
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const storage = getStorage(app);
-
-onAuthStateChanged(auth, (user) => {
+// عند تسجيل الدخول
+onAuthStateChanged(auth, async user => {
   if (user) {
-    document.getElementById("avatar").src =
-      user.photoURL || "https://via.placeholder.com/120";
+    const base64Img = await getAvatarBase64(user.uid);
+    if (base64Img) {
+      console.log("Base64:", base64Img);
+
+      // عرض الصورة على الصفحة
+      const imgElement = document.getElementById("avatar");
+      imgElement.src = base64Img;
+
+      // حفظ الصورة في LocalStorage
+      localStorage.setItem("avatarBase64", base64Img);
+    }
+  } else {
+    console.log("لم يتم تسجيل الدخول");
   }
 });
 
+export { getAvatarBase64 };
 
 
-// ===== تغيير الصورة من Base64 =====
-async function updateAvatarFromBase64(base64Image) {
-  const user = auth.currentUser;
-  if (!user) return alert("يجب تسجيل الدخول");
-
-  const blob = base64ToBlob(base64Image);
-  const fileRef = ref(storage, `avatars/${user.uid}.jpg`);
-
-  // رفع الصورة
-  await uploadBytes(fileRef, blob);
-
-  // جلب الرابط
-  const photoURL = await getDownloadURL(fileRef);
-
-  // تحديث Firebase Auth
-  await updateProfile(user, { photoURL });
-
-  // تحديث العرض
-  document.getElementById("avatar").src = photoURL;
-
-  alert("تم تغيير الصورة بنجاح ✅");
-}

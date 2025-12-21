@@ -1,0 +1,7 @@
+[
+  {
+    "origin": ["https://pricealerts.web.app"],
+    "method": ["GET", "POST", "PUT", "DELETE"],
+    "maxAgeSeconds": 3600
+  }
+]

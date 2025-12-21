@@ -5,15 +5,13 @@ import {
 	ref,
 	update,
 	updateProfile,
-	storage,/* 
-	getStorage, */
+	storage,
 	storageRef,
 	uploadBytes,
 	getDownloadURL,
 } from "https://pricealerts.github.io/firebaseCode.js";
 const WEB_APP_URL =
 	"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
-//const storage = getStorage(); 
 let userId;
 let userBr;
 onAuthStateChanged(auth, async user => {
@@ -172,5 +170,5 @@ function toBase64(file) {
 base64 = base64.replace(/^data:image\/(png|jpeg);base64,/, "");
 reader.result.split(",")[1]
  */
-console.log('hadi jdida 2');
+console.log('hadi jdida 4');
 
