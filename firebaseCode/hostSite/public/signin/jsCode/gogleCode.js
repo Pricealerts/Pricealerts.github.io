@@ -4,14 +4,14 @@ import {
 	onAuthStateChanged,
 	signInWithCredential,
 	GoogleAuthProvider,
-	signInWithEmailAndPassword,// rah f signin
+	signInWithEmailAndPassword, // rah f signin
 	/* jiht db */
 	db,
 	ref,
 	update,
 	set,
 	get,
-	/* jiht storag */ 
+	/* jiht storag */
 	getDownloadURL,
 	storageRef,
 	storage,
@@ -34,6 +34,7 @@ window.handleCredentialResponse = response => {
 			let user = result.user;
 
 			console.log("تم تسجيل الدخول بنجاح:", user);
+
 			// تحديث بيانات المستخدم في قاعدة البيانات
 			await updateUserData(user, false);
 			// إخفاء الزر بعد النجاح (اختياري)
@@ -84,63 +85,68 @@ window.onload = function () {
 let iLoup = 0;
 async function updateUserData(user, isExist = true) {
 	iLoup++;
-	const userRef = ref(db, "users/" + user.uid);
-	await get(userRef).then(async snapshot => {
-		const snp = snapshot.exists();
-		if (snp) {
-			const { lastLogin, paid, status, ...restUsr } = snapshot.val();
-			for (const key in restUsr) {
-				localStorage[key] = restUsr[key];
-			}
+	try {
+		const userRef = ref(db, "users/" + user.uid);
+		await get(userRef).then(async snapshot => {
+			const snp = snapshot.exists();
+			if (snp) {
+				const { lastLogin, paid, status, ...restUsr } = snapshot.val();
+				for (const key in restUsr) {
+					localStorage[key] = restUsr[key];
+				}
 
-			await update(userRef, {
-				lastLogin: new Date().toISOString(),
-				status: "online",
-			}).then(() => {
-				console.log("تم التسجيل وتعديل البيانات ✔️");
-			});
-		} else {
-			if (isExist) {
-				setTimeout(async () => {
-					if (iLoup < 3) {
-						await updateUserData(user);
-						console.log("rah ydor : " + iLoup);
-					} else {
-						alert("حدث خطأ أعد المحاولة ✔️");
-					}
-				}, 2000);
+				await update(userRef, {
+					lastLogin: new Date().toISOString(),
+					status: "online",
+				}).then(() => {
+					console.log("تم التسجيل وتعديل البيانات ✔️");
+				});
 			} else {
-				await setData(userRef, user);
+				if (isExist) {
+					setTimeout(async () => {
+						if (iLoup < 3) {
+							await updateUserData(user);
+							console.log("rah ydor : " + iLoup);
+						} else {
+							alert("حدث خطأ أعد المحاولة ✔️");
+						}
+					}, 2000);
+				} else {
+					await setData(userRef, user);
+				}
+			}
+		});
+
+		let imgUrl = user.photoURL;
+		if (
+			imgUrl == "https://pricealerts.web.app/imgs/web/icon-512-maskable.png"
+		) {
+			localStorage.setItem("base64Pctr", imgUrl);
+		} else {
+			console.log("img url is : " + imgUrl);
+
+			let srcImg = localStorage.userPicture;
+			const index = imgUrl.lastIndexOf("=") + 1;
+			const newImgUrl =
+				index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
+
+			if (srcImg == "frbsStrg") {
+				await storgImg(user);
+			} else {
+				await gogleImg(newImgUrl);
 			}
 		}
-	});
-
-	let imgUrl = user.photoURL;
-	if (imgUrl == "https://pricealerts.web.app/imgs/web/icon-512-maskable.png") {
-		localStorage.setItem("base64Pctr", imgUrl);
-	} else {
-		//	let srcImg = localStorage.userPicture;
-		//const index = imgUrl.lastIndexOf("=") + 1;
-		//const newImgUrl = index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
-		console.log(imgUrl);
-		const imgCont = await gtImagedadi(user)
-		localStorage.setItem("base64Pctr", imgCont);
-		//await saveImage(imgUrl);
-		/* if (srcImg == newImgUrl) {
-			await saveImage(srcImg);
-		} else {// ki ydi image mn 3ndh
-			await loadImageViaPost(srcImg);
-		} */
+		window.location.href = drction;
+	} catch (error) {
+		console.log("error updateUserData is : " + error);
 	}
-
-	//window.location.href = drction;
 }
 
 async function setData(userRef, user) {
 	const infoUser = {
 		userEmail: user.email,
 		userName: user.displayName,
-		userPicture: user.photoURL,
+		userPicture: "noFrbsStrg",
 		chtId1: "",
 		chtId2: "",
 		chtId3: "",
@@ -186,7 +192,7 @@ async function sgnOUt(user) {
 		});
 }
 
-async function saveImage(source) {
+async function gogleImg(source) {
 	try {
 		const img = new Image();
 		img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
@@ -262,69 +268,69 @@ async function loadImageViaPost(fileId) {
 	}
 }
 async function getAvatarBase64(userId) {
-  try {
-    // إنشاء المرجع للملف
-    const avatarRef = storageRef(storage, `avatars/${userId}`);
+	try {
+		// إنشاء المرجع للملف
+		const avatarRef = storageRef(storage, `avatars/${userId}`);
 
-    // جلب رابط التحميل
-    const url = await getDownloadURL(avatarRef);
+		// جلب رابط التحميل
+		const url = await getDownloadURL(avatarRef);
 
-    // جلب الصورة كـ Blob
-    const response = await fetch(url);
-    const blob = await response.blob();
+		// جلب الصورة كـ Blob
+		const response = await fetch(url);
+		const blob = await response.blob();
 
-    // تحويل Blob إلى Base64
-    return await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result); // النتيجة ستكون: "data:image/png;base64,..."
-      reader.onerror = reject;
-      reader.readAsDataURL(blob);
-    });
-  } catch (error) {
-    console.error("خطأ في جلب الصورة:", error);
-    return null;
-  }
+		// تحويل Blob إلى Base64
+		return await new Promise((resolve, reject) => {
+			const reader = new FileReader();
+			reader.onloadend = () => resolve(reader.result); // النتيجة ستكون: "data:image/png;base64,..."
+			reader.onerror = reject;
+			reader.readAsDataURL(blob);
+		});
+	} catch (error) {
+		console.error("خطأ في جلب الصورة:", error);
+		return null;
+	}
 }
 
- async function gtImagedadi(user)  {
-  if (!user) return;
+async function storgImg(user) {
+	if (!user) return;
 
-  const avatarRef = storageRef(storage, `avatars/${user.uid}`);
+	const avatarRef = storageRef(storage, `avatars/${user.uid}`);
 
-  try {
-    // الحصول على رابط تحميل آمن من Firebase
-    const url = await getDownloadURL(avatarRef);
+	try {
+		// الحصول على رابط تحميل آمن من Firebase
+		const url = await getDownloadURL(avatarRef);
 
-    const img = document.getElementById("avatarImg");
-    img.crossOrigin = "anonymous"; // مهم لتجنب مشاكل canvas مع CORS
-    img.src = url;
+		const img = document.getElementById("avatarImg");
+		img.crossOrigin = "anonymous"; // مهم لتجنب مشاكل canvas مع CORS
+		img.src = url;
 
-    img.onload = () => {
-      // إنشاء canvas بنفس حجم الصورة
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width;
-      canvas.height = img.height;
-      const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0);
+		img.onload = () => {
+			// إنشاء canvas بنفس حجم الصورة
+			const canvas = document.createElement("canvas");
+			canvas.width = img.width;
+			canvas.height = img.height;
+			const ctx = canvas.getContext("2d");
+			ctx.drawImage(img, 0, 0);
 
-      // تحويل الصورة إلى Base64
-      const base64 = canvas.toDataURL("image/png");
-      console.log("Base64:", base64);
+			// تحويل الصورة إلى Base64
+			const base64 = canvas.toDataURL("image/png");
+			//console.log("Base64:", base64);
 
-      // حفظها في LocalStorage
-      localStorage.setItem("avatarBase64", base64);
+			// حفظها في LocalStorage
+			localStorage.setItem("base64Pctr", base64);
 
-      // عرض الصورة على الصفحة إذا أحببت
-      const displayImg = document.createElement("img");
-      displayImg.src = base64;
-      document.body.appendChild(displayImg);
-    };
-  } catch (err) {
-    console.error("حدث خطأ في جلب الصورة:", err);
-  }
-};
+			// عرض الصورة على الصفحة إذا أحببت
+			const displayImg = document.createElement("img");
+			displayImg.src = base64;
+			document.body.appendChild(displayImg);
+		};
+	} catch (err) {
+		console.error("حدث خطأ في جلب الصورة:", err);
+	}
+}
 
-/* function saveImageFromImg() {
+/* function gogleImgFromImg() {
 	const img = document.getElementById("imgNavbar");
 	img.src = localStorage.userPicture;
 	const canvas = document.createElement("canvas");
@@ -341,6 +347,6 @@ async function getAvatarBase64(userId) {
 	console.log("تم حفظ الصورة من الصفحة ✔️");
 } */
 
-console.log("hadi jdida 33");
+console.log("hadi jdida 35");
 
 //export { auth };

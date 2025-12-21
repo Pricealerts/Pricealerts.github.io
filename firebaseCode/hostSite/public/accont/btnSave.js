@@ -24,6 +24,7 @@ onAuthStateChanged(auth, async user => {
 });
 
 async function updateUserData(bodySet) {
+	
 	const userRef = ref(db, "users/" + userId);
 	try {
 		await update(userRef, bodySet);
@@ -94,31 +95,7 @@ gebi("formSave").addEventListener("submit", async e => {
 		//document.getElementById("avatar").src = photoURL;
 
 		console.log("تم تغيير الصورة بنجاح ✅");
-
-		/* 
-		 let base64 = file.split(",")[1]; // 7ta file rah base64
-		const imgName = userId || new Date().getTime().toString();
-		// إرسال الصورة عبر fetch
-		const response = await fetch(WEB_APP_URL, {
-			method: "POST",
-			body: JSON.stringify({
-				action: "postImg",
-				image: base64,
-				name: imgName,
-			}),
-		});
-
-		const result = await response.json();
-		console.log(result);
-		if (result.status != "success") {
-			gebi("rspns").innerText = "حدث خطأ في رفع الصورة أعد المحاولة";
-			gebi("rspns").style.color = "red";
-			setTimeout(() => {
-				gebi("rspns").innerText = "";
-			}, 15000);
-			return false;
-		} */
-		bodySet.userPicture = photoURL;
+		bodySet.userPicture = 'frbsStrg';
 		localStorage.base64Pctr = file; //  base64
 	}
 
@@ -126,6 +103,7 @@ gebi("formSave").addEventListener("submit", async e => {
 		localStorage[key] = bodySet[key];
 	}
 	try {
+		bodySet.userPicturec= '';
 		const resUpdate = await updateUserData(bodySet);
 		if (resUpdate) {
 			gebi("rspns").innerText = "تم الحفظ بنجاح";
@@ -156,19 +134,5 @@ function base64ToBlob(base64) {
 	return new Blob([new Uint8Array(array)], { type: mime });
 }
 
-/* 
-function toBase64(file) {
-	return new Promise((resolve, reject) => {
-		const reader = new FileReader();
-		reader.onload = () => resolve(reader.result.split(",")[1]);
-		reader.onerror = reject;
-		reader.readAsDataURL(file);
-	});
-}
-
-
-base64 = base64.replace(/^data:image\/(png|jpeg);base64,/, "");
-reader.result.split(",")[1]
- */
 console.log('hadi jdida 4');
 
