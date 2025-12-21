@@ -123,7 +123,7 @@ async function updateUserData(user, isExist = true) {
 		//const index = imgUrl.lastIndexOf("=") + 1;
 		//const newImgUrl = index !== -1 ? imgUrl.substring(0, index) + "s300-c" : imgUrl;
 		console.log(imgUrl);
-		const imgCont = await getAvatarBase64(user.uid)
+		const imgCont = await gtImagedadi(user)
 		localStorage.setItem("base64Pctr", imgCont);
 		//await saveImage(imgUrl);
 		/* if (srcImg == newImgUrl) {
@@ -285,6 +285,45 @@ async function getAvatarBase64(userId) {
     return null;
   }
 }
+
+ async function gtImagedadi(user)  {
+  if (!user) return;
+
+  const avatarRef = storageRef(storage, `avatars/${user.uid}`);
+
+  try {
+    // الحصول على رابط تحميل آمن من Firebase
+    const url = await getDownloadURL(avatarRef);
+
+    const img = document.getElementById("avatarImg");
+    img.crossOrigin = "anonymous"; // مهم لتجنب مشاكل canvas مع CORS
+    img.src = url;
+
+    img.onload = () => {
+      // إنشاء canvas بنفس حجم الصورة
+      const canvas = document.createElement("canvas");
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(img, 0, 0);
+
+      // تحويل الصورة إلى Base64
+      const base64 = canvas.toDataURL("image/png");
+      console.log("Base64:", base64);
+
+      // حفظها في LocalStorage
+      localStorage.setItem("avatarBase64", base64);
+
+      // عرض الصورة على الصفحة إذا أحببت
+      const displayImg = document.createElement("img");
+      displayImg.src = base64;
+      document.body.appendChild(displayImg);
+    };
+  } catch (err) {
+    console.error("حدث خطأ في جلب الصورة:", err);
+  }
+};
+
 /* function saveImageFromImg() {
 	const img = document.getElementById("imgNavbar");
 	img.src = localStorage.userPicture;
@@ -302,6 +341,6 @@ async function getAvatarBase64(userId) {
 	console.log("تم حفظ الصورة من الصفحة ✔️");
 } */
 
-console.log("hadi jdida 32");
+console.log("hadi jdida 33");
 
 //export { auth };

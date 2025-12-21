@@ -35,7 +35,8 @@ const firebaseConfig = {
 	databaseURL:
 		"https://pricealert-31787-default-rtdb.europe-west1.firebasedatabase.app",
 	projectId: "pricealert-31787",
-	storageBucket: "pricealert-31787.appspot.com",
+	storageBucket: "pricealert-31787.firebasestorage.app",
+	//"pricealert-31787.appspot.com",
 		//"pricealert-31787.firebasestorage.app",
 	messagingSenderId: "200237716010",
 	appId: "1:200237716010:web:65a9e33254d2302339a953",
