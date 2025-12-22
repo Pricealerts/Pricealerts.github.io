@@ -4,17 +4,32 @@ import {
 	db,
 	ref,
 	update,
+	signOut,
 	updateProfile,
 	storage,
 	storageRef,
 	uploadBytes,
 	getDownloadURL,
 } from "https://pricealerts.github.io/firebaseCode.js";
-const WEB_APP_URL =
-	"https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
+// const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
+gebi("sgnOutInLink").addEventListener("click", async () => {
+	await onAuthStateChanged(auth, async user => {
+		if (user) {
+			const userRef = ref(db, "users/" + user.uid);
+			await update(userRef, {
+				lastLogout: new Date().toISOString(),
+				status: "outline",
+			});
+			await signOut(auth);
+		}
+	});
+	localStorage.clear();
+	window.location.href = "/signin";
+});
+
 let userId;
 let userBr;
-onAuthStateChanged(auth, async user => {
+onAuthStateChanged(auth, user => {
 	if (user) {
 		userBr = user;
 		userId = user.uid;
@@ -102,9 +117,9 @@ gebi("formSave").addEventListener("submit", async e => {
 			notChng = false;
 		}
 	}
-	if(notChng && !file){
-			gebi("rspns").innerText = "لم تغير شيء لحفظه";
-	gebi("rspns").style.color = "black";
+	if (notChng && !file) {
+		gebi("rspns").innerText = "لم تغير شيء لحفظه";
+		gebi("rspns").style.color = "black";
 	}
 	try {
 		bodySet.userPicturec = "";
@@ -122,6 +137,7 @@ gebi("formSave").addEventListener("submit", async e => {
 		gebi("rspns").innerText = "حدث خطأ أعد المحاولة";
 		gebi("rspns").style.color = "red";
 	}
+	file = null;
 });
 
 // ===== تحويل Base64 إلى Blob =====

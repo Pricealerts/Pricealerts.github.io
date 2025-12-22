@@ -175,23 +175,7 @@ onAuthStateChanged(auth, async user => {
 	isPrmrEntr = false;
 });
 
-async function sgnOUt(user) {
-	const userRef = ref(db, "users/" + user.uid);
-	await update(userRef, {
-		lastLogout: new Date().toISOString(),
-		status: "outline",
-	}).then(() => {
-		console.log("تم  تعديل البيانات للخروج✔️");
-	});
-	await signOut(auth)
-		.then(async () => {
-			console.log("تم تسجيل الخروج بنجاح");
-			localStorage.clear();
-		})
-		.catch(error => {
-			console.error("خطأ في تسجيل الخروج:", error);
-		});
-}
+
 
 async function gogleImg(source) {
 	try {

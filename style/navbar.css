@@ -131,9 +131,8 @@ body {
 
 /* زر الحساب في الأسفل */
 .accountBtn {
-	display: flex;
 	position: absolute;
-	bottom: 40px;
+	bottom: 10px;
 	width: calc(100% - 40px);
 }
 
@@ -166,8 +165,5 @@ body {
 @media (max-width: 600px) {
 	.nav-title {
 		font-size: 18px;
-	}
-	.accountBtn {
-		bottom: 10px;
 	}
 }

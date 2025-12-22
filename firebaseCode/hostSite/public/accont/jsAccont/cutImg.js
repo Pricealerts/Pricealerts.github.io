@@ -221,8 +221,8 @@ function crop() {
 				// 🔹 تحويل إلى Base64
 				const reader = new FileReader();
 				reader.onloadend = function () {
-					 file = reader.result; // هنا الصورة النهائية بالصيغة Base64
-					console.log(file.length/1024, "حجم الأحرف");
+					file = reader.result; // هنا الصورة النهائية بالصيغة Base64
+					console.log(file.length / 1024, "حجم الأحرف");
 				};
 				reader.readAsDataURL(bestBlob);
 			}

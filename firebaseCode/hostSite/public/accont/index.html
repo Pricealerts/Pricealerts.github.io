@@ -152,7 +152,7 @@
 			<p id="rspns"></p>
 			<button id="saveBtn" type="submit" class="saveBtn">حفظ التغيرات</button>
 		</form>
-		<div id="signOutOrInLink" onclick="exitAccont()" class="gtchIdMsg">
+		<div id="sgnOutInLink"  class="exsitAcoont">
 			تسجبل الخروج
 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="" />
 		</div>
@@ -161,10 +161,7 @@
 
 		<!-- front and script -->
 		<script>
-			function exitAccont() {
-				localStorage.clear();
-				window.location.href = "https://pricealerts.web.app/signin";
-			}
+			
 			function gebi(el) {
 				return document.getElementById(el);
 			}
@@ -180,8 +177,8 @@
 			}
 		</script>
 		<!-- btn save -->
-		<script type="module" src="./btnSave.js"></script>
-		<script src="./cutImg.js"></script>
+		<script type="module" src="./jsAccont/btnSave.js"></script>
+		<script src="./jsAccont/cutImg.js"></script>
 		<!-- save image and togglePwd -->
 		<script>
 			/* function saveImage(source) {
