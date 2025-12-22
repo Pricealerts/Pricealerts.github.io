@@ -163,11 +163,12 @@ body {
 }
 .saveBtn {
 	font-size: 20px;
-	background: #007bff;
+	background: #444;
 	border: none;
 	border-radius: 5px;
 	padding: 8px;
 	color: white;
+	cursor: not-allowed;
 }
 @media (max-width: 768px) {
 	.profile-container {

@@ -93,20 +93,19 @@
 		<form id="formSave" class="profile-container" action="#">
 			<div class="profile-photo">
 				<label for="qdfd" id="drop-area">
-					<input type="file" accept="image/*" id="input-file" hidden />
+					<input id="input-file" class="inptSave" type="file" accept="image/*"  hidden />
 					<div class="imgCv">
 						<img src="/imgs/camera-square-svgrepo-com.svg" alt="" />
 					</div>
 					<img
-					id="uploadedImage"
-					src="/imgs/user-svgrepo-com.svg"
-					draggable="false"
-				/>
+						id="uploadedImage"
+						src="/imgs/user-svgrepo-com.svg"
+						draggable="false"
+					/>
 				</label>
-				
 			</div>
 
-			<h1 id="userName" class="user-name" contenteditable="true"></h1>
+			<h1 id="userName" class="user-name inptSave"  contenteditable="true"></h1>
 
 			<p id="uesrEmail" class="user-email"></p>
 
@@ -130,6 +129,7 @@
 				<input
 					type="text"
 					id="telegramChatId1"
+					class="inptSave"
 					placeholder="أدخل معرّف دردشة تيليجرام"
 				/>
 				<br /><br />
@@ -138,6 +138,7 @@
 				<input
 					type="text"
 					id="telegramChatId2"
+					class="inptSave"
 					placeholder="أدخل معرّف دردشة تيليجرام"
 				/>
 				<br /><br />
@@ -146,13 +147,14 @@
 				<input
 					type="text"
 					id="telegramChatId3"
+					class="inptSave"
 					placeholder="أدخل معرّف دردشة تيليجرام"
 				/>
 			</div>
 			<p id="rspns"></p>
 			<button id="saveBtn" type="submit" class="saveBtn">حفظ التغيرات</button>
 		</form>
-		<div id="sgnOutInLink"  class="exsitAcoont">
+		<div id="sgnOutInLink" class="exsitAcoont">
 			تسجبل الخروج
 			<img src="/imgs/web/signout-svgrepo-com.svg" alt="" />
 		</div>
@@ -161,7 +163,6 @@
 
 		<!-- front and script -->
 		<script>
-			
 			function gebi(el) {
 				return document.getElementById(el);
 			}
@@ -180,8 +181,8 @@
 		<script type="module" src="./jsAccont/btnSave.js"></script>
 		<script src="./jsAccont/cutImg.js"></script>
 		<!-- save image and togglePwd -->
-		<script>
-			/* function saveImage(source) {
+		<!-- <script>
+				function saveImage(source) {
 				const img = new Image();
 				img.crossOrigin = "anonymous"; // مهم لو الصورة من رابط خارجي
 				img.onload = function () {
@@ -194,9 +195,7 @@
 					localStorage.setItem("base64Pctr", base64);
 					console.log("تم حفظ الصورة بنجاح ✔️");
 				};
-				img.onerror = function () {
-					console.error("فشل تحميل الصورة");
-				};
+				img.onerror = function () { console.error("فشل تحميل الصورة"); };
 				img.src = source;
 			}
 			function togglePwd(toggle, id) {
@@ -209,7 +208,7 @@
 					password.type = "password"; // إخفاء
 					toggle.innerHTML = '<i class="fa-solid fa-eye"></i>'; // إعادة الأيقونة
 				}
-			} */
-		</script>
+			} 
+		</script> -->
 	</body>
 </html>

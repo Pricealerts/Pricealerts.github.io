@@ -94,7 +94,6 @@ async function updateUserData(user, isExist = true) {
 				for (const key in restUsr) {
 					localStorage[key] = restUsr[key];
 				}
-
 				await update(userRef, {
 					lastLogin: new Date().toISOString(),
 					status: "online",
@@ -124,7 +123,6 @@ async function updateUserData(user, isExist = true) {
 			localStorage.setItem("base64Pctr", imgUrl);
 		} else {
 			console.log("img url is : " + imgUrl);
-
 			let srcImg = localStorage.userPicture;
 			const index = imgUrl.lastIndexOf("=") + 1;
 			const newImgUrl =
@@ -167,10 +165,7 @@ async function setData(userRef, user) {
 let isPrmrEntr = true;
 onAuthStateChanged(auth, async user => {
 	if (user && isPrmrEntr) {
-		gebi("imgNavbar").src = "/imgs/web/apple-touch-icon.png";
-		//gebi("signOutLink").style.display = "none";
 		console.log("User is signed in:", user);
-		await sgnOUt(user);
 	}
 	isPrmrEntr = false;
 });
@@ -202,7 +197,7 @@ async function gogleImg(source) {
 		});
 		// بعد تحميل الصورة وتحويلها إلى Base64، يمكنك حفظها في localStorage
 		localStorage.setItem("base64Pctr", base64);
-		console.log("تم حفظ الصورة بنجاح  في locale storg✔️");
+		console.log("تم حفظ الصورة بنجاح  في locale storg ✔️");
 	} catch (error) {
 		console.error(error); // التعامل مع الأخطاء في حالة فشل تحميل الصورة
 	}

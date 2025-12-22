@@ -22,13 +22,18 @@ gebi("sgnOutInLink").addEventListener("click", async () => {
 			});
 			await signOut(auth);
 		}
+		localStorage.clear();
+		window.location.href = "/signin";
 	});
-	localStorage.clear();
-	window.location.href = "/signin";
+});
+slctAll(".inptSave").forEach(el => {
+	el.addEventListener("change", () => {
+		gebi("saveBtn").style.backgroundColor = "#007bff";
+		gebi("saveBtn").style.cursor = "pointer";
+	});
 });
 
-let userId;
-let userBr;
+let userId, userBr;
 onAuthStateChanged(auth, user => {
 	if (user) {
 		userBr = user;
@@ -84,28 +89,19 @@ gebi("formSave").addEventListener("submit", async e => {
 		chtId2: gebi("telegramChatId2")?.value || "",
 		chtId3: gebi("telegramChatId3")?.value || "",
 	};
-
 	if (file) {
 		// ===== تغيير الصورة من Base64 =====
-
 		if (!userBr) return alert("يجب تسجيل الدخول");
-
 		const blob = base64ToBlob(file);
-
 		const fileRef = storageRef(storage, `avatars/${userBr.uid}`);
-
 		// رفع الصورة
 		await uploadBytes(fileRef, blob);
-
 		// جلب الرابط
 		const photoURL = await getDownloadURL(fileRef);
-
 		// تحديث Firebase Auth
 		await updateProfile(userBr, { photoURL });
-
 		// تحديث العرض
 		//document.getElementById("avatar").src = photoURL;
-
 		console.log("تم تغيير الصورة بنجاح ✅");
 		bodySet.userPicture = "frbsStrg";
 		localStorage.base64Pctr = file; //  base64
@@ -129,7 +125,7 @@ gebi("formSave").addEventListener("submit", async e => {
 			gebi("rspns").style.color = "green";
 			setTimeout(() => {
 				gebi("rspns").innerText = "";
-				//window.location.href = "https://pricealerts.web.app";
+				window.location.href = "https://pricealerts.web.app";
 			}, 3000);
 		}
 	} catch (error) {

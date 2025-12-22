@@ -95,7 +95,7 @@ export const proxyRequestV2 = onRequest(
 // ------------------------
 export const updateSymbolsWeekly = onSchedule(
 	{
-		schedule: "every 168 hours",
+		schedule: "every 720 hours",
 		region: "europe-west1",
 		memory: "128MiB",
 		cpu: 1,
