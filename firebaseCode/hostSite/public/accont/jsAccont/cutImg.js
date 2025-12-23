@@ -48,6 +48,8 @@ gebi("input-file").addEventListener("change", async e => {
 	if (!file) {
 		return;
 	}
+	
+	vrfInpt(gebi("input-file"))
 	const reader = new FileReader();
 	/* reader.onload = () => {
 			image.src = reader.result;

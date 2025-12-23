@@ -26,12 +26,20 @@ gebi("sgnOutInLink").addEventListener("click", async () => {
 		window.location.href = "/signin";
 	});
 });
-slctAll(".inptSave").forEach(el => {
-	el.addEventListener("change", () => {
-		gebi("saveBtn").style.backgroundColor = "#007bff";
-		gebi("saveBtn").style.cursor = "pointer";
+
+function vrfInpt(el) {
+	el.addEventListener("keydown", () => {
+		if (el.value.length > 0) {
+			gebi("saveBtn").style.backgroundColor = "#007bff";
+			gebi("saveBtn").style.cursor = "pointer";
+		} else {
+			gebi("saveBtn").style.backgroundColor = "#444";
+			gebi("saveBtn").style.cursor = "not-allowed";
+		}
 	});
-});
+}
+
+slctAll(".inptSave").forEach(el => vrfInpt(el));
 
 let userId, userBr;
 onAuthStateChanged(auth, user => {
@@ -150,4 +158,4 @@ function base64ToBlob(base64) {
 	return new Blob([new Uint8Array(array)], { type: mime });
 }
 
-console.log("hadi jdida 6");
+console.log("hadi jdida 7");

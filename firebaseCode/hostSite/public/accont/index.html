@@ -93,7 +93,13 @@
 		<form id="formSave" class="profile-container" action="#">
 			<div class="profile-photo">
 				<label for="qdfd" id="drop-area">
-					<input id="input-file" class="inptSave" type="file" accept="image/*"  hidden />
+					<input
+						id="input-file"
+						class="inptSave"
+						type="file"
+						accept="image/*"
+						hidden
+					/>
 					<div class="imgCv">
 						<img src="/imgs/camera-square-svgrepo-com.svg" alt="" />
 					</div>
@@ -105,7 +111,7 @@
 				</label>
 			</div>
 
-			<h1 id="userName" class="user-name inptSave"  contenteditable="true"></h1>
+			<h1 id="userName" class="user-name inptSave" contenteditable="true"></h1>
 
 			<p id="uesrEmail" class="user-email"></p>
 
@@ -166,16 +172,12 @@
 			function gebi(el) {
 				return document.getElementById(el);
 			}
-			startpage();
-			function startpage() {
-				gebi("uploadedImage").src =
-					UserImage || "/imgs/web/apple-touch-icon.png";
-				gebi("userName").innerText = localStorage.userName || "إسمك";
-				gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
-				gebi("telegramChatId1").value = localStorage.chtId1 || "";
-				gebi("telegramChatId2").value = localStorage.chtId2 || "";
-				gebi("telegramChatId3").value = localStorage.chtId3 || "";
-			}
+			gebi("uploadedImage").src = UserImage || "/imgs/web/apple-touch-icon.png";
+			gebi("userName").innerText = localStorage.userName || "إسمك";
+			gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
+			gebi("telegramChatId1").value = localStorage.chtId1 || "";
+			gebi("telegramChatId2").value = localStorage.chtId2 || "";
+			gebi("telegramChatId3").value = localStorage.chtId3 || "";
 		</script>
 		<!-- btn save -->
 		<script type="module" src="./jsAccont/btnSave.js"></script>
