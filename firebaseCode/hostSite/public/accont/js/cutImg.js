@@ -48,8 +48,8 @@ gebi("input-file").addEventListener("change", async e => {
 	if (!file) {
 		return;
 	}
-	
-	vrfInpt(gebi("input-file"))
+
+	//vrfInpt(gebi("input-file"));
 	const reader = new FileReader();
 	/* reader.onload = () => {
 			image.src = reader.result;
@@ -57,33 +57,27 @@ gebi("input-file").addEventListener("change", async e => {
 
 	gebi("cntnr").style.display = "block";
 	gebi("divplac").classList.add("opPlc");
-	circle.classList.add("trnsCrcl");
 
 	reader.onload = function (e) {
 		image.src = e.target.result; // تعيين الصورة إلى العنصر img
-
 		// عند تحميل الصورة، نحصل على أبعادها
 		image.onload = function () {
 			const width = image.width;
 			const height = image.height;
 			const srclFinl = width > height ? height / 2 : width / 2;
-			// const gjgd = typeOf height
 			const nrmlNmbr = srclFinl.toFixed(0);
-
-			gebi("cropCircle").style.width = nrmlNmbr + "px";
-			gebi("cropCircle").style.height = nrmlNmbr + "px";
-
-			const mydv = width + " " + height + "  " + nrmlNmbr;
-			console.log(mydv);
-			//heightElement.textContent = height;
-
+			const top = (height - nrmlNmbr) / 2;
+			setTimeout(() => {
+				gebi("cropCircle").style.top = top + "px";
+				gebi("cropCircle").style.left = `calc(50% - ${nrmlNmbr / 2}px)`;
+				gebi("cropCircle").style.width = nrmlNmbr + "px";
+				gebi("cropCircle").style.height = nrmlNmbr + "px";
+			}, 100);
 			// إظهار الصورة بعد تحميلها
 			image.hidden = false;
 		};
 	};
 	reader.readAsDataURL(file);
-	/* imgUrlSrc = URL.createObjectURL(file);
-		gebi("uploadedImage").src = imgUrlSrc; */
 });
 
 // -------- أدوات مساعدة --------
@@ -161,7 +155,118 @@ circle.addEventListener("touchend", () => {
 	dragging = false;
 	startDist = null;
 });
+gebi("btnCrop").addEventListener("click", crop);
+// -------- القص --------
+/* function crop() {
+	const rect = circle.getBoundingClientRect();
+	const imgRect = image.getBoundingClientRect();
 
+	const scaleX = image.naturalWidth / image.width;
+
+	const srcSize = rect.width * scaleX;
+	const srcX = (rect.left - imgRect.left) * scaleX;
+	const srcY = (rect.top - imgRect.top) * scaleX;
+
+	// حجم الإخراج النهائي
+	const OUTPUT_SIZE = 700;
+
+	canvas.width = OUTPUT_SIZE;
+	canvas.height = OUTPUT_SIZE;
+
+	ctx.clearRect(0, 0, OUTPUT_SIZE, OUTPUT_SIZE);
+
+	// قص دائري
+	ctx.save();
+	ctx.beginPath();
+	ctx.arc(OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, OUTPUT_SIZE / 2, 0, Math.PI * 2);
+	ctx.clip();
+
+	ctx.drawImage(
+		image,
+		srcX,
+		srcY,
+		srcSize,
+		srcSize,
+		0,
+		0,
+		OUTPUT_SIZE,
+		OUTPUT_SIZE
+	);
+
+	ctx.restore();
+
+	// ===============================
+	//   ضغط الصورة ≈ 100KB بأعلى جودة
+	//================================ 
+
+	const TARGET_KB = 100;
+	const MIN_QUALITY = 0.4;
+	const MAX_QUALITY = 0.95;
+	const TOLERANCE = 1;
+
+	let minQ = MIN_QUALITY;
+	let maxQ = MAX_QUALITY;
+	let bestBlob = null;
+
+	function compress() {
+        	// ✅ لا ضغط إذا كانت ≤ 100KB
+		if (originalSizeKB <= TARGET_KB) {
+			console.log("بدون ضغط:", Math.round(originalSizeKB), "KB");
+
+			const url = URL.createObjectURL(originalBlob);
+			gebi("base64Pctr").src = url;
+
+			const reader = new FileReader();
+			reader.onloadend = function () {
+				file = reader.result;
+			};
+			reader.readAsDataURL(originalBlob);
+
+			gebi("saveBtn").style.backgroundColor = "#007bff";
+			gebi("saveBtn").style.cursor = "pointer";
+			return;
+		}
+		if (maxQ - minQ < 0.005) {
+			if (bestBlob) {
+				const url = URL.createObjectURL(bestBlob);
+				gebi("base64Pctr").src = url;
+				console.log("الحجم النهائي:", Math.round(bestBlob.size / 1024), "KB");
+				gebi("saveBtn").style.backgroundColor = "#007bff";
+				gebi("saveBtn").style.cursor = "pointer";
+				// 🔹 تحويل إلى Base64
+				const reader = new FileReader();
+				reader.onloadend = function () {
+					file = reader.result; // هنا الصورة النهائية بالصيغة Base64
+					console.log(file.length / 1024, "حجم الأحرف");
+				};
+				reader.readAsDataURL(bestBlob);
+			}
+			return;
+		}
+      
+		const q = (minQ + maxQ) / 2;
+		canvas.toBlob(
+			blob => {
+				const sizeKB = blob.size / 1024;
+
+				if (sizeKB > TARGET_KB + TOLERANCE) {
+					maxQ = q;
+				} else {
+					minQ = q;
+					bestBlob = blob;
+                      console.log("الحجم الأول:", Math.round(bestBlob.size / 1024), "KB");
+				}
+
+				compress();
+			},
+			"image/jpeg",
+			q
+		);
+	}
+
+	compress();
+}
+ */
 // -------- القص --------
 function crop() {
 	const rect = circle.getBoundingClientRect();
@@ -202,7 +307,7 @@ function crop() {
 	ctx.restore();
 
 	/* ===============================
-	   ضغط الصورة ≈ 100KB بأعلى جودة
+	   ضغط الصورة ≈ 100KB عند الحاجة
 	================================ */
 
 	const TARGET_KB = 100;
@@ -214,83 +319,65 @@ function crop() {
 	let maxQ = MAX_QUALITY;
 	let bestBlob = null;
 
-	function compress() {
-		if (maxQ - minQ < 0.005) {
-			if (bestBlob) {
-				const url = URL.createObjectURL(bestBlob);
-				document.getElementById("uploadedImage").src = url;
-				console.log("الحجم النهائي:", Math.round(bestBlob.size / 1024), "KB");
-				// 🔹 تحويل إلى Base64
-				const reader = new FileReader();
-				reader.onloadend = function () {
-					file = reader.result; // هنا الصورة النهائية بالصيغة Base64
-					console.log(file.length / 1024, "حجم الأحرف");
-				};
-				reader.readAsDataURL(bestBlob);
+	// 🔹 نبدأ بتحويل عادي لمعرفة الحجم
+	canvas.toBlob(
+		originalBlob => {
+			const originalSizeKB = originalBlob.size / 1024;
+
+			// ✅ لا ضغط إذا كانت ≤ 100KB
+			if (originalSizeKB <= TARGET_KB) {
+				finchRslt(originalBlob);
+				console.log("بدون ضغط:", Math.round(originalSizeKB), "KB");
+				return;
 			}
-			return;
-		}
-		const q = (minQ + maxQ) / 2;
-		canvas.toBlob(
-			blob => {
-				const sizeKB = blob.size / 1024;
 
-				if (sizeKB > TARGET_KB + TOLERANCE) {
-					maxQ = q;
-				} else {
-					minQ = q;
-					bestBlob = blob;
+			// ❌ أكبر من 100KB → نبدأ الضغط
+			function compress() {
+				if (maxQ - minQ < 0.005) {
+					if (bestBlob) {
+						finchRslt(bestBlob);
+						console.log(
+							"الحجم النهائي:",
+							Math.round(bestBlob.size / 1024),
+							"KB"
+						);
+					}
+					return;
 				}
+				const q = (minQ + maxQ) / 2;
+				canvas.toBlob(
+					blob => {
+						const sizeKB = blob.size / 1024;
+						if (sizeKB > TARGET_KB + TOLERANCE) {
+							maxQ = q;
+						} else {
+							minQ = q;
+							bestBlob = blob;
+							console.log("محاولة:", Math.round(sizeKB), "KB");
+						}
 
-				compress();
-			},
-			"image/jpeg",
-			q
-		);
+						compress();
+					},
+					"image/jpeg",
+					q
+				);
+			}
+
+			compress();
+		},
+		"image/jpeg",
+		MAX_QUALITY
+	);
+
+	function finchRslt(bestBlob) {
+		const url = URL.createObjectURL(bestBlob);
+		gebi("base64Pctr").src = url;
+		const reader = new FileReader();
+		reader.onloadend = function () {
+			file = reader.result;
+		};
+		reader.readAsDataURL(bestBlob);
+		gebi("saveBtn").style.backgroundColor = "#007bff";
+		gebi("saveBtn").style.cursor = "pointer";
 	}
-
-	compress();
 }
-
-/* function cmprsImg(imgSrc) {
-	const img = imgSrc;
-	if (!img.complete) {
-		alert("الصورة لم تُحمّل بعد");
-		return;
-	}
-
-	const canvas = document.createElement("canvas");
-	const ctx = canvas.getContext("2d");
-
-	// 1️⃣ تصغير الأبعاد
-	const MAX_WIDTH = 1200;
-	let width = img.naturalWidth;
-	let height = img.naturalHeight;
-
-	if (width > MAX_WIDTH) {
-		height = height * (MAX_WIDTH / width);
-		width = MAX_WIDTH;
-	}
-
-	canvas.width = width;
-	canvas.height = height;
-	ctx.drawImage(img, 0, 0, width, height);
-
-	//  تحويل إلى Base64 مع ضغط
-	let quality = 0.9;
-	let base64;
-
-	do {
-		base64 = canvas.toDataURL("image/jpeg", quality);
-		quality -= 0.05;
-	} while (base64.length > 50 * 1024 * 1.37 && quality > 0.1);
-	// 1.37 تقريب لتحويل Base64 إلى حجم فعلي
-
-	return base64;
-	// عرض الصورة
-	//document.getElementById("outpotimg").src = base64;
-
-	// عرض النص
-	//document.getElementById("base64Output").value = base64;
-}
- */

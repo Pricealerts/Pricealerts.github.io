@@ -26,23 +26,26 @@ gebi("sgnOutInLink").addEventListener("click", async () => {
 		window.location.href = "/signin";
 	});
 });
-
-function vrfInpt(el) {
-	el.addEventListener("keydown", () => {
-		if (el.value.length > 0) {
+let isChnge = false;
+function vrfInpts(el) {
+	el.addEventListener("input", () => {
+		const newInpts = valInpts();
+		if (newInpts != prmyrInpts || file) {
 			gebi("saveBtn").style.backgroundColor = "#007bff";
 			gebi("saveBtn").style.cursor = "pointer";
+            isChnge = true
 		} else {
 			gebi("saveBtn").style.backgroundColor = "#444";
 			gebi("saveBtn").style.cursor = "not-allowed";
+            isChnge = false
 		}
 	});
 }
 
-slctAll(".inptSave").forEach(el => vrfInpt(el));
+slctAll(".inptSave").forEach(el => vrfInpts(el));
 
 let userId, userBr;
-onAuthStateChanged(auth, user => {
+/* onAuthStateChanged(auth, user => {
 	if (user) {
 		userBr = user;
 		userId = user.uid;
@@ -50,7 +53,7 @@ onAuthStateChanged(auth, user => {
 		window.location.href = "/signin";
 	}
 });
-
+ */
 async function updateUserData(bodySet) {
 	const userRef = ref(db, "users/" + userId);
 	try {
@@ -67,6 +70,7 @@ async function updateUserData(bodySet) {
 
 gebi("formSave").addEventListener("submit", async e => {
 	e.preventDefault();
+    if (!isChnge) return false
 	gebi("rspns").innerText = "جاري الحفظ ...";
 	gebi("rspns").style.color = "black";
 	/////////////////////////// jiht limage
@@ -92,10 +96,10 @@ gebi("formSave").addEventListener("submit", async e => {
 		return false;
 	}
 	const bodySet = {
-		userName: gebi("userName")?.innerText || "",
-		chtId1: gebi("telegramChatId1")?.value || "",
-		chtId2: gebi("telegramChatId2")?.value || "",
-		chtId3: gebi("telegramChatId3")?.value || "",
+		userName: gebi("userName").innerText || "",
+		chtId1: gebi("telegramChatId1").value || "",
+		chtId2: gebi("telegramChatId2").value || "",
+		chtId3: gebi("telegramChatId3").value || "",
 	};
 	if (file) {
 		// ===== تغيير الصورة من Base64 =====
@@ -108,28 +112,21 @@ gebi("formSave").addEventListener("submit", async e => {
 		const photoURL = await getDownloadURL(fileRef);
 		// تحديث Firebase Auth
 		await updateProfile(userBr, { photoURL });
-		// تحديث العرض
-		//document.getElementById("avatar").src = photoURL;
 		console.log("تم تغيير الصورة بنجاح ✅");
 		bodySet.userPicture = "frbsStrg";
 		localStorage.base64Pctr = file; //  base64
 	}
-	let notChng = true;
 	for (const key in bodySet) {
 		if (localStorage[key] != bodySet[key]) {
 			localStorage[key] = bodySet[key];
-			notChng = false;
 		}
 	}
-	if (notChng && !file) {
-		gebi("rspns").innerText = "لم تغير شيء لحفظه";
-		gebi("rspns").style.color = "black";
-	}
+
 	try {
 		bodySet.userPicturec = "";
 		const resUpdate = await updateUserData(bodySet);
 		if (resUpdate) {
-			gebi("rspns").innerText = "تم الحفظ بنجاح";
+			gebi("rspns").innerText = "تم الحفظ بنجاح ✅";
 			gebi("rspns").style.color = "green";
 			setTimeout(() => {
 				gebi("rspns").innerText = "";
