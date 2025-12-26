@@ -83,9 +83,9 @@ gebi("formSave").addEventListener("submit", async e => {
 		return false;
 	}
 	if (
-		gebi("telegramChatId1").value.length +
-			gebi("telegramChatId2").value.length +
-			gebi("telegramChatId3").value.length ==
+		gebi("chtId1").value.length +
+			gebi("chtId2").value.length +
+			gebi("chtId3").value.length ==
 		0
 	) {
 		gebi("rspns").innerText = "  لم تسجل أي chat Id ";
@@ -97,9 +97,9 @@ gebi("formSave").addEventListener("submit", async e => {
 	}
 	const bodySet = {
 		userName: gebi("userName").innerText || "",
-		chtId1: gebi("telegramChatId1").value || "",
-		chtId2: gebi("telegramChatId2").value || "",
-		chtId3: gebi("telegramChatId3").value || "",
+		chtId1: gebi("chtId1").value || "",
+		chtId2: gebi("chtId2").value || "",
+		chtId3: gebi("chtId3").value || "",
 	};
 	if (file) {
 		// ===== تغيير الصورة من Base64 =====

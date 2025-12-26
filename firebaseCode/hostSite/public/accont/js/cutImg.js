@@ -379,5 +379,6 @@ function crop() {
 		reader.readAsDataURL(bestBlob);
 		gebi("saveBtn").style.backgroundColor = "#007bff";
 		gebi("saveBtn").style.cursor = "pointer";
+		isChnge = true
 	}
 }
