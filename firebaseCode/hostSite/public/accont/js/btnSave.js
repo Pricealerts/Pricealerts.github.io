@@ -45,7 +45,7 @@ function vrfInpts(el) {
 slctAll(".inptSave").forEach(el => vrfInpts(el));
 
 let userId, userBr;
-/* onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, user => {
 	if (user) {
 		userBr = user;
 		userId = user.uid;
@@ -53,7 +53,7 @@ let userId, userBr;
 		window.location.href = "/signin";
 	}
 });
- */
+
 async function updateUserData(bodySet) {
 	const userRef = ref(db, "users/" + userId);
 	try {
