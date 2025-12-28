@@ -1,15 +1,18 @@
-import axios from "axios";
-import { EXCHANGES_CONFIG, gtapiUrl } from "./cnstnts.js";
-import { cAllDatabase } from "./cAllDatabase.js";
 
+import axios from "axios";
+import {EXCHANGES_CONFIG ,gtapiUrl} from "./cnstnts.js"
+import {  cAllDatabase } from "./cAllDatabase.js"
+//const axios = require("axios");
 
 // *** بيانات اعتماد Telegram Bot API (لا تنس تحديثها) ***
 const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
 
 //const APPS_SCRIPT_WEB_APP_URL =
 //	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
+let dltRwApp = [];
 let interval;
 let limit;
+
 
 function getIntLmt(requestTimeStr) {
 	const currentTriggerTime = new Date(); // وقت تشغيل الـ Trigger الحالي
@@ -32,111 +35,166 @@ function getIntLmt(requestTimeStr) {
 	return { intervall, limitt };
 }
 
-//////////////// get candles 
+
+
+//////////////// get candles
 async function getCandles(allAlerts) {
-	const symbolsMap = new Map();
+	
+	
+	const promises = [];
+	const symbols = []; // للاحتفاظ بالرموز لربطها بالنتائج لاحقًا
+	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
+	for (let i = allAlerts.length-1 ; i >= 0; i--) {
+		// البدء من آخر صف بيانات (باستثناء الرؤوس)
+		
+    const  row = allAlerts[i];  // تفكيك مباشر
 
-	// 1. التكرار لتجميع الرموز وتحديد أفضل إعدادات لكل رمز
-	allAlerts.forEach(row => {
-		const { exchangeId, symbol, requestTime } = row;
-		// حساب الـ Interval والـ Limit بناءً على دالتك
-		const { intervall: currentInterval, limitt: currentLimit } =
-			getIntLmt(requestTime);
-		if (symbolsMap.has(symbol)) {
-			const existing = symbolsMap.get(symbol);
-			// --- منطق المفاضلة ---
-			// 1. أولوية المنصة: إذا ظهرت Binance نعتمدها كمصدر
-			const finalExchange =
-				exchangeId === "binance" ? "binance" : existing.exchangeId;
-			// 2. أولوية الـ Interval: إذا كان أحدهما 1m والآخر 5m، نفضل الـ 1m لأنه يعطي تفاصيل أدق
-			// ( أو يمكنك عكس المنطق حسب رغبتك )
-			const finalInterval =
-				existing.interval === "1m" || currentInterval === "1m" ? "1m" : "5m";
-			// 3. أولوية الـ Limit: نأخذ الأكبر دائماً لضمان تغطية الفارق الزمني الأطول
-			const finalLimit = Math.max(existing.limit, currentLimit);
-			symbolsMap.set(symbol, {
-				exchangeId: finalExchange,
-				interval: finalInterval,
-				limit: finalLimit,
-			});
-		} else {
-			// أول ظهور للرمز
-			symbolsMap.set(symbol, {
-				exchangeId,
-				interval: currentInterval,
-				limit: currentLimit,
-			});
-		}
-	});
+    const { exchangeId, symbol ,requestTime } = row;
+	
 
-	const symbolsOrder = Array.from(symbolsMap.keys());
-
-	// 2. تحويل الخريطة (Map) إلى وعود (Promises) لجلب البيانات
-	const promises = symbolsOrder.map(symbol => {
-		const config = symbolsMap.get(symbol);
-		return fetchCandlestickData(
-			config.exchangeId,
-			symbol,
-			config.interval,
-			config.limit
-		).catch(err => {
-			console.error(
-				`❌ Error fetching ${symbol} from ${config.exchangeId} err is  :`
-			);
-			console.log(err);
-			return null;
-		});
-	});
-
-	// 3. تنفيذ جميع الطلبات بالتوازي
-	const results = await Promise.all(promises);
-
-	// 4. بناء الكائن النهائي
-	const candles = {};
-	results.forEach((data, index) => {
-		const symbol = symbolsOrder[index];
-		// حتى لو كانت النتيجة null، نضعها في الكائن للحفاظ على مرجع للرمز
-		candles[symbol] =
-			data && Array.isArray(data) && data.length > 0 ? data : null;
-	});
-
-	console.log(
-		`✅ جلب البيانات الفريدة مكتمل. عدد الأزواج المطلوبة: ${symbolsOrder.length}`
-	);
+		// عمود Last Checked هو row[8]
+		let intLmt = getIntLmt(requestTime);
+		interval = intLmt.intervall;
+		limit = intLmt.limitt;
+		// تخزين الوعود الناتجة دون انتظار إتمامها 
+		promises.push(fetchCandlestickData(exchangeId, symbol, interval, limit));
+		symbols.push(symbol);
+	}
+	// 2. استخدام Promise.all() للانتظار لجميع الوعود
+	const allCandles = await Promise.all(promises);
+	const candles=[];
+	// 3. تجميع النتائج في كائن الشموع (candles)
+	for (let i = 0; i < symbols.length; i++) {
+		candles[symbols[i]] = allCandles[i];
+	}
+	console.log('candles is : ');
+	console.log(candles);
+	
+	
 	return candles;
 }
 
-async function checkAndSendAlerts() {
-	const data = await cAllDatabase({ action: "gtAlerts", chid: "all" });
-	if (!data) return false;
-	const allAlerts = [];
-	const usersAll = Object.entries(data);
-	usersAll.forEach(user => {
-		const idUser = user[0];
-		const alrts = Object.entries(user[1]);
-		alrts.forEach(alert => {
-			const alrt = alert[1];
-			alrt.id = alert[0];
-			alrt.telegramChatId = idUser;
-			allAlerts.push(alrt);
-		});
-	});
 
+async function getCandles2(allAlerts) {
+    const symbolsMap = new Map();
+    
+    // 1. تجميع البيانات الفريدة بناءً على الرمز (Symbol)
+    // هذا يضمن أننا لن نكرر الطلب لنفس العملة أكثر من مرة
+    allAlerts.forEach(row => {
+        const { exchangeId, symbol, requestTime } = row;
+        
+        if (!symbolsMap.has(symbol)) {
+            let intLmt = getIntLmt(requestTime);
+            symbolsMap.set(symbol, {
+                exchangeId,
+                interval: intLmt.intervall,
+                limit: intLmt.limitt
+            });
+        }
+    });
+
+    const promises = [];
+    const symbolsOrder = [];
+
+    // 2. إنشاء الوعود (Promises) للرموز الفريدة فقط
+    symbolsMap.forEach((config, symbol) => {
+        promises.push(fetchCandlestickData(config.exchangeId, symbol, config.interval, config.limit));
+        symbolsOrder.push(symbol);
+    });
+
+    // 3. تنفيذ جميع الطلبات بالتوازي
+    try {
+        const allCandlesResults = await Promise.all(promises);
+        
+        const candles = {};
+        // 4. ربط النتائج بالرموز في كائن نهائي
+        allCandlesResults.forEach((data, index) => {
+            const symbol = symbolsOrder[index];
+            candles[symbol] = data;
+        });
+
+        console.log('Total unique requests sent:', symbolsOrder.length);
+        console.log('Candles data:', candles);
+        
+        return candles;
+    } catch (error) {
+        console.error("Error fetching candlestick data:", error);
+        throw error;
+    }
+}
+
+async function getCandles3(allAlerts) {
+    const symbolsMap = new Map();
+
+    // 1. تجميع البيانات الفريدة (Logic: Unique Symbol per Exchange/Interval)
+    allAlerts.forEach(row => {
+        const { exchangeId, symbol, requestTime } = row;
+        // المفتاح الفريد هو الرمز لضمان عدم تكرار الطلب لنفس العملة
+        if (!symbolsMap.has(symbol)) {
+            let intLmt = getIntLmt(requestTime);
+            symbolsMap.set(symbol, {
+                exchangeId,
+                interval: intLmt.intervall,
+                limit: intLmt.limitt
+            });
+        }
+    });
+
+    const symbolsOrder = Array.from(symbolsMap.keys());
+    const promises = symbolsOrder.map(symbol => {
+        const config = symbolsMap.get(symbol);
+        // نستخدم catch داخلي لكل promise حتى لا ينهار Promise.all إذا فشل طلب واحد
+        return fetchCandlestickData(config.exchangeId, symbol, config.interval, config.limit)
+            .catch(err => {
+                console.error(`Failed to fetch ${symbol}:`, err);
+                return null; // تعيد null في حالة الخطأ لاستبعادها لاحقاً
+            });
+    });
+
+    // 2. تنفيذ الطلبات بالتوازي
+    const results = await Promise.all(promises);
+
+    // 3. بناء الكائن النهائي (النتيجة)
+    const candles = {};
+    results.forEach((data, index) => {
+        const symbol = symbolsOrder[index];
+        // نتحقق أن البيانات موجودة وليست null (بسبب فشل الـ API أو عدم دعم المنصة)
+        if (data && Array.isArray(data) && data.length > 0) {
+            candles[symbol] = data;
+        } else {
+            console.warn(`⚠️ تم استبعاد الزوج ${symbol} لعدم وجود بيانات.`);
+        }
+    });
+
+    console.log(`✅ تم جلب بيانات لـ ${Object.keys(candles).length} زوج من أصل ${symbolsOrder.length} طلب فريد.`);
+    return candles;
+}
+
+async function checkAndSendAlerts() {
+	const data = await cAllDatabase({action: 'gtAlerts',chid:'all'})
+
+	const allAlerts = [];
+	const usersAll = Object.entries(data) 
+	usersAll.forEach(user  => {
+		const idUser = user[0]
+		const alrts = Object.entries(user[1]) 
+		
+		alrts.forEach( alert  =>{
+			
+			const alrt = alert[1]
+			alrt.id = alert[0]
+			alrt.telegramChatId = idUser;
+			allAlerts.push(alrt)
+		})
+	})
+	
 	const rsltcandles = await getCandles(allAlerts);
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
-
-	let dltRwApp = [];
-	for (let i = allAlerts.length - 1; i >= 0; i--) {
+	
+	for (let i = allAlerts.length-1 ; i >= 0; i--) {
 		// البدء من آخر صف بيانات (باستثناء الرؤوس)
-
-		const {
-			exchangeId,
-			symbol,
-			targetPrice,
-			alertCondition,
-			telegramChatId,
-			id,
-		} = allAlerts[i];
+		
+    const { exchangeId, symbol, targetPrice, alertCondition, telegramChatId, id } = allAlerts[i];
 
 		const candles = rsltcandles[symbol];
 
@@ -162,25 +220,24 @@ async function checkAndSendAlerts() {
 			}
 		} else {
 			console.warn(
-				`لم يتم الحصول على بيانات شمعة (${interval},
-				 limit: ${limit}) لـ ${symbol} على 
-				 ${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`
+				`لم يتم الحصول على بيانات شمعة (${interval}, limit: ${limit}) لـ ${symbol} على ${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`
 			);
 		}
 
 		if (triggeredByHistoricalPrice) {
-			let message = `🔔 تنبيه سعر ${
+			 let message = `🔔 تنبيه سعر ${
 				EXCHANGES_CONFIG[exchangeId].name
 			}!\<b>${symbol}</b> بلغت <b>${actualTriggerPrice}</b> (الشرط: السعر ${
 				alertCondition === "less_than_or_equal"
 					? "أقل من أو يساوي"
 					: "أعلى من أو يساوي"
 			} ${targetPrice})`;
-			const nwChatId = telegramChatId.slice(3);
+			const nwChatId = telegramChatId.slice(3)
 			let sendResult = await sendTelegramMessage(nwChatId, message);
 
 			if (sendResult.success) {
-				let dlt = { telegramChatId: telegramChatId, id: id, alrtOk: true };
+				let iPls = i + 2;
+				let dlt = {telegramChatId : telegramChatId , id :id , alrtOk: true}
 				dltRwApp.push(dlt);
 
 				// بما أننا حذفنا الصف، يجب أن نقلل الفهرس لتجنب تخطي صفوف
@@ -196,7 +253,7 @@ async function checkAndSendAlerts() {
 			}
 		}
 	}
-	await dltForDatabase(dltRwApp);
+	/* let retour =  */await dltForDatabase();
 }
 
 /**
@@ -223,7 +280,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 	symbol = symbol.replace("$", "");
 	const now = new Date();
 	const endTimeMs = now.getTime();
-
+	
 	// لحساب وقت البدء لطلب الشمعة الأخيرة
 	const intervalMs = parseIntervalToMilliseconds(interval);
 	// نحدد وقت البدء لضمان الحصول على الشموع المطلوبة بالضبط
@@ -233,7 +290,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		let datas;
 		let mappedInterval = exchange.intervalMap[interval];
 
-		const apiUrl = gtapiUrl(exchangeId, symbol, mappedInterval, limit);
+		const apiUrl=gtapiUrl(exchangeId, symbol, mappedInterval, limit);
 		datas = (await axios.get(apiUrl)).data;
 
 		let candles = [];
@@ -321,7 +378,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				);
 			}
 		}
-
+		
 		let candles2 = candles.slice(-limit);
 		return candles2;
 	} catch (error) {
@@ -334,20 +391,21 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 	}
 }
 
-async function dltForDatabase(dltRwApp) {
+async function dltForDatabase() {
 	if (dltRwApp.length == 0) {
 		return "walo";
 	}
-
+	
 	try {
 		const promises = [];
 
 		for (let i = 0; i < dltRwApp.length; i++) {
 			const dlt = dltRwApp[i];
-			dlt.action = "dltAlrt";
-			promises.push(cAllDatabase(dlt));
+			dlt.action = 'dltAlrt' 
+			promises.push(cAllDatabase(dlt))
 		}
-		await Promise.all(promises);
+		await Promise.all(promises)
+		dltRwApp = [];
 	} catch (error) {
 		console.error(
 			"error  respons",
@@ -384,11 +442,12 @@ function parseIntervalToMilliseconds(interval) {
  */
 async function sendTelegramMessage(chatId, messageText) {
 	if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
-		console.error("TELEGRAM_BOT_TOKEN غير معرّف أو غير صالح.");
+		console.error("TELEGRAM_BOT_TOKEN غير معرّف أو غير صالح في Apps Script.");
 		return { success: false, error: "توكن بوت تيليجرام غير موجود." };
 	}
 	let rspns = {};
 	const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+
 	let payload = {
 		chat_id: chatId,
 		text: messageText,
@@ -397,8 +456,8 @@ async function sendTelegramMessage(chatId, messageText) {
 
 	try {
 		const response = await axios.post(TELEGRAM_API_URL, payload);
-
-		rspns = { success: true, response: response.data };
+		
+		rspns= { success: true, response: response.data };
 	} catch (error) {
 		console.error(
 			"خطأ في إرسال رسالة تيليجرام:",
@@ -409,7 +468,9 @@ async function sendTelegramMessage(chatId, messageText) {
 			error: error.response ? error.response.data : error.message,
 		};
 	}
-	return rspns;
+	return rspns
 }
+
+
 
 export { checkAndSendAlerts, sendTelegramMessage };

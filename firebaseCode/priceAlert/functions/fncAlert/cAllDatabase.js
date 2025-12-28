@@ -1,6 +1,5 @@
 // استيراد مكتبة Firebase Admin SDK
 import { getDatabase } from "firebase-admin/database";
-//import { object } from "firebase-functions/v1/storage";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
 import { checkAndSendAlerts, sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
@@ -46,7 +45,7 @@ async function cAllDatabase(data) {
 		return rspns;
 	} catch (error) {
 		// Throw an Error object for better stack traces and consistency
-		throw new Error(
+		throw console.error(
 			"حدث خطأ: " + (error && error.message ? error.message : String(error))
 		);
 	}
@@ -184,30 +183,28 @@ async function cntctUser(data, alrtAdd) {
 			} else {
 				rspns.status = "notSuccess";
 				rspns.okRspns = false;
-				console.error(
-					`فشل إرسال في  sendTelegramMessage  لـ ${alrtAdd.symbol} : ${error}`
-				);
+				rspns.msg = sendMsg
 			}
 
 			return rspns;
 		}
 		gtChIdExixst = getChId.val();
 
-		if (gtChIdExixst.counter < 5 || gtChIdExixst.paid) {
+		if (gtChIdExixst.counter < 100 || gtChIdExixst.paid) {
 			rspns.okRspns = true;
-		} else if (gtChIdExixst.counter > 100 && !gtChIdExixst.paid) {
+		} else if (gtChIdExixst.counter > 99 && !gtChIdExixst.paid) {
 			rspns.status = "notPaid";
 			rspns.okRspns = false;
 		} else {
 			rspns = { okRspns: false, status: "errorNotfond" };
-			console.error(` خطأ غير معروف لـ ${alrtAdd.symbol} : ${error}`);
 		}
 
 		return rspns;
 	} catch (error) {
 		rspns.status = "notSuccess";
 		rspns.okRspns = false;
-		console.error(`فشل إرسال في cntctUser    ${alrtAdd.symbol} : ${error}`);
+		rspns.error = error;
+		console.error(`فشل إرسال في cntctUser    ${alrtAdd.symbol}  is : ${error}`);
 		return rspns;
 	}
 }
