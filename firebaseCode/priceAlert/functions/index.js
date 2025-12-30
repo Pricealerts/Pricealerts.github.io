@@ -62,12 +62,15 @@ export const scheduledTask = onSchedule(
 	{
 		schedule: "every 5 minutes",
 		region: "europe-west1",
+		memory: "128MiB", // تكفي وزيادة لمتغير 1Mb وتوفر المال
+		maxInstances: 1,
+		timeoutSeconds: 60, // حاول تقليلها إذا كان الجلب سريعاً
 	},
 	async () => {
 		try {
 			await checkAndSendAlerts();
 		} catch (error) {
-		return error;
+			return error;
 		}
 	}
 );
@@ -96,4 +99,3 @@ export const handleUserCreated = auth.user().onCreate(
     return null;
   }
 ); */
-

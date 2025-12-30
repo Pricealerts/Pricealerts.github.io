@@ -2,14 +2,11 @@ import axios from "axios";
 import { EXCHANGES_CONFIG, gtapiUrl } from "./cnstnts.js";
 import { cAllDatabase } from "./cAllDatabase.js";
 
-
-// *** بيانات اعتماد Telegram Bot API (لا تنس تحديثها) ***
+// *** بيانات اعتماد Telegram Bot API ***
 const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
 
 //const APPS_SCRIPT_WEB_APP_URL =
 //	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
-let interval;
-let limit;
 
 function getIntLmt(requestTimeStr) {
 	const currentTriggerTime = new Date(); // وقت تشغيل الـ Trigger الحالي
@@ -17,60 +14,65 @@ function getIntLmt(requestTimeStr) {
 	let timeDifferenceMs = currentTriggerTime.getTime() - requestTime.getTime();
 	let timeDifferenceMinutes = Math.floor(timeDifferenceMs / (1000 * 60));
 
-	let intervall;
-	let limitt;
+	let interval;
+	let limit;
 
 	if (timeDifferenceMinutes <= 5) {
 		// إذا كان الفارق 0-5 دقائق، استخدم شموع 1 دقيقة
-		intervall = "1m";
-		limitt = Math.max(1, timeDifferenceMinutes); // على الأقل شمعة واحدة
+		interval = "1m";
+		limit = Math.max(1, timeDifferenceMinutes); // على الأقل شمعة واحدة
 	} else {
 		// إذا كان الفارق أكبر من 5 دقائق، استخدم شمعة 5 دقائق واحدة
-		intervall = "5m";
-		limitt = 1;
+		interval = "5m";
+		limit = 1;
 	}
-	return { intervall, limitt };
+	return { interval, limit };
 }
-
-//////////////// get candles 
-async function getCandles(allAlerts) {
-	const symbolsMap = new Map();
-
-	// 1. التكرار لتجميع الرموز وتحديد أفضل إعدادات لكل رمز
-	allAlerts.forEach(row => {
-		const { exchangeId, symbol, requestTime } = row;
-		// حساب الـ Interval والـ Limit بناءً على دالتك
-		const { intervall: currentInterval, limitt: currentLimit } =
-			getIntLmt(requestTime);
-		if (symbolsMap.has(symbol)) {
-			const existing = symbolsMap.get(symbol);
-			// --- منطق المفاضلة ---
-			// 1. أولوية المنصة: إذا ظهرت Binance نعتمدها كمصدر
-			const finalExchange =
-				exchangeId === "binance" ? "binance" : existing.exchangeId;
-			// 2. أولوية الـ Interval: إذا كان أحدهما 1m والآخر 5m، نفضل الـ 1m لأنه يعطي تفاصيل أدق
-			// ( أو يمكنك عكس المنطق حسب رغبتك )
-			const finalInterval =
-				existing.interval === "1m" || currentInterval === "1m" ? "1m" : "5m";
-			// 3. أولوية الـ Limit: نأخذ الأكبر دائماً لضمان تغطية الفارق الزمني الأطول
-			const finalLimit = Math.max(existing.limit, currentLimit);
-			symbolsMap.set(symbol, {
-				exchangeId: finalExchange,
-				interval: finalInterval,
-				limit: finalLimit,
-			});
-		} else {
-			// أول ظهور للرمز
-			symbolsMap.set(symbol, {
-				exchangeId,
-				interval: currentInterval,
-				limit: currentLimit,
-			});
-		}
-	});
-
+let symbolsMap;
+let allAlerts;
+//////////////// get candles
+async function getCandles() {
+	if (!symbolsMap) {
+		symbolsMap = new Map();
+		// 1. التكرار لتجميع الرموز وتحديد أفضل إعدادات لكل رمز
+		allAlerts.forEach(row => {
+			const { exchangeId, symbol, requestTime } = row;
+			// حساب الـ Interval والـ Limit بناءً على دالتك
+			const { interval: currentInterval, limit: currentLimit } =
+				getIntLmt(requestTime);
+			if (symbolsMap.has(symbol)) {
+				const existing = symbolsMap.get(symbol);
+				// --- منطق المفاضلة ---
+				// 1. أولوية المنصة: إذا ظهرت Binance نعتمدها كمصدر
+				const finalExchange =
+					exchangeId === "binance" ? "binance" : existing.exchangeId;
+				// 2. أولوية الـ Interval: إذا كان أحدهما 1m والآخر 5m، نفضل الـ 1m لأنه يعطي تفاصيل أدق
+				// ( أو يمكنك عكس المنطق حسب رغبتك )
+				const finalInterval =
+					existing.interval === "1m" || currentInterval === "1m" ? "1m" : "5m";
+				// 3. أولوية الـ Limit: نأخذ الأكبر دائماً لضمان تغطية الفارق الزمني الأطول
+				const finalLimit = Math.max(existing.limit, currentLimit);
+				symbolsMap.set(symbol, {
+					exchangeId: finalExchange,
+					interval: finalInterval,
+					limit: finalLimit,
+				});
+			} else {
+				// أول ظهور للرمز
+				symbolsMap.set(symbol, {
+					exchangeId,
+					interval: currentInterval,
+					limit: currentLimit,
+				});
+			}
+		});
+	} else {
+		const rfyj =  "rah 3amr is : "
+		console.log(symbolsMap);
+		
+		
+	}
 	const symbolsOrder = Array.from(symbolsMap.keys());
-
 	// 2. تحويل الخريطة (Map) إلى وعود (Promises) لجلب البيانات
 	const promises = symbolsOrder.map(symbol => {
 		const config = symbolsMap.get(symbol);
@@ -87,10 +89,8 @@ async function getCandles(allAlerts) {
 			return null;
 		});
 	});
-
 	// 3. تنفيذ جميع الطلبات بالتوازي
 	const results = await Promise.all(promises);
-
 	// 4. بناء الكائن النهائي
 	const candles = {};
 	results.forEach((data, index) => {
@@ -99,7 +99,6 @@ async function getCandles(allAlerts) {
 		candles[symbol] =
 			data && Array.isArray(data) && data.length > 0 ? data : null;
 	});
-
 	console.log(
 		`✅ جلب البيانات الفريدة مكتمل. عدد الأزواج المطلوبة: ${symbolsOrder.length}`
 	);
@@ -107,28 +106,27 @@ async function getCandles(allAlerts) {
 }
 
 async function checkAndSendAlerts() {
-	const data = await cAllDatabase({ action: "gtAlerts", chid: "all" });
-	if (!data) return false;
-	const allAlerts = [];
-	const usersAll = Object.entries(data);
-	usersAll.forEach(user => {
-		const idUser = user[0];
-		const alrts = Object.entries(user[1]);
-		alrts.forEach(alert => {
-			const alrt = alert[1];
-			alrt.id = alert[0];
-			alrt.telegramChatId = idUser;
-			allAlerts.push(alrt);
+	if (!allAlerts) {
+		const data = await cAllDatabase({ action: "gtAlerts", chid: "all" });
+		if (!data) return false;
+		allAlerts = [];
+		const usersAll = Object.entries(data);
+		usersAll.forEach(user => {
+			const idUser = user[0];
+			const alrts = Object.entries(user[1]);
+			alrts.forEach(alert => {
+				const alrt = alert[1];
+				alrt.id = alert[0];
+				alrt.telegramChatId = idUser;
+				allAlerts.push(alrt);
+			});
 		});
-	});
-
-	const rsltcandles = await getCandles(allAlerts);
+	}
+	const rsltcandles = await getCandles();
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
-
 	let dltRwApp = [];
 	for (let i = allAlerts.length - 1; i >= 0; i--) {
 		// البدء من آخر صف بيانات (باستثناء الرؤوس)
-
 		const {
 			exchangeId,
 			symbol,
@@ -139,20 +137,18 @@ async function checkAndSendAlerts() {
 		} = allAlerts[i];
 
 		const candles = rsltcandles[symbol];
-
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null; // لتسجيل السعر الذي تسبب في التنبيه
-
 		if (candles && candles.length > 0) {
 			// إذا كانت الشموع 1m، يجب أن نفحص كل شمعة
 			for (const candle of candles) {
-				if (alertCondition === "less_than_or_equal") {
+				if (alertCondition === "less") {
 					if (candle.low <= targetPrice) {
 						triggeredByHistoricalPrice = true;
 						actualTriggerPrice = candle.low;
 						break; // وجدنا التحقق، لا داعي لمواصلة الفحص
 					}
-				} else if (alertCondition === "greater_than_or_equal") {
+				} else if (alertCondition === "greater") {
 					if (candle.high >= targetPrice) {
 						triggeredByHistoricalPrice = true;
 						actualTriggerPrice = candle.high;
@@ -161,18 +157,15 @@ async function checkAndSendAlerts() {
 				}
 			}
 		} else {
-			console.warn(
-				`لم يتم الحصول على بيانات شمعة (${interval},
-				 limit: ${limit}) لـ ${symbol} على 
-				 ${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`
-			);
+			console.warn(`لم يتم الحصول على بيانات شمعة  لـ ${symbol} على 
+				${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`);
 		}
 
 		if (triggeredByHistoricalPrice) {
 			let message = `🔔 تنبيه سعر ${
 				EXCHANGES_CONFIG[exchangeId].name
-			}!\<b>${symbol}</b> بلغت <b>${actualTriggerPrice}</b> (الشرط: السعر ${
-				alertCondition === "less_than_or_equal"
+			}!<b>${symbol}</b> بلغت <b>${actualTriggerPrice}</b> (الشرط: السعر ${
+				alertCondition === "less"
 					? "أقل من أو يساوي"
 					: "أعلى من أو يساوي"
 			} ${targetPrice})`;
@@ -182,7 +175,6 @@ async function checkAndSendAlerts() {
 			if (sendResult.success) {
 				let dlt = { telegramChatId: telegramChatId, id: id, alrtOk: true };
 				dltRwApp.push(dlt);
-
 				// بما أننا حذفنا الصف، يجب أن نقلل الفهرس لتجنب تخطي صفوف
 				allAlerts.slice(i, 1); // إزالة الصف المحذوف من مصفوفة البيانات المحلية أيضًا
 			} else {
@@ -191,8 +183,6 @@ async function checkAndSendAlerts() {
 					`فشل إرسال إشعار تيليجرام لـ ${symbol}:`,
 					sendResult.error
 				);
-				// يمكننا تعيين حالة التنبيه إلى "Failed" في الشيت إذا أردنا تتبع الأخطاء
-				// sheet.getRange(i + 1, 7).setValue("Failed");
 			}
 		}
 	}
@@ -215,9 +205,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		!exchange.parseCandle ||
 		!exchange.intervalMap[interval]
 	) {
-		console.error(
-			`منصة ${exchangeId} لا تدعم جلب بيانات الشموع أو URL/parseCandle/intervalMap غير معرف لـ ${interval}.`
-		);
 		return null;
 	}
 	symbol = symbol.replace("$", "");

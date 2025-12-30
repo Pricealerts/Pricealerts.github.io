@@ -91,21 +91,28 @@ export const proxyRequestV2 = onRequest(
 );
 
 // ------------------------
-// وظيفة أسبوعية للتحديث
+// وظيفة شهرية للتحديث
 // ------------------------
-export const updateSymbolsWeekly = onSchedule(
-	{
-		schedule: "every 720 hours",
-		region: "europe-west1",
-		memory: "128MiB",
-		cpu: 1,
-		maxInstances: 1,
-		timeoutSeconds: 60, // لا تتركها مفتوحة
-	},
-	async () => {
-		await getExchangeSymbols();
-	}
+
+
+export const updateSymbolsMonthly = onSchedule(
+    {
+        // "0 0 1 * *" تعني: الدقيقة 0، الساعة 0، اليوم 1 من كل شهر
+        schedule: "0 0 1 * *", 
+        region: "europe-west1",
+        memory: "128MiB",      
+        maxInstances: 1,       // حماية من التشغيل المزدوج
+        timeoutSeconds: 200,   // مهلة كافية لطلب البيانات من عدة منصات
+    },
+    async (event) => {
+        try {
+            await getExchangeSymbols();
+        } catch (error) {
+            console.error("❌ فشل التحديث الشهري:", error);
+        }
+    }
 );
+
 
 /* 
 /////////////////////////

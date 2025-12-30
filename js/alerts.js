@@ -30,9 +30,9 @@ function renderAlerts(alerts) {
 	alerts.forEach(alert2 => {
 		let alert = alert2[1];
 		let conditionText = "";
-		if (alert.alertCondition === "less_than_or_equal") {
+		if (alert.alertCondition === "less") {
 			conditionText = "عندما يصبح السعر أصغر أو يساوي";
-		} else if (alert.alertCondition === "greater_than_or_equal") {
+		} else if (alert.alertCondition === "greater") {
 			conditionText = "عندما يصبح السعر أكبر أو يساوي";
 		}
 
@@ -84,9 +84,9 @@ function requestNotificationPermission() {
 
 function showBrowserNotification(symbol, price, targetPrice, condition) {
 	let conditionText = "";
-	if (condition === "less_than_or_equal") {
+	if (condition === "less") {
 		conditionText = `أصبح ≥ ${targetPrice} USDT`;
-	} else if (condition === "greater_than_or_equal") {
+	} else if (condition === "greater") {
 		conditionText = `أصبح ≤ ${targetPrice} USDT`;
 	}
 
@@ -112,12 +112,12 @@ function checkForBrowserAlerts() {
 			) {
 				let shouldTrigger = false;
 				if (
-					alert.alertCondition === "less_than_or_equal" &&
+					alert.alertCondition === "less" &&
 					currentPrice <= alert.targetPrice
 				) {
 					shouldTrigger = true;
 				} else if (
-					alert.alertCondition === "greater_than_or_equal" &&
+					alert.alertCondition === "greater" &&
 					currentPrice >= alert.targetPrice
 				) {
 					shouldTrigger = true;

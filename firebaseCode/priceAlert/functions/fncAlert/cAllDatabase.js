@@ -165,7 +165,7 @@ async function cntctUser(data, alrtAdd) {
 			}! 
 ل<b> ${alrtAdd.symbol} </b>  
 (الشرط: السعر   ${
-				alrtAdd.alertCondition === "less_than_or_equal"
+				alrtAdd.alertCondition === "less"
 					? "أقل من أو يساوي"
 					: "أعلى من أو يساوي"
 			} ${alrtAdd.targetPrice} )
