@@ -1,8 +1,9 @@
 import { getDatabase } from "firebase-admin/database";
 import axios from "axios";
 
-const TELEGRAM_BOT_TOKEN =  process.env.BOT_TOKEN;
-const chatIdAbdelhadi = "5399098591";
+const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
+const chatIdAbdelhadi = process.env.DADI_CHAT_ID;
+
 let db;
 // ------------------------
 // جلب رموز بورصة واحدة من البورصات لخرين
@@ -53,7 +54,7 @@ async function getExchangeSymbols() {
 		}
 		await Promise.all(promisesDb);
 	} catch (error) {
-		return 'حدث خطأ' + error;
+		return "حدث خطأ" + error;
 	}
 }
 
@@ -67,7 +68,7 @@ async function exchangeSymbols(exchange) {
 		if (!data) return [];
 		return data;
 	} catch (error) {
-	return error
+		return error;
 	}
 }
 
@@ -150,7 +151,6 @@ async function srchSmbls(querySmble) {
 			responseFnl.push(estCandle);
 		}
 	} catch (error) {
-		
 		return {
 			error: "Failed to fetch data1",
 			details: error.message,
@@ -162,26 +162,22 @@ async function srchSmbls(querySmble) {
 
 /////// nta3 message
 async function sendMesageFn(messageText) {
-	
 	try {
-		const msag = `عبدالهادي جائتك رسالة من ${messageText.nameUser } 
-ايميله : ${messageText.emailUser } 
+		const msag = `عبدالهادي جائتك رسالة من ${messageText.nameUser} 
+ايميله : ${messageText.emailUser} 
 الرسالة : ${messageText.msageUser} 
- `
-		
-	await sendTelegramMessage(chatIdAbdelhadi, msag);
-	return{statusMsge : 'ok'}
+ `;
+
+		await sendTelegramMessage(chatIdAbdelhadi, msag);
+		return { statusMsge: "ok" };
 	} catch (error) {
-		return{statusMsge : 'no'}
-		
+		return { statusMsge: "no" };
 	}
-	
 }
 
 /////// nta3 telegram
 async function sendTelegramMessage(chatId, messageText) {
 	if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
-	
 		return { success: false, error: "توكن بوت تيليجرام غير موجود." };
 	}
 	let rspns = {};
@@ -252,4 +248,4 @@ async function price(smbl) {
 		};
 	}
 }
-export { srchSmbls, price, stocksExchange, getExchangeSymbols ,sendMesageFn };
+export { srchSmbls, price, stocksExchange, getExchangeSymbols, sendMesageFn };

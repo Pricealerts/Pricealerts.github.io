@@ -1,17 +1,17 @@
-//const functions = require("firebase-functions");
 import { initializeApp } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-//import { auth } from "firebase-functions/v1";
 import { cAllDatabase } from "./fncAlert/cAllDatabase.js";
 import { checkAndSendAlerts } from "./fncAlert/srchSmbls.js";
 
-//import { onUserCreated, onUserDeleted } from "firebase-functions/v2/auth";
-
 initializeApp();
-
 export const proxyRequestV2 = onRequest(
-	{ region: "europe-west1" },
+	{
+		region: "europe-west1",
+		memory: "256MiB", 
+		maxInstances: 1,
+		timeoutSeconds: 60, // حاول تقليلها إذا كان الجلب سريعاً
+	},
 	async (req, res) => {
 		// تعيين رؤوس CORS
 		const origin = req.headers.origin;
@@ -46,7 +46,9 @@ export const proxyRequestV2 = onRequest(
 			//  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
 			// res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`);
 		} catch (error) {
-			console.error("error f proxyRequestV2 is :" + error);
+			console.error("error f proxyRequestV2 is :");
+			console.log(error);
+			
 
 			const err = JSON.stringify({
 				error: "Failed to fetch data",
@@ -62,9 +64,9 @@ export const scheduledTask = onSchedule(
 	{
 		schedule: "every 5 minutes",
 		region: "europe-west1",
-		memory: "128MiB", // تكفي وزيادة لمتغير 1Mb وتوفر المال
+		memory: "256MiB", 
 		maxInstances: 1,
-		timeoutSeconds: 60, // حاول تقليلها إذا كان الجلب سريعاً
+		timeoutSeconds: 120, // حاول تقليلها إذا كان الجلب سريعاً
 	},
 	async () => {
 		try {

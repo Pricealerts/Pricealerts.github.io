@@ -28,50 +28,43 @@ function getIntLmt(requestTimeStr) {
 	}
 	return { interval, limit };
 }
-let symbolsMap;
-let allAlerts;
+
 //////////////// get candles
-async function getCandles() {
-	if (!symbolsMap) {
-		symbolsMap = new Map();
-		// 1. التكرار لتجميع الرموز وتحديد أفضل إعدادات لكل رمز
-		allAlerts.forEach(row => {
-			const { exchangeId, symbol, requestTime } = row;
-			// حساب الـ Interval والـ Limit بناءً على دالتك
-			const { interval: currentInterval, limit: currentLimit } =
-				getIntLmt(requestTime);
-			if (symbolsMap.has(symbol)) {
-				const existing = symbolsMap.get(symbol);
-				// --- منطق المفاضلة ---
-				// 1. أولوية المنصة: إذا ظهرت Binance نعتمدها كمصدر
-				const finalExchange =
-					exchangeId === "binance" ? "binance" : existing.exchangeId;
-				// 2. أولوية الـ Interval: إذا كان أحدهما 1m والآخر 5m، نفضل الـ 1m لأنه يعطي تفاصيل أدق
-				// ( أو يمكنك عكس المنطق حسب رغبتك )
-				const finalInterval =
-					existing.interval === "1m" || currentInterval === "1m" ? "1m" : "5m";
-				// 3. أولوية الـ Limit: نأخذ الأكبر دائماً لضمان تغطية الفارق الزمني الأطول
-				const finalLimit = Math.max(existing.limit, currentLimit);
-				symbolsMap.set(symbol, {
-					exchangeId: finalExchange,
-					interval: finalInterval,
-					limit: finalLimit,
-				});
-			} else {
-				// أول ظهور للرمز
-				symbolsMap.set(symbol, {
-					exchangeId,
-					interval: currentInterval,
-					limit: currentLimit,
-				});
-			}
-		});
-	} else {
-		const rfyj =  "rah 3amr is : "
-		console.log(symbolsMap);
-		
-		
-	}
+async function getCandles(allAlerts) {
+	const symbolsMap = new Map();
+	// 1. التكرار لتجميع الرموز وتحديد أفضل إعدادات لكل رمز
+	allAlerts.forEach(row => {
+		const { exchangeId, symbol, requestTime } = row;
+		// حساب الـ Interval والـ Limit بناءً على دالتك
+		const { interval: currentInterval, limit: currentLimit } =
+			getIntLmt(requestTime);
+		if (symbolsMap.has(symbol)) {
+			const existing = symbolsMap.get(symbol);
+			// --- منطق المفاضلة ---
+			// 1. أولوية المنصة: إذا ظهرت Binance نعتمدها كمصدر
+			const finalExchange =
+				exchangeId === "binance" ? "binance" : existing.exchangeId;
+			// 2. أولوية الـ Interval: إذا كان أحدهما 1m والآخر 5m، نفضل الـ 1m لأنه يعطي تفاصيل أدق
+			// ( أو يمكنك عكس المنطق حسب رغبتك )
+			const finalInterval =
+				existing.interval === "1m" || currentInterval === "1m" ? "1m" : "5m";
+			// 3. أولوية الـ Limit: نأخذ الأكبر دائماً لضمان تغطية الفارق الزمني الأطول
+			const finalLimit = Math.max(existing.limit, currentLimit);
+			symbolsMap.set(symbol, {
+				exchangeId: finalExchange,
+				interval: finalInterval,
+				limit: finalLimit,
+			});
+		} else {
+			// أول ظهور للرمز
+			symbolsMap.set(symbol, {
+				exchangeId,
+				interval: currentInterval,
+				limit: currentLimit,
+			});
+		}
+	});
+
 	const symbolsOrder = Array.from(symbolsMap.keys());
 	// 2. تحويل الخريطة (Map) إلى وعود (Promises) لجلب البيانات
 	const promises = symbolsOrder.map(symbol => {
@@ -99,30 +92,26 @@ async function getCandles() {
 		candles[symbol] =
 			data && Array.isArray(data) && data.length > 0 ? data : null;
 	});
-	console.log(
-		`✅ جلب البيانات الفريدة مكتمل. عدد الأزواج المطلوبة: ${symbolsOrder.length}`
-	);
 	return candles;
 }
 
 async function checkAndSendAlerts() {
-	if (!allAlerts) {
-		const data = await cAllDatabase({ action: "gtAlerts", chid: "all" });
-		if (!data) return false;
-		allAlerts = [];
-		const usersAll = Object.entries(data);
-		usersAll.forEach(user => {
-			const idUser = user[0];
-			const alrts = Object.entries(user[1]);
-			alrts.forEach(alert => {
-				const alrt = alert[1];
-				alrt.id = alert[0];
-				alrt.telegramChatId = idUser;
-				allAlerts.push(alrt);
-			});
+	const data = await cAllDatabase({ action: "gtAlerts", chid: "all" });
+	if (!data) return false;
+	let allAlerts = [];
+	const usersAll = Object.entries(data);
+	usersAll.forEach(user => {
+		const idUser = user[0];
+		const alrts = Object.entries(user[1]);
+		alrts.forEach(alert => {
+			const alrt = alert[1];
+			alrt.id = alert[0];
+			alrt.telegramChatId = idUser;
+			allAlerts.push(alrt);
 		});
-	}
-	const rsltcandles = await getCandles();
+	});
+
+	const rsltcandles = await getCandles(allAlerts);
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
 	let dltRwApp = [];
 	for (let i = allAlerts.length - 1; i >= 0; i--) {
@@ -165,9 +154,7 @@ async function checkAndSendAlerts() {
 			let message = `🔔 تنبيه سعر ${
 				EXCHANGES_CONFIG[exchangeId].name
 			}!<b>${symbol}</b> بلغت <b>${actualTriggerPrice}</b> (الشرط: السعر ${
-				alertCondition === "less"
-					? "أقل من أو يساوي"
-					: "أعلى من أو يساوي"
+				alertCondition === "less" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${targetPrice})`;
 			const nwChatId = telegramChatId.slice(3);
 			let sendResult = await sendTelegramMessage(nwChatId, message);

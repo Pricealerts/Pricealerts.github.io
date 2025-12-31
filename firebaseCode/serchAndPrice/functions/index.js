@@ -17,7 +17,7 @@ initializeApp();
 export const proxyRequestV2 = onRequest(
 	{
 		region: "europe-west1",
-		memory: "128MiB", // أقل ذاكرة
+		memory: "256MiB", // أقل ذاكرة
 		cpu: 1, // افتراضي (لا ترفعها)
 		maxInstances: 1, // Instance واحدة فقط
 		minInstances: 0, // لا تبقى شغالة
@@ -100,7 +100,7 @@ export const updateSymbolsMonthly = onSchedule(
         // "0 0 1 * *" تعني: الدقيقة 0، الساعة 0، اليوم 1 من كل شهر
         schedule: "0 0 1 * *", 
         region: "europe-west1",
-        memory: "128MiB",      
+        memory: "256MiB",      
         maxInstances: 1,       // حماية من التشغيل المزدوج
         timeoutSeconds: 200,   // مهلة كافية لطلب البيانات من عدة منصات
     },

@@ -1,3 +1,5 @@
+/* --- الخطوط الأساسية وإعادة التعيين --- */
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 :root {
 	--primary: #0f62fe;
 	--bg: #f5f7fa;
@@ -11,8 +13,6 @@
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
 }
-/* --- الخطوط الأساسية وإعادة التعيين --- */
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap');
 body {
     font-family: 'Cairo', sans-serif;
 }
