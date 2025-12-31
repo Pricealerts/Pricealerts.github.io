@@ -149,7 +149,8 @@ async function fetchTradingPairs(exchangeId) {
 					const locaTim = new Date(localExSmbls.time);
 					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
 				}
-
+				console.log(localExSmbls);
+				
 				if (nmbrDays < 30 && localExSmbls) {
 					symbols =localExSmbls.symbols ;
 				} else {

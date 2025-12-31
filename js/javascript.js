@@ -298,7 +298,7 @@ usdDsply.addEventListener("change", async () => {
 		let response = await fetch(url, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ datas: "price", querySmble: smbl }),
+			body: JSON.stringify({ action: "price", querySmble: smbl }),
 		});
 		console.log(response);
 		let rslt  = await response.json();
@@ -312,7 +312,7 @@ usdDsply.addEventListener("change", async () => {
 	let response = await fetch(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ datas: "price", querySmble: smbl2 }),
+		body: JSON.stringify({ action: "price", querySmble: smbl2 }),
 	});
 	let rslt = await response.json();
 	priceNewCrncy = rslt.close;

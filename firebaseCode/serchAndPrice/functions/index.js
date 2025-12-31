@@ -46,8 +46,9 @@ export const proxyRequestV2 = onRequest(
         }
 
         // --- استخراج البيانات ---
-        const action = req.method === "POST" ? req.body.action : req.query.action;
-        const querySmble = req.method === "POST" ? req.body.querySmble : req.query.querySmble;
+        const rqust = req.method === "POST" ? req.body : req.query;
+        const action = rqust.action;
+        const querySmble = rqust.querySmble;
 
         try {
             if (!action) {
