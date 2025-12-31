@@ -147,11 +147,13 @@ async function fetchTradingPairs(exchangeId) {
 				if (localExSmbls) {
 					localExSmbls = JSON.parse(localExSmbls);
 					const locaTim = new Date(localExSmbls.time);
-					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24*30));
+					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
 				}
 
-				if (nmbrDays < 8) {
-					symbols =JSON.parse(localExSmbls.symbols) ;
+				if (nmbrDays < 30) {
+					
+					
+					symbols =localExSmbls.symbols ;
 				} else {
 					
 					data = await ftchFnctn(exchange.exchangeInfoUrl, {action: "stocksExchange",querySmble: exchangeId});

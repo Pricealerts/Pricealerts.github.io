@@ -13,13 +13,12 @@ let db;
  * @param alert - البيانات التي سيتم إضافتها
  */
 async function cAllDatabase(data) {
-	db = getDatabase();
+	// ✅ تهيئة القاعدة مرة واحدة فقط عند أول استدعاء (Lazy Init)
+		if (!db) db = getDatabase();
+		if (!postsRef) postsRef = db.ref("alerts");
 	//data.uid = btoa(data.userEmail);
-	if (!data.userPassword) {
-		data.userPassword = "qsfqzrqsqle7610dqsdepllpl";
-	}
+	
 	if (!data.paid) data.paid = false;
-	postsRef = db.ref("alerts");
 	try {
 		const action = data.action;
 		let rspns;
@@ -44,10 +43,8 @@ async function cAllDatabase(data) {
 
 		return rspns;
 	} catch (error) {
-		// Throw an Error object for better stack traces and consistency
-		throw console.error(
-			"حدث خطأ: " + (error && error.message ? error.message : String(error))
-		);
+		console.error("❌ Error in cAllDatabase:", error.message);
+        throw new Error(error.message);
 	}
 }
 

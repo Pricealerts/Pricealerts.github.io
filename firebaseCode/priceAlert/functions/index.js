@@ -80,7 +80,6 @@ export const scheduledTask = onSchedule(
 //// on created
 
 /* 
-
 export const handleUserCreated = auth.user().onCreate(
   async (user) => {
     const userId = user.uid;
@@ -101,3 +100,6 @@ export const handleUserCreated = auth.user().onCreate(
     return null;
   }
 ); */
+
+
+

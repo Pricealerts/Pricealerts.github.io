@@ -3,7 +3,19 @@ import { EXCHANGES_CONFIG, gtapiUrl } from "./cnstnts.js";
 import { cAllDatabase } from "./cAllDatabase.js";
 
 // *** بيانات اعتماد Telegram Bot API ***
-const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
+
+
+
+
+let TELEGRAM_BOT_TOKEN;
+
+const getBotToken = () => {
+    if (!TELEGRAM_BOT_TOKEN) {
+        TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
+    }
+    return TELEGRAM_BOT_TOKEN; // إرجاع القيمة كضمان إضافي
+};
+
 
 //const APPS_SCRIPT_WEB_APP_URL =
 //	"https://script.google.com/macros/s/AKfycbz0hE-JXd26WjQtLOwp3SZI5_x5ZETBZjWPxFutRyZiPMDn01khIam6tVxBanNl-O2s/exec";
@@ -357,12 +369,10 @@ function parseIntervalToMilliseconds(interval) {
  * دالة لإرسال رسالة Telegram.
  */
 async function sendTelegramMessage(chatId, messageText) {
-	if (!TELEGRAM_BOT_TOKEN || TELEGRAM_BOT_TOKEN === "YOUR_TELEGRAM_BOT_TOKEN") {
-		console.error("TELEGRAM_BOT_TOKEN غير معرّف أو غير صالح.");
-		return { success: false, error: "توكن بوت تيليجرام غير موجود." };
-	}
+	 const token = getBotToken(); 
+	
 	let rspns = {};
-	const TELEGRAM_API_URL = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+	const TELEGRAM_API_URL = `https://api.telegram.org/bot${token}/sendMessage`;
 	let payload = {
 		chat_id: chatId,
 		text: messageText,

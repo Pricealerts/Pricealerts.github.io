@@ -34,7 +34,9 @@ export const proxyRequestV2 = onRequest(
         if (allowedOrigins.includes(origin)) {
             res.set("Access-Control-Allow-Origin", origin);
         } else if (origin) { // إذا كان هناك أصل غير مدعوم
+            console.log('is forbidden origin');
             return res.status(403).send("Forbidden Origin");
+            
         }
 
         if (req.method === "OPTIONS") {

@@ -295,18 +295,21 @@ usdDsply.addEventListener("change", async () => {
 	let url = EXCHANGES.nasdaq.exchangeInfoUrl;
 	if (currencyFtch !== "USD") {
 		let smbl = currencyFtch + "USD=X";
-		response = await fetch(url, {
+		let response = await fetch(url, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ datas: "price", querySmble: smbl }),
 		});
+		console.log(response);
 		let rslt  = await response.json();
+		
+		
 		priceCurrencyFtch = rslt.close;
 	}
 
 	let priceNewCrncy = 1;
 	let smbl2 = usdDsply.value + "USD=X";
-	response = await fetch(url, {
+	let response = await fetch(url, {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ datas: "price", querySmble: smbl2 }),
