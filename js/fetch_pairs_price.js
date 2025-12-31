@@ -150,9 +150,7 @@ async function fetchTradingPairs(exchangeId) {
 					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
 				}
 
-				if (nmbrDays < 30) {
-					
-					
+				if (nmbrDays < 30 && localExSmbls) {
 					symbols =localExSmbls.symbols ;
 				} else {
 					
