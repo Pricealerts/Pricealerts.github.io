@@ -147,7 +147,7 @@ async function fetchTradingPairs(exchangeId) {
 				if (localExSmbls) {
 					localExSmbls = JSON.parse(localExSmbls);
 					const locaTim = new Date(localExSmbls.time);
-					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
+					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24*30));
 				}
 
 				if (nmbrDays < 8) {
@@ -160,7 +160,9 @@ async function fetchTradingPairs(exchangeId) {
 					const tolclStrg = { symbols: data, time: today };
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
 					
-					symbols = JSON.parse(data);
+					symbols = data;
+					console.log(symbols);
+					
 				}
 
 				//console.log(symbols);
@@ -205,7 +207,7 @@ async function fetchTradingPairs(exchangeId) {
 		currentPriceDisplay.textContent = "خطأ, إعادة التحميل.";
 		searchPrice.placeholder = "خطأ, إعادة التحميل";
 		if (priceUpdateInterval) clearInterval(priceUpdateInterval);
-		console.log("3awd wla " + err);
+		console.log("3awd wla " + error);
 
 		rfrsh++;
 		if (rfrsh < 5) {
