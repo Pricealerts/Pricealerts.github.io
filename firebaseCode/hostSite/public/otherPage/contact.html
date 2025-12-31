@@ -165,10 +165,7 @@
 							querySmble: allMesage, //.toUpperCase(),
 						}),
 					});
-					const data = await response.json();
-					console.log(data);
-					const rslt = JSON.parse(data);
-					console.log(data);
+					const rslt = await response.json();
 
 					if (rslt.statusMsge == "ok") {
 						responsP.innerHTML =

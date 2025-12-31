@@ -161,7 +161,6 @@ async function fetchTradingPairs(exchangeId) {
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
 					
 					symbols = data;
-					console.log(symbols);
 					
 				}
 
@@ -296,27 +295,14 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 			case "HKSE":
 			case "NSE":
 			case "other":
-				data = await ftchFnctn(exchange.exchangeInfoUrl, { action: "price", querySmble: symbol });
+				rslt = await ftchFnctn(exchange.exchangeInfoUrl, { action: "price", querySmble: symbol });
 				
-				rslt = JSON.parse(data);
+				
 				currencyFtch = rslt.currency;
 				price = rslt.close;
 				priceFtch = price;
 
 				break;
-			/* case "other":
-				response = await fetch(exchange.tickerPriceUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ action: "price", querySmble: symbol }),
-				});
-				data = await response.json();
-				rslt = JSON.parse(data);
-				currencyFtch = rslt.currency;
-				price = rslt.close;
-				priceFtch = price;
-				break;  */
-			//querySmbl = encodeURIComponent('BMW.DE')
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
 				break;

@@ -231,8 +231,7 @@ async function filterList() {
 		}
 		const url = EXCHANGES.other.exchangeInfoUrl;
 		try {
-			const data = await ftchFnctn(url, { querySmble: querySmbl, action: "smbls" });
-			const result = JSON.parse(data);
+			const result = await ftchFnctn(url, { querySmble: querySmbl, action: "smbls" });
 
 			dropdownList.innerHTML = result
 				.map(
@@ -301,8 +300,7 @@ usdDsply.addEventListener("change", async () => {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ datas: "price", querySmble: smbl }),
 		});
-		data = await response.json();
-		let rslt = JSON.parse(data);
+		let rslt  = await response.json();
 		priceCurrencyFtch = rslt.close;
 	}
 
@@ -313,8 +311,7 @@ usdDsply.addEventListener("change", async () => {
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ datas: "price", querySmble: smbl2 }),
 	});
-	data = await response.json();
-	let rslt = JSON.parse(data);
+	let rslt = await response.json();
 	priceNewCrncy = rslt.close;
 	currentPriceDisplay.textContent =
 		(priceFtch * priceCurrencyFtch) / priceNewCrncy;
