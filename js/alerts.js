@@ -6,9 +6,7 @@ async function loadUserAlertsDisplay() {
 			action: "gtAlerts",
 			chid: telegramChatId,
 		}).then(rslt => {
-			let aryRslt = JSON.parse(rslt);
-			aryRslt = Object.entries(aryRslt);
-
+			let aryRslt = Object.entries(rslt);
 			renderAlerts(aryRslt);
 		});
 	} catch (err) {
@@ -27,25 +25,32 @@ function renderAlerts(alerts) {
 		return;
 	}
 
-	alerts.forEach(alert2 => {
-		let alert = alert2[1];
+	alerts.forEach(alert => {
+		const {
+			e: exchangeId,
+			s: symbol,
+			t: targetPrice,
+			c: alertCondition,
+			//tid: telegramChatId,
+			//i: id,
+		} = alert[1];
 		let conditionText = "";
-		if (alert.alertCondition === "less") {
+		if (alertCondition === "l") {
 			conditionText = "عندما يصبح السعر أصغر أو يساوي";
-		} else if (alert.alertCondition === "greater") {
+		} else if (alertCondition === "g") {
 			conditionText = "عندما يصبح السعر أكبر أو يساوي";
 		}
 
 		const listItem = document.createElement("li");
 		const dltAlrt = JSON.stringify({
-			alertId: alert2[0],
+			alertId: alert[0],
 			telegramChatId: "cht" + telegramChatId,
 		});
 
 		listItem.innerHTML = `
 			<span class="alert-info" >
-				<strong>${EXCHANGES[alert.exchangeId].name} - ${alert.symbol}</strong>
-				${conditionText} ${alert.targetPrice} 
+				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>
+				${conditionText} ${targetPrice} 
 				(النوع: تيليجرام)
 				<br>   المعرف:   
 				 ${telegramChatId}  
@@ -84,9 +89,9 @@ function requestNotificationPermission() {
 
 function showBrowserNotification(symbol, price, targetPrice, condition) {
 	let conditionText = "";
-	if (condition === "less") {
+	if (condition === "l") {
 		conditionText = `أصبح ≥ ${targetPrice} USDT`;
-	} else if (condition === "greater") {
+	} else if (condition === "g") {
 		conditionText = `أصبح ≤ ${targetPrice} USDT`;
 	}
 
@@ -112,12 +117,12 @@ function checkForBrowserAlerts() {
 			) {
 				let shouldTrigger = false;
 				if (
-					alert.alertCondition === "less" &&
+					alert.alertCondition === "l" &&
 					currentPrice <= alert.targetPrice
 				) {
 					shouldTrigger = true;
 				} else if (
-					alert.alertCondition === "greater" &&
+					alert.alertCondition === "g" &&
 					currentPrice >= alert.targetPrice
 				) {
 					shouldTrigger = true;
@@ -150,7 +155,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			action: action,
 			...alertData,
 		}).then(dt => {
-			data = JSON.parse(dt);
+			data = dt
 			console.log(data);
 		});
 

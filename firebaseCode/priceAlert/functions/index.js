@@ -8,7 +8,7 @@ initializeApp();
 export const proxyRequestV2 = onRequest(
 	{
 		region: "europe-west1",
-		memory: "256MiB", 
+		memory: "256MiB",
 		maxInstances: 1,
 		timeoutSeconds: 60, // حاول تقليلها إذا كان الجلب سريعاً
 	},
@@ -30,26 +30,20 @@ export const proxyRequestV2 = onRequest(
 		}
 		res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 		res.set("Access-Control-Allow-Headers", "Content-Type");
-
 		const data = req.method === "POST" ? req.body : req.query;
-
 		try {
 			if (!data) {
 				res.send("rah  " + data);
 				return null;
 			}
-
 			const rslt = await cAllDatabase(data);
 			const respons = JSON.stringify(rslt);
 			res.status(200).json(respons);
-
 			//  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
 			// res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`);
 		} catch (error) {
 			console.error("error f proxyRequestV2 is :");
 			console.log(error);
-			
-
 			const err = JSON.stringify({
 				error: "Failed to fetch data",
 				status: "notSuccess",
@@ -64,7 +58,7 @@ export const scheduledTask = onSchedule(
 	{
 		schedule: "every 5 minutes",
 		region: "europe-west1",
-		memory: "256MiB", 
+		memory: "256MiB",
 		maxInstances: 1,
 		timeoutSeconds: 120, // حاول تقليلها إذا كان الجلب سريعاً
 	},
@@ -100,6 +94,3 @@ export const handleUserCreated = auth.user().onCreate(
     return null;
   }
 ); */
-
-
-

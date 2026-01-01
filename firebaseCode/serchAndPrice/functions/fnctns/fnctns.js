@@ -4,6 +4,7 @@ import axios from "axios";
 const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
 const chatIdAbdelhadi = process.env.DADI_CHAT_ID;
 
+
 let db;
 // ------------------------
 // جلب رموز بورصة واحدة من البورصات لخرين

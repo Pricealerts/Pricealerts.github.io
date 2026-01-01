@@ -9,7 +9,6 @@ const usdDsply = gebi("usdDsply");
 let allCrpto = [];
 let allPrices = [];
 let rfrsh = 0;
-
 /* med email */
 /* const conditionLessThanOrEqual = gebi(
 	"conditionLessThanOrEqual"
@@ -187,9 +186,9 @@ async function deleteAlert(alert) {
 		id: alert.alertId,
 		telegramChatId: alert.telegramChatId,
 	});
-	if (success) {
+	/* if (success) {
 		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnFirebase عند النجاح
-	}
+	} */
 }
 
 /*  May code */

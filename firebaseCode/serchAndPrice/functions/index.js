@@ -49,7 +49,6 @@ export const proxyRequestV2 = onRequest(
         const rqust = req.method === "POST" ? req.body : req.query;
         const action = rqust.action;
         const querySmble = rqust.querySmble;
-
         try {
             if (!action) {
                 return res.status(400).send("Action is missing");
@@ -92,10 +91,10 @@ export const updateSymbolsMonthly = onSchedule(
         schedule: "0 0 1 * *", 
         region: "europe-west1",
         memory: "256MiB", // الذاكرة الكافية لمنع تكرار الفشل
-        maxInstances: 1,      
+        maxInstances: 1,
         timeoutSeconds: 300, // 5 دقائق كافية جداً
     },
-    async (event) => {
+    async () => {
         try {
             await getExchangeSymbols();
             console.log("✅ تم التحديث الشهري بنجاح");

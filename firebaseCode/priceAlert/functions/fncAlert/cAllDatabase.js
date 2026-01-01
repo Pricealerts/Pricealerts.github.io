@@ -79,17 +79,15 @@ async function setAlert(data) {
 		!data.targetPrice ||
 		!data.telegramChatId ||
 		!data.alertCondition
-	) {
-		throw "الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.";
-	}
+	) {	throw "الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام."}
+	
 	const alrtAdd = {
-		exchangeId: data.exchangeId,
-		symbol: data.symbol,
-		targetPrice: data.targetPrice,
-		alertCondition: data.alertCondition,
-		//telegramChatId:data.telegramChatId,
-		requestTime: new Date().toLocaleString(),
-	};
+    e: data.exchangeId,      // e بدلاً من exchangeId
+    s: data.symbol,          // s بدلاً من symbol
+    t: data.targetPrice,     // t بدلاً من targetPrice
+    c: data.alertCondition,  // c بدلاً من alertCondition
+  //  r: new Date().toLocaleString(), // requestTime 
+};
 
 	const rspns = {};
 
@@ -162,7 +160,7 @@ async function cntctUser(data, alrtAdd) {
 			}! 
 ل<b> ${alrtAdd.symbol} </b>  
 (الشرط: السعر   ${
-				alrtAdd.alertCondition === "less"
+				alrtAdd.alertCondition === "l"
 					? "أقل من أو يساوي"
 					: "أعلى من أو يساوي"
 			} ${alrtAdd.targetPrice} )

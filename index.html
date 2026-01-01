@@ -35,10 +35,7 @@
 		<!-- end OG Meta for Social shares -->
 
 		<title>منبه الأسعار</title>
-		<link
-			rel="stylesheet"
-			href="https://pricealerts.github.io/style.min.css"
-		/>
+		<link rel="stylesheet" href="https://pricealerts.github.io/style.min.css" />
 		<!-- Poure applecation -->
 		<link rel="manifest" href="./manifest.json" />
 		<meta name="theme-color" content="#f0f2f5" />
@@ -161,7 +158,7 @@
 							type="radio"
 							id="conditionGreaterThanOrEqual"
 							name="alertCondition"
-							value="greater_than_or_equal"
+							value="g"
 						/>
 						<label for="conditionGreaterThanOrEqual">
 							<img src="imgs/up-arrow-svgrepo-com (1).svg" alt="" />أعلى من أو
@@ -173,7 +170,7 @@
 							type="radio"
 							id="conditionLessThanOrEqual"
 							name="alertCondition"
-							value="less_than_or_equal"
+							value="l"
 							checked
 						/>
 						<label for="conditionLessThanOrEqual"
@@ -245,19 +242,17 @@
 						margin-bottom: 10px;
 					"
 				>
-				<div id="installBtn" style="display: none">	حمله كتطبيق 
-			<img
-					id="dwnld"
-					style="display: block; width: 70%; margin: auto"
-					src="/imgs/anddw.png"
-					alt="حمل التطبيق"
-				/>
-		</div>
+					<div id="installBtn" style="display: none">
+						حمله كتطبيق
+						<img
+							id="dwnld"
+							style="display: block; width: 70%; margin: auto"
+							src="/imgs/anddw.png"
+							alt="حمل التطبيق"
+						/>
+					</div>
 				</h3>
-				
 			</div>
-
-		
 
 			<!--  <iframe id="ifrmTRdVw"
   src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&style=1"
@@ -319,6 +314,79 @@
 					})
 					.catch(err => console.error("SW Error:", err));
 			}
+
+			const drt = {
+				exchng1: {
+					id1: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+					id3: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+					id4: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+				},
+				exchng2: {
+					id1: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+					id3: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+					id4: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+				},
+				exchng3: {
+					id1: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+					id3: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+					id4: {
+						rerer: "etr",
+						errezez: "dcfg",
+						ddsf: 76654,
+					},
+				},
+			};
+			const alrts = Object.entries(drt);
+			console.log(alrts);
+
+			//const alrts2 = Object.entries(alrts[1]);
+			//console.log(alrts2);
+			let allAlerts = [];
+			alrts.forEach(user => {
+				//console.log(user);
+				const idUser = user[0];
+				const alrts = Object.entries(user[1]);
+				alrts.forEach(alert => {
+					const alrt = alert[1];
+					alrt.id = alert[0];
+					alrt.exchng = idUser;
+					allAlerts.push(alrt);
+				});
+			});
+			console.log(allAlerts);
+			
 		</script>
 
 		<script src="./js.min.js"></script>
