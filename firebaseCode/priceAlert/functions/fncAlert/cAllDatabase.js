@@ -153,20 +153,18 @@ async function cntctUser(data, alrtAdd) {
 		const callDb = db.ref(`allChatId/cht${idChat}`);
 		const getChId = await callDb.get();
 		let gtChIdExixst;
-
 		if (!getChId.exists()) {
 			let message = `لقد قمت بتعين تنبيه على  ${
 				EXCHANGES_CONFIG[alrtAdd.exchangeId].name
-			}! 
-ل<b> ${alrtAdd.symbol} </b>  
-(الشرط: السعر   ${
+				}! 
+				ل<b> ${alrtAdd.symbol} </b>  
+				(الشرط: السعر   ${
 				alrtAdd.alertCondition === "l"
 					? "أقل من أو يساوي"
 					: "أعلى من أو يساوي"
-			} ${alrtAdd.targetPrice} )
-سيتم تبليغك فور تحقيق الشرط
-شكرا`;
-
+				} ${alrtAdd.targetPrice} )
+				سيتم تبليغك فور تحقيق الشرط
+				شكرا`;
 			const sendMsg = await sendTelegramMessage(idChat, message);
 			if (sendMsg.success) {
 				gtChIdExixst = {};
