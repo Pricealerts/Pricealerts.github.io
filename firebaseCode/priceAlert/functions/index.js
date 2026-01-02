@@ -37,8 +37,7 @@ export const proxyRequestV2 = onRequest(
 				return null;
 			}
 			const rslt = await cAllDatabase(data);
-			const respons = JSON.stringify(rslt);
-			res.status(200).json(respons);
+			res.status(200).json(rslt);
 			//  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
 			// res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`);
 		} catch (error) {

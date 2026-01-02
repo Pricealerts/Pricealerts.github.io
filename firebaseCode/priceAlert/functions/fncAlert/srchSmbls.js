@@ -121,13 +121,13 @@ async function checkAndSendAlerts() {
 		} /* else {console.warn(`لم يتم الحصول على بيانات شمعة  لـ ${symbol} على 
 		${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`)} */
 		if (triggeredByHistoricalPrice) {
-			let message = `🔔 تنبيه سعر ${
+			const message = `🔔 تنبيه سعر ${
 				EXCHANGES_CONFIG[exchangeId].name
 			}!<b>${symbol}</b> بلغت <b>${actualTriggerPrice}</b> (الشرط: السعر ${
 				alertCondition === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${targetPrice})`;
 			const nwChatId = telegramChatId.slice(3);
-			let dlt = {
+			const dlt = {
 				telegramChatId: telegramChatId,
 				id: id,
 				alrtOk: true,

@@ -88,17 +88,23 @@ async function setAlert(data) {
     c: data.alertCondition,  // c بدلاً من alertCondition
   //  r: new Date().toLocaleString(), // requestTime 
 };
-
 	const rspns = {};
-
 	try {
+		if(data.isAlrd){
+			const message = `🔔 تنبيه سعر ${
+				EXCHANGES_CONFIG[alrtAdd.e].name
+			}!<b>${alrtAdd.s}</b> بلغت <b>${alrtAdd.t}</b> (الشرط: السعر ${
+				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
+			} ${targetPrice})`;
+			await sendTelegramMessage(data.telegramChatId, message)
+			return {status : "success"}
+		}
 		const okUser = await cntctUser(data, alrtAdd);
 		if (!okUser.okRspns) {
 			return okUser;
 		}
 		await postsRef.child(`cht${data.telegramChatId}/id${data.id}`).set(alrtAdd);
 		rspns.status = "success";
-		await checkAndSendAlerts();
 		return rspns;
 	} catch (error) {
 		rspns.status = "notSuccess";
@@ -181,16 +187,16 @@ async function cntctUser(data, alrtAdd) {
 
 			return rspns;
 		}
-		gtChIdExixst = getChId.val();
-
-		if (gtChIdExixst.counter < 100 || gtChIdExixst.paid) {
+		//gtChIdExixst = getChId.val();
+		rspns.okRspns = true;
+		/* if (gtChIdExixst.counter < 100 || gtChIdExixst.paid) {
 			rspns.okRspns = true;
 		} else if (gtChIdExixst.counter > 99 && !gtChIdExixst.paid) {
 			rspns.status = "notPaid";
 			rspns.okRspns = false;
 		} else {
 			rspns = { okRspns: false, status: "errorNotfond" };
-		}
+		} */
 
 		return rspns;
 	} catch (error) {

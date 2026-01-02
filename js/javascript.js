@@ -31,7 +31,7 @@ let currentPrice = null;
 let priceUpdateInterval;
 let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
 // --- معالجات الأحداث ---
- startPage()
+startPage();
 async function startPage() {
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
@@ -146,7 +146,7 @@ setAlertButton.addEventListener("click", async () => {
 	if (isTelegramAlert) {
 		if (localStorage.idChat !== telegramChatId) {
 			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
-		gebi('telegramChatIdNote').style.display = 'none'
+			gebi("telegramChatIdNote").style.display = "none";
 		}
 
 		// إنشاء معرف فريد للتنبيه
@@ -159,11 +159,16 @@ setAlertButton.addEventListener("click", async () => {
 			currenci: usdDsply.value,
 			targetPrice: targetPrice,
 			alertCondition: alertCondition,
-			alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
+			//alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
 			telegramChatId: telegramChatId,
-			paidOrNo: false,
+			isAlrd: false,
 		};
-
+		const prc = currentPriceDisplay.textContent;
+		console.log(prc);
+		
+		if ((alertCondition === "l" && prc <= targetPrice) ||(alertCondition === "g" && prc >= targetPrice)) {
+		newTelegramAlert.isAlrd= true;
+		} 
 		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
 		if (success) {
 			alertStatus.textContent +=
@@ -230,7 +235,10 @@ async function filterList() {
 		}
 		const url = EXCHANGES.other.exchangeInfoUrl;
 		try {
-			const result = await ftchFnctn(url, { querySmble: querySmbl, action: "smbls" });
+			const result = await ftchFnctn(url, {
+				querySmble: querySmbl,
+				action: "smbls",
+			});
 
 			dropdownList.innerHTML = result
 				.map(
@@ -300,9 +308,8 @@ usdDsply.addEventListener("change", async () => {
 			body: JSON.stringify({ action: "price", querySmble: smbl }),
 		});
 		console.log(response);
-		let rslt  = await response.json();
-		
-		
+		let rslt = await response.json();
+
 		priceCurrencyFtch = rslt.close;
 	}
 

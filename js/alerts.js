@@ -2,13 +2,12 @@
 
 async function loadUserAlertsDisplay() {
 	try {
-		await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
+		const rslt = await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
 			action: "gtAlerts",
 			chid: telegramChatId,
-		}).then(rslt => {
-			let aryRslt = Object.entries(rslt);
-			renderAlerts(aryRslt);
 		});
+		let aryRslt = Object.entries(rslt);
+		renderAlerts(aryRslt);
 	} catch (err) {
 		console.error("خطأ في تحميل التنبيهات:", err.message);
 		const alertsList = gebi("alertsList");
@@ -26,6 +25,8 @@ function renderAlerts(alerts) {
 	}
 
 	alerts.forEach(alert => {
+		console.log(alert);
+		
 		const {
 			e: exchangeId,
 			s: symbol,
@@ -40,13 +41,14 @@ function renderAlerts(alerts) {
 		} else if (alertCondition === "g") {
 			conditionText = "عندما يصبح السعر أكبر أو يساوي";
 		}
+		console.log(exchangeId);
 
 		const listItem = document.createElement("li");
 		const dltAlrt = JSON.stringify({
 			alertId: alert[0],
 			telegramChatId: "cht" + telegramChatId,
 		});
-
+		
 		listItem.innerHTML = `
 			<span class="alert-info" >
 				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>
@@ -116,10 +118,7 @@ function checkForBrowserAlerts() {
 				alert.exchangeId === currentExchangeId
 			) {
 				let shouldTrigger = false;
-				if (
-					alert.alertCondition === "l" &&
-					currentPrice <= alert.targetPrice
-				) {
+				if (alert.alertCondition === "l" && currentPrice <= alert.targetPrice) {
 					shouldTrigger = true;
 				} else if (
 					alert.alertCondition === "g" &&
@@ -149,17 +148,17 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		action === "setAlert" ? "تعيين" : "حذف"
 	} التنبيه...`;
 	alertStatus.style.color = "#007bff";
-
+	
 	try {
 		await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
 			action: action,
 			...alertData,
 		}).then(dt => {
-			data = dt
-			console.log(data);
+			data = dt;
 		});
 
 		if (data.status === "success") {
+			//  {"status":"success"}
 			alertStatus.textContent = `${
 				action === "setAlert" ? "تم تعيين" : "تم حذف"
 			} التنبيه بنجاح.`;
@@ -187,6 +186,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			console.error("خطأ في استجابة  firebase:", data);
 			return false;
 		}
+		console.log(data);
 	} catch (error) {
 		alertStatus.textContent = `حدث خطأ في الاتصال بخدمة التنبيهات: ${error.message}`;
 		alertStatus.style.color = "red";
