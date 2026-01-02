@@ -164,11 +164,12 @@ setAlertButton.addEventListener("click", async () => {
 			isAlrd: false,
 		};
 		const prc = currentPriceDisplay.textContent;
-		console.log(prc);
-		
-		if ((alertCondition === "l" && prc <= targetPrice) ||(alertCondition === "g" && prc >= targetPrice)) {
-		newTelegramAlert.isAlrd= true;
-		} 
+		if (
+			(alertCondition === "l" && prc <= targetPrice) ||
+			(alertCondition === "g" && prc >= targetPrice)
+		) {
+			newTelegramAlert.isAlrd = true;
+		}
 		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
 		if (success) {
 			alertStatus.textContent +=

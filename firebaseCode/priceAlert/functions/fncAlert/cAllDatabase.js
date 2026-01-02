@@ -95,7 +95,7 @@ async function setAlert(data) {
 				EXCHANGES_CONFIG[alrtAdd.e].name
 			}!<b>${alrtAdd.s}</b> بلغت <b>${alrtAdd.t}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-			} ${targetPrice})`;
+			} ${alrtAdd.t})`;
 			await sendTelegramMessage(data.telegramChatId, message)
 			return {status : "success"}
 		}

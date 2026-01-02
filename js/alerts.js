@@ -25,8 +25,6 @@ function renderAlerts(alerts) {
 	}
 
 	alerts.forEach(alert => {
-		console.log(alert);
-		
 		const {
 			e: exchangeId,
 			s: symbol,
@@ -41,8 +39,6 @@ function renderAlerts(alerts) {
 		} else if (alertCondition === "g") {
 			conditionText = "عندما يصبح السعر أكبر أو يساوي";
 		}
-		console.log(exchangeId);
-
 		const listItem = document.createElement("li");
 		const dltAlrt = JSON.stringify({
 			alertId: alert[0],
