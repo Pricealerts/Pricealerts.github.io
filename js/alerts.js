@@ -7,6 +7,8 @@ async function loadUserAlertsDisplay() {
 			chid: telegramChatId,
 		});
 		let aryRslt = Object.entries(rslt);
+		// تحويل المصفوفة إلى نص JSON قبل الحفظ
+		localStorage.setItem("alrtsStorg", JSON.stringify(aryRslt));
 		renderAlerts(aryRslt);
 	} catch (err) {
 		console.error("خطأ في تحميل التنبيهات:", err.message);
@@ -23,15 +25,12 @@ function renderAlerts(alerts) {
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 		return;
 	}
-
 	alerts.forEach(alert => {
 		const {
 			e: exchangeId,
 			s: symbol,
 			t: targetPrice,
 			c: alertCondition,
-			//tid: telegramChatId,
-			//i: id,
 		} = alert[1];
 		let conditionText = "";
 		if (alertCondition === "l") {
@@ -44,7 +43,6 @@ function renderAlerts(alerts) {
 			alertId: alert[0],
 			telegramChatId: "cht" + telegramChatId,
 		});
-		
 		listItem.innerHTML = `
 			<span class="alert-info" >
 				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>
@@ -59,7 +57,6 @@ function renderAlerts(alerts) {
 		`;
 		alertsList.appendChild(listItem);
 	});
-
 	document.querySelectorAll(".delete-button").forEach(button => {
 		button.addEventListener("click", event => {
 			const alertIdToDelete = JSON.parse(event.target.dataset.alert);
@@ -70,7 +67,6 @@ function renderAlerts(alerts) {
 }
 
 // --- وظائف التنبيهات (تم تبسيطها) ---
-
 function requestNotificationPermission() {
 	if (!("Notification" in window)) {
 		// alert("هذا المتصفح لا يدعم إشعارات سطح المكتب.");
@@ -136,57 +132,4 @@ function checkForBrowserAlerts() {
 				}
 			}
 		});
-}
-// دالة لتعيين/حذف التنبيهات على  farebase
-async function manageAlertOnFirebase(action, alertData = null) {
-	let data = {};
-	alertStatus.textContent = `جاري ${
-		action === "setAlert" ? "تعيين" : "حذف"
-	} التنبيه...`;
-	alertStatus.style.color = "#007bff";
-	
-	try {
-		await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
-			action: action,
-			...alertData,
-		}).then(dt => {
-			data = dt;
-		});
-
-		if (data.status === "success") {
-			//  {"status":"success"}
-			alertStatus.textContent = `${
-				action === "setAlert" ? "تم تعيين" : "تم حذف"
-			} التنبيه بنجاح.`;
-			alertStatus.style.color = "green";
-			await loadUserAlertsDisplay(); // تحديث قائمة التنبيهات بعد كل عملية
-			setTimeout(() => {
-				alertStatus.textContent = "";
-			}, 3000);
-			return true;
-		} else if (data.status == "notPaid") {
-			alertStatus.textContent =
-				"انتهت صلاحية الإشتراك في النسخة المجانية عليك الإشتراك في النسخة المدفوعة لمواصلة العملية";
-			alertStatus.style.color = "red";
-			return false;
-		} else if (data.status == "notSuccess") {
-			alertStatus.textContent =
-				"فشل التأكد من معرّف دردشة التيليجرام (Chat ID) الخاص بك يرجى التأكد منه وإعادة المحاولة";
-			alertStatus.style.color = "red";
-			return false;
-		} else {
-			alertStatus.textContent = `فشل ${
-				action === "setAlert" ? "تعيين" : "حذف"
-			} التنبيه: ${data.message || "خطأ غير معروف."}`;
-			alertStatus.style.color = "red";
-			console.error("خطأ في استجابة  firebase:", data);
-			return false;
-		}
-		console.log(data);
-	} catch (error) {
-		alertStatus.textContent = `حدث خطأ في الاتصال بخدمة التنبيهات: ${error.message}`;
-		alertStatus.style.color = "red";
-		console.error("خطأ في إرسال طلب  firebase:", error);
-		return false;
-	}
 }

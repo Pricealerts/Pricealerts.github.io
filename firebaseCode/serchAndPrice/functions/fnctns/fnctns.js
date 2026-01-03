@@ -3,9 +3,8 @@ import axios from "axios";
 
 const TELEGRAM_BOT_TOKEN = process.env.BOT_TOKEN;
 const chatIdAbdelhadi = process.env.DADI_CHAT_ID;
-
-
 let db;
+
 // ------------------------
 // جلب رموز بورصة واحدة من البورصات لخرين
 // ------------------------
@@ -210,43 +209,48 @@ async function sendTelegramMessage(chatId, messageText) {
 //get pice of symbole
 async function price(smbl) {
 	const urlPrice = `https://query1.finance.yahoo.com/v8/finance/chart/${smbl}?interval=1h&range=1d`;
-	let responsePost = {};
 	try {
 		const response = await axios.get(urlPrice);
-		const data = response.data;
-		const result = data.chart.result && data.chart.result[0];
+		const result = response.data?.chart?.result?.[0];
 
-		if (!result || result.length === 0) {
+		if (!result) {
 			return { error: "Symbol not found", smbl };
 		}
 
-		const timestamps = result.timestamp;
 		const q = result.indicators?.quote?.[0];
 		const meta = result.meta;
 
-		// ✅ الحالة 1: بيانات شموع حقيقية متوفرة
-		if (timestamps && q && q.close && q.close.length > 0) {
-			const i = q.close.length - 1;
-			responsePost = {
-				close: q.close[i],
+		// ✅ تحسين: البحث عن آخر سعر إغلاق ليس null
+		let lastClose = null;
+		if (q?.close && q.close.length > 0) {
+			// نمر على المصفوفة من الخلف للأمام لنجد أول رقم حقيقي
+			lastClose = q.close
+				.slice()
+				.reverse()
+				.find(p => p !== null && p !== undefined);
+		}
+
+		// ✅ الحالة 1: استخدام آخر سعر إغلاق موجود في المصفوفة
+		if (lastClose !== null) {
+			return {
+				close: lastClose,
 				currency: meta.currency,
 			};
-		} else if (meta && meta.regularMarketPrice) {
-			// ✅ الحالة 2: لا توجد بيانات شموع → نُنشئ شمعة تقديرية من meta
-			responsePost = {
+		}
+		// ✅ الحالة 2: إذا فشلت المصفوفة، نستخدم سعر السوق المباشر من meta
+		else if (meta && meta.regularMarketPrice) {
+			return {
 				close: meta.regularMarketPrice,
 				currency: meta.currency,
 			};
-		} else {
-			responsePost = { error: "No valid price data found", smbl };
 		}
-		return responsePost;
+
+		return { error: "No valid price data found", smbl };
 	} catch (error) {
 		console.error("Axios error:", error.message);
-		return {
-			error: "Failed to fetch data 2",
-			details: error.message,
-		};
+		return { error: "Failed to fetch data", details: error.message };
 	}
 }
+
+
 export { srchSmbls, price, stocksExchange, getExchangeSymbols, sendMesageFn };

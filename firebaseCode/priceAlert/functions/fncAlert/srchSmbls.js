@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EXCHANGES_CONFIG, gtapiUrl } from "./cnstnts.js";
+import { EXCHANGES_CONFIG, gtapiUrl, gtCndlYahoo,exchs } from "./cnstnts.js";
 import { cAllDatabase } from "./cAllDatabase.js";
 
 // *** بيانات اعتماد Telegram Bot API ***
@@ -159,7 +159,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 	) {
 		return null;
 	}
-	symbol = symbol.replace("$", "");
+	symbol = symbol.replace(/\$\g/, "");
 	const now = new Date();
 	const endTimeMs = now.getTime();
 
@@ -173,7 +173,8 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		let mappedInterval = exchange.intervalMap[interval];
 
 		const apiUrl = gtapiUrl(exchangeId, symbol, mappedInterval, limit);
-		datas = (await axios.get(apiUrl)).data;
+		const axs= await axios.get(apiUrl)
+		datas = axs.data;
 
 		let candles = [];
 		if (exchangeId === "binance") {
@@ -217,7 +218,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		} else if (exchangeId === "coingecko") {
 			const now = Date.now();
 			const fiveMinutesAgo = now - 5 * 60 * 1000;
-
 			// تصفية الأسعار في آخر 5 دقائق
 			const pricesLast5Min = datas.prices.filter(
 				item => item[0] >= fiveMinutesAgo
@@ -250,6 +250,8 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				let dtSlc = [datas[indData]];
 				candles = dtSlc.map(exchange.parseCandle);
 			}
+		} else if (exchs.includes(exchangeId)) {
+			candles = gtCndlYahoo(axs)
 		} else {
 			if (Array.isArray(datas) && datas.length) {
 				candles = datas.map(exchange.parseCandle);
@@ -260,7 +262,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				);
 			}
 		}
-
 		let candles2 = candles.slice(-limit);
 		return candles2;
 	} catch (error) {

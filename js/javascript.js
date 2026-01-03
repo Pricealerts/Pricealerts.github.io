@@ -30,6 +30,7 @@ let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
 let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
+let factorPric = 1;
 // --- معالجات الأحداث ---
 startPage();
 async function startPage() {
@@ -44,7 +45,12 @@ async function startPage() {
 		telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
 		telegramChatId = localStorage.getItem("idChat");
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
-		loadUserAlertsDisplay(); // تحميل التنبيهات من الشيت للعرض
+		if (localStorage.alrtsStorg) {
+			const strg = JSON.parse(localStorage.alrtsStorg);
+			renderAlerts(strg); // تحميل التنبيهات من الشيت للعرض
+		} else {
+			await loadUserAlertsDisplay();
+		}
 		//
 	} else {
 		telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
@@ -90,113 +96,6 @@ async function startPage() {
 	});
 }
 
-setAlertButton.addEventListener("click", async () => {
-	const isTelegramAlert = alertTypeTelegramCheckbox.checked;
-	const isBrowserAlert = alertTypeBrowserCheckbox.checked;
-
-	if (!isTelegramAlert && !isBrowserAlert) {
-		alertStatus.textContent =
-			"الرجاء اختيار نوع واحد على الأقل من التنبيهات (تيليجرام أو المتصفح).";
-		alertStatus.style.color = "red";
-		return;
-	}
-
-	const targetPrice = parseFloat(targetPriceInput.value);
-	const alertCondition = document.querySelector(
-		'input[name="alertCondition"]:checked'
-	).value;
-	telegramChatId = telegramChatIdInput.value.trim();
-
-	if (isNaN(targetPrice) || targetPrice <= 0) {
-		alertStatus.textContent = "الرجاء إدخال سعر مستهدف صحيح.";
-		alertStatus.style.color = "red";
-		return;
-	}
-	if (!selectedSymbol || !currentExchangeId) {
-		alertStatus.textContent = "الرجاء اختيار منصة وعملة.";
-		alertStatus.style.color = "red";
-		return;
-	}
-
-	if (isTelegramAlert && !telegramChatId) {
-		alertStatus.textContent =
-			"الرجاء إدخال معرّف دردشة تيليجرام لتنبيه تيليجرام.";
-		alertStatus.style.color = "red";
-		return;
-	}
-
-	localStorage.setItem("exchangeChoz", currentExchangeId);
-
-	// التعامل مع تنبيه المتصفح محليًا
-	if (isBrowserAlert) {
-		activeBrowserAlerts.push({
-			exchangeId: currentExchangeId,
-			symbol: selectedSymbol,
-			targetPrice: targetPrice,
-			alertCondition: alertCondition,
-			alertType: "browser", // هذا للحفاظ على التمييز
-			status: "Active",
-		});
-		alertStatus.textContent = `تم تعيين تنبيه المتصفح لـ ${selectedSymbol}.`;
-		alertStatus.style.color = "green";
-		checkForBrowserAlerts(); // فحص فوري
-	}
-
-	// التعامل مع تنبيه تيليجرام عبر Apps Script
-	if (isTelegramAlert) {
-		if (localStorage.idChat !== telegramChatId) {
-			localStorage.setItem("idChat", telegramChatId); // حفظ Chat ID في التخزين المحلي
-			gebi("telegramChatIdNote").style.display = "none";
-		}
-
-		// إنشاء معرف فريد للتنبيه
-		const alertId = Date.now().toString();
-
-		const newTelegramAlert = {
-			id: alertId,
-			exchangeId: currentExchangeId,
-			symbol: selectedSymbol,
-			currenci: usdDsply.value,
-			targetPrice: targetPrice,
-			alertCondition: alertCondition,
-			//alertType: "telegram", // يجب أن نرسل النوع إلى Apps Script للتخزين
-			telegramChatId: telegramChatId,
-			isAlrd: false,
-		};
-		const prc = currentPriceDisplay.textContent;
-		if (
-			(alertCondition === "l" && prc <= targetPrice) ||
-			(alertCondition === "g" && prc >= targetPrice)
-		) {
-			newTelegramAlert.isAlrd = true;
-		}
-		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
-		if (success) {
-			alertStatus.textContent +=
-				(isBrowserAlert ? " و" : "") +
-				`تم تعيين تنبيه تيليجرام لـ ${selectedSymbol}.`;
-			alertStatus.style.color = "green";
-			//targetPriceInput.value = "";
-			// لا نمسح telegramChatIdInput إذا تم تعيين تنبيه تيليجرام بنجاح
-		}
-	}
-
-	if (!isTelegramAlert && isBrowserAlert) {
-		// إذا تم تعيين تنبيه متصفح فقط
-		targetPriceInput.value = "";
-	}
-});
-
-async function deleteAlert(alert) {
-	const success = await manageAlertOnFirebase("dltAlrt", {
-		id: alert.alertId,
-		telegramChatId: alert.telegramChatId,
-	});
-	/* if (success) {
-		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnFirebase عند النجاح
-	} */
-}
-
 /*  May code */
 function gebi(el) {
 	return document.getElementById(el);
@@ -240,7 +139,6 @@ async function filterList() {
 				querySmble: querySmbl,
 				action: "smbls",
 			});
-
 			dropdownList.innerHTML = result
 				.map(
 					item => `
@@ -250,9 +148,9 @@ async function filterList() {
                     <strong>${item.symbol}</strong> — ${
 						item.shortname || item.longname || "No Name"
 					}  
-                    <span style="color:gray">(${
-											item.quoteType
-										})</span> <span style="color:gray">(${item.exchDisp})</span>
+                    <span style="color:gray">(
+					${item.quoteType}
+					)</span> <span style="color:gray">(${item.exchDisp})</span>
                 </div>
             `
 				)
@@ -300,6 +198,7 @@ function updateTargetPrice() {
 
 usdDsply.addEventListener("change", async () => {
 	let priceCurrencyFtch = 1;
+
 	let url = EXCHANGES.nasdaq.exchangeInfoUrl;
 	if (currencyFtch !== "USD") {
 		let smbl = currencyFtch + "USD=X";
@@ -323,8 +222,8 @@ usdDsply.addEventListener("change", async () => {
 	});
 	let rslt = await response.json();
 	priceNewCrncy = rslt.close;
-	currentPriceDisplay.textContent =
-		(priceFtch * priceCurrencyFtch) / priceNewCrncy;
+	factorPric = priceFtch / priceNewCrncy;
+	currentPriceDisplay.textContent = priceCurrencyFtch * factorPric;
 });
 
 /* instalation app */
@@ -342,13 +241,9 @@ let buttonInstall = gebi("dvdw");
 buttonInstall.addEventListener("click", async () => {
 	gebi("dvdw").style.display = "none";
 	deferredPrompt.prompt();
-	/* if (vUp.dwAapp >0) {
-        
-    } */
-	/* 
-        const { outcome } = await deferredPrompt.userChoice;
-    
-        console.log(`User response to the install prompt: ${outcome}`); */
+	/* if (vUp.dwAapp >0) {} 
+	const { outcome } = await deferredPrompt.userChoice;
+	console.log(`User response to the install prompt: ${outcome}`); */
 	deferredPrompt = null;
 });
 

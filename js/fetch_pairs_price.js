@@ -12,8 +12,6 @@ const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى لل�
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
 // --- وظائف جلب البيانات وتحديث الأسعار ---
 
-
-
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
 
@@ -49,7 +47,6 @@ async function fetchTradingPairs(exchangeId) {
 					.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
 					.map(s => s.symbol);
 				break;
-
 			case "kucoin":
 				response = await fetch(urlCrpts);
 				data = await response.json();
@@ -81,7 +78,6 @@ async function fetchTradingPairs(exchangeId) {
 					) */
 					.map(s => s.instId /* .replace("-", "") */);
 				break;
-
 			case "bybit":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
@@ -104,7 +100,6 @@ async function fetchTradingPairs(exchangeId) {
 				symbols = await allPrices.map(s => s.symbol);
 
 				break;
-
 			case "coincap":
 				response = await fetch(exchange.tickerPriceUrl);
 
@@ -140,46 +135,37 @@ async function fetchTradingPairs(exchangeId) {
 			case "TSE":
 			case "HKSE":
 			case "NSE":
-				let nmbrDays = 10;
+				let nmbrDays = 100;
 				let localExSmbls = localStorage.getItem(exchangeId);
-				const today = new Date();
-
+				const today = Date.now().toString();
 				if (localExSmbls) {
 					localExSmbls = JSON.parse(localExSmbls);
-					const locaTim = new Date(localExSmbls.time);
+					const locaTim = localExSmbls.time;
 					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
 				}
 				if (nmbrDays < 30 && localExSmbls) {
-					symbols =localExSmbls.symbols ;
+					symbols = localExSmbls.symbols;
 				} else {
-					data = await ftchFnctn(exchange.exchangeInfoUrl, {action: "stocksExchange",querySmble: exchangeId});
+					data = await ftchFnctn(exchange.exchangeInfoUrl, {
+						action: "stocksExchange",
+						querySmble: exchangeId,
+					});
 
 					// storage data
 					const tolclStrg = { symbols: data, time: today };
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
-					
-					symbols = data;
-					
-				}
 
-				//console.log(symbols);
-				/* symbols = nasdaqStocks; */
+					symbols = data;
+				}
 
 				break;
 			case "other":
-				/* response = await fetch(exchange.exchangeInfoUrl, {
-					method: "POST",
-					headers: { "Content-Type": "application/json" },
-					body: JSON.stringify({ action: "stocksExchange", querySmble: "other" }),
-				});
-				symbols = await response.json(); */
 				symbols = otherPrpos;
 				break;
 			default:
 				console.warn(`Exchange info parsing not implemented for ${exchangeId}`);
 				return [];
 		}
-
 		dropdownList.innerHTML = "";
 		if (symbols.length > 0) {
 			symbols.sort();
@@ -200,7 +186,7 @@ async function fetchTradingPairs(exchangeId) {
 		}
 		rfrsh = 0;
 	} catch (error) {
-		//console.error(`حدث خطأ في جلب أزواج العملات من ${exchange.name}:`, error);
+		console.error(`حدث خطأ في جلب أزواج العملات من ${exchange.name} : `, error);
 		currentPriceDisplay.textContent = "خطأ, إعادة التحميل.";
 		searchPrice.placeholder = "خطأ, إعادة التحميل";
 		if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -212,7 +198,6 @@ async function fetchTradingPairs(exchangeId) {
 		}
 	}
 }
-
 async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 	const exchange = EXCHANGES[exchangeId];
 	if (!exchange) return null;
@@ -222,7 +207,6 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 		let apiUrl = "";
 		let price = null;
 		let response, data, rslt;
-
 		switch (exchangeId) {
 			case "binance":
 				price = allPrices.find(obj => obj.symbol == symbol).price;
@@ -293,21 +277,21 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 			case "HKSE":
 			case "NSE":
 			case "other":
-				rslt = await ftchFnctn(exchange.exchangeInfoUrl, { action: "price", querySmble: symbol });
-				
-				
+				rslt = await ftchFnctn(exchange.exchangeInfoUrl, {
+					action: "price",
+					querySmble: symbol,
+				});
+
 				currencyFtch = rslt.currency;
 				price = rslt.close;
 				priceFtch = price;
-
+				usdDsply.value = currencyFtch;
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
 				break;
 		}
 		//console.log(data);
-
-		usdDsply.value = currencyFtch;
 
 		if (price !== null) {
 			currentPrice = price;

@@ -105,17 +105,18 @@ const EXCHANGES = {
 		exchangeInfoUrl: "https://proxyrequestv2-nkipfwe2qq-ew.a.run.app",
 		tickerPriceUrl: "https://proxyrequestv2-nkipfwe2qq-ew.a.run.app",
 		usdtSuffix: "USD",
-		intervalData: 6000000,
+		intervalData: 3600000,
 		crptChos: "none",
 		usdDsply: "inline-block",
 	},
 };
 
-const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other"];
+const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other","nasdaq"];
 exchs.forEach(ex => {
 	EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
 	EXCHANGES[ex].name = ex; //.toLowerCase()
 });
+//console.log(EXCHANGES);
 
 /* 
 	function clone(obj) {
@@ -141,7 +142,6 @@ const otherPrpos = [
 	"PL=F",
 	"PA=F",
 ];
-
 
 async function ftchFnctn(url, body) {
 	try {
