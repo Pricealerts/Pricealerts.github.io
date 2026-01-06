@@ -8,7 +8,6 @@ let currencyFtch = "USD";
 let priceFtch;
 
 const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى للتنبيهات
-
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
 // --- وظائف جلب البيانات وتحديث الأسعار ---
 
@@ -137,11 +136,12 @@ async function fetchTradingPairs(exchangeId) {
 			case "NSE":
 				let nmbrDays = 100;
 				let localExSmbls = localStorage.getItem(exchangeId);
-				const today = Date.now().toString();
+				const today = Date.now();
 				if (localExSmbls) {
 					localExSmbls = JSON.parse(localExSmbls);
 					const locaTim = localExSmbls.time;
 					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
+					console.log("ime is :" + nmbrDays);
 				}
 				if (nmbrDays < 30 && localExSmbls) {
 					symbols = localExSmbls.symbols;
@@ -157,7 +157,6 @@ async function fetchTradingPairs(exchangeId) {
 
 					symbols = data;
 				}
-
 				break;
 			case "other":
 				symbols = otherPrpos;
@@ -339,3 +338,4 @@ function startPriceUpdates() {
 		currentPrice = null;
 	}
 }
+

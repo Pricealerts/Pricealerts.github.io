@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EXCHANGES_CONFIG, gtapiUrl, gtCndlYahoo,exchs } from "./cnstnts.js";
+import { EXCHANGES_CONFIG, gtapiUrl, gtCndlYahoo, exchs } from "./cnstnts.js";
 import { cAllDatabase } from "./cAllDatabase.js";
 
 // *** بيانات اعتماد Telegram Bot API ***
@@ -74,7 +74,17 @@ async function checkAndSendAlerts() {
 		const alrts = Object.entries(user[1]);
 		alrts.forEach(alert => {
 			const alrt = alert[1];
-			const { e: exchangeId, s: symbol } = alrt;
+			const { e: exchangeId, s: symbol, mt: meta } = alrt;
+			if (meta) {
+				const now = Date.now();
+				const startTime = meta.st * 1000;
+				const endTime = meta.end * 1000;
+				const exchangeDate = new Date(Date.now() + meta.gm * 1000); // gmtoffset
+				const exchangeToday = exchangeDate.getUTCDate();
+				if ((now < startTime || now > endTime) && exchangeToday == meta.oDy)
+					return false;
+			}
+
 			const existing = symbolsMap.get(symbol);
 			if (
 				!existing ||
@@ -90,8 +100,8 @@ async function checkAndSendAlerts() {
 	usersAll = null;
 	const rsltcandles = await getCandles(symbolsMap);
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
-	let dltRwApp = [];
-	for (let i = 0; i < allAlerts.length; i++) {
+	let promises = [];
+	for (let k = 0; k < allAlerts.length; k++) {
 		const {
 			e: exchangeId,
 			s: symbol,
@@ -99,11 +109,13 @@ async function checkAndSendAlerts() {
 			c: alertCondition,
 			tid: telegramChatId,
 			i: id,
-		} = allAlerts[i];
+			mt: meta,
+		} = allAlerts[k];
 
 		const candles = rsltcandles[symbol];
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null;
+		const rglrChatId = telegramChatId.slice(3);
 		if (candles && candles.length > 0) {
 			for (const candle of candles) {
 				if (alertCondition === "l" && candle.low <= targetPrice) {
@@ -126,19 +138,38 @@ async function checkAndSendAlerts() {
 			}!<b>${symbol}</b> بلغت <b>${actualTriggerPrice}</b> (الشرط: السعر ${
 				alertCondition === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${targetPrice})`;
-			const nwChatId = telegramChatId.slice(3);
+
 			const dlt = {
+				action: "dltAlrt",
 				telegramChatId: telegramChatId,
 				id: id,
 				alrtOk: true,
-				chtIdMsg: nwChatId,
+				chtIdMsg: rglrChatId,
 				message: message,
 			};
-			dltRwApp.push(dlt);
+			promises.push(cAllDatabase(dlt));
+			promises.push(sendTelegramMessage(dlt.chtIdMsg, dlt.message));
+			continue;
+		}
+		const statusChanged = meta?.st !== candles?.meta?.st;
+		const isMarketClosed = candles?.marketState === "CLOSED";
+		if (statusChanged || isMarketClosed) {
+			const rglrId = id.slice(2);
+			const exchangeDate = new Date(Date.now() + candles.meta.gm * 1000);
+			meta.oDay = exchangeDate.getUTCDate();
+			const { id, tid, ...stData } = allAlerts[k];
+			const rsltDt = {
+				...stData,
+				action: "setAlert",
+				id: rglrId,
+				telegramChatId: rglrChatId,
+				mt: meta,
+			};
+			promises.push(cAllDatabase(rsltDt));
 		}
 	}
 	allAlerts = [];
-	await dltForDatabase(dltRwApp);
+	await chngOfDb(promises);
 }
 
 /**
@@ -173,7 +204,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		let mappedInterval = exchange.intervalMap[interval];
 
 		const apiUrl = gtapiUrl(exchangeId, symbol, mappedInterval, limit);
-		const axs= await axios.get(apiUrl)
+		const axs = await axios.get(apiUrl);
 		datas = axs.data;
 
 		let candles = [];
@@ -251,7 +282,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				candles = dtSlc.map(exchange.parseCandle);
 			}
 		} else if (exchs.includes(exchangeId)) {
-			candles = gtCndlYahoo(axs)
+			candles = gtCndlYahoo(axs);
 		} else {
 			if (Array.isArray(datas) && datas.length) {
 				candles = datas.map(exchange.parseCandle);
@@ -274,20 +305,11 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 	}
 }
 
-async function dltForDatabase(dltRwApp) {
-	if (!dltRwApp || dltRwApp.length == 0) return "walo";
+async function chngOfDb(promises) {
+	if (!promises || promises.length == 0) return "walo";
 	try {
-		let promises = [];
-
-		for (let i = 0; i < dltRwApp.length; i++) {
-			const dlt = dltRwApp[i];
-			dlt.action = "dltAlrt";
-			promises.push(cAllDatabase(dlt));
-			promises.push(sendTelegramMessage(dlt.chtIdMsg, dlt.message));
-		}
 		await Promise.all(promises);
-		promises = [];
-		dltRwApp = null;
+		promises = null;
 		return { success: true };
 	} catch (error) {
 		console.error("error respons", error.message);

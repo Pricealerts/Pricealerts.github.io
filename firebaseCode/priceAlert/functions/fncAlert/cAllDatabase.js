@@ -14,10 +14,10 @@ let db;
  */
 async function cAllDatabase(data) {
 	// ✅ تهيئة القاعدة مرة واحدة فقط عند أول استدعاء (Lazy Init)
-		if (!db) db = getDatabase();
-		if (!postsRef) postsRef = db.ref("alerts");
+	if (!db) db = getDatabase();
+	if (!postsRef) postsRef = db.ref("alerts");
 	//data.uid = btoa(data.userEmail);
-	
+
 	if (!data.paid) data.paid = false;
 	try {
 		const action = data.action;
@@ -44,7 +44,7 @@ async function cAllDatabase(data) {
 		return rspns;
 	} catch (error) {
 		console.error("❌ Error in cAllDatabase:", error.message);
-        throw new Error(error.message);
+		throw new Error(error.message);
 	}
 }
 
@@ -79,25 +79,27 @@ async function setAlert(data) {
 		!data.targetPrice ||
 		!data.telegramChatId ||
 		!data.alertCondition
-	) {	throw "الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام."}
-	
+	) {
+		throw "الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.";
+	}
 	const alrtAdd = {
-    e: data.exchangeId,      // e بدلاً من exchangeId
-    s: data.symbol,          // s بدلاً من symbol
-    t: data.targetPrice,     // t بدلاً من targetPrice
-    c: data.alertCondition,  // c بدلاً من alertCondition
-  //  r: new Date().toLocaleString(), // requestTime 
-};
+		e: data.exchangeId, // e بدلاً من exchangeId
+		s: data.symbol, // s بدلاً من symbol
+		t: data.targetPrice, // t بدلاً من targetPrice
+		c: data.alertCondition, // c بدلاً من alertCondition
+		//  r: new Date().toLocaleString(), // requestTime
+	};
+	if (data.mt) alrtAdd.mt = data.mt;
 	const rspns = {};
 	try {
-		if(data.isAlrd){
-			const message = `🔔 تنبيه سعر ${
-				EXCHANGES_CONFIG[alrtAdd.e].name
-			}!<b>${alrtAdd.s}</b> بلغت <b>${alrtAdd.t}</b> (الشرط: السعر ${
+		if (data.isAlrd) {
+			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
+				alrtAdd.s
+			}</b> بلغت <b>${alrtAdd.t}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${alrtAdd.t})`;
-			await sendTelegramMessage(data.telegramChatId, message)
-			return {status : "success"}
+			await sendTelegramMessage(data.telegramChatId, message);
+			return { status: "success" };
 		}
 		const okUser = await cntctUser(data, alrtAdd);
 		if (!okUser.okRspns) {
@@ -162,12 +164,12 @@ async function cntctUser(data, alrtAdd) {
 		if (!getChId.exists()) {
 			let message = `لقد قمت بتعين تنبيه على  ${
 				EXCHANGES_CONFIG[alrtAdd.exchangeId].name
-				}! 
+			}! 
 				ل<b> ${alrtAdd.symbol} </b>  
 				(الشرط: السعر   ${
-				alrtAdd.alertCondition === "l"
-					? "أقل من أو يساوي"
-					: "أعلى من أو يساوي"
+					alrtAdd.alertCondition === "l"
+						? "أقل من أو يساوي"
+						: "أعلى من أو يساوي"
 				} ${alrtAdd.targetPrice} )
 				سيتم تبليغك فور تحقيق الشرط
 				شكرا`;
@@ -182,7 +184,7 @@ async function cntctUser(data, alrtAdd) {
 			} else {
 				rspns.status = "notSuccess";
 				rspns.okRspns = false;
-				rspns.msg = sendMsg
+				rspns.msg = sendMsg;
 			}
 
 			return rspns;
@@ -197,7 +199,6 @@ async function cntctUser(data, alrtAdd) {
 		} else {
 			rspns = { okRspns: false, status: "errorNotfond" };
 		} */
-
 		return rspns;
 	} catch (error) {
 		rspns.status = "notSuccess";
@@ -207,6 +208,5 @@ async function cntctUser(data, alrtAdd) {
 		return rspns;
 	}
 }
-
 
 export { cAllDatabase };

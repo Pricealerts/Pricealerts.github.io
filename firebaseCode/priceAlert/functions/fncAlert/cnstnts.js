@@ -164,7 +164,16 @@ export const EXCHANGES_CONFIG = {
 	},
 };
 
-export const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other","nasdaq"]
+export const exchs = [
+	"nyse",
+	"xetra",
+	"lse",
+	"TSE",
+	"HKSE",
+	"NSE",
+	"other",
+	"nasdaq",
+];
 exchs.forEach(ex => {
 	EXCHANGES_CONFIG[ex] = { ...EXCHANGES_CONFIG.nasdaq };
 	EXCHANGES_CONFIG[ex].name = ex; //.toLowerCase()
@@ -206,7 +215,8 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 		case "coinbase":
 			let ndt = new Date();
 			const startDate =
-				new Date(ndt.getTime() - 60 * 120 * 1000).toISOString().split(".")[0] + "Z";
+				new Date(ndt.getTime() - 60 * 120 * 1000).toISOString().split(".")[0] +
+				"Z";
 			const endDate = new Date().toISOString().split(".")[0] + "Z";
 			apiUrl = `${exchange.tickerPriceUrl}${symbol}/candles?start=${startDate}&end=${endDate}&granularity=300`;
 			break;
@@ -234,14 +244,21 @@ export const gtCndlYahoo = response => {
 	const timestamps = result.timestamp;
 	const q = result.indicators?.quote?.[0];
 	const meta = result.meta;
+
+	const regularPeriod = meta.currentTradingPeriod?.regular;
+	const mt = {
+		st: regularPeriod.start,
+		end: regularPeriod.end,
+		gm: meta.gmtoffset,//gmtoffset
+	};
 	// دالة مساعدة لتوليد الاستجابة التقديرية مع إضافة حالة السوق
 	const createMetaResponse = m => [
 		{
 			open: m.regularMarketPrice,
 			high: m.regularMarketPrice,
 			low: m.regularMarketPrice,
-			close: m.regularMarketPrice,
-			volume: 0,
+			// close: m.regularMarketPrice,
+			meta: mt,
 			currency: m.currency,
 			marketState: m.marketState, // يخبرك إذا كان السوق مغلقاً (CLOSED) أو مفتوحاً (REGULAR)
 			isEstimated: true,
@@ -259,7 +276,7 @@ export const gtCndlYahoo = response => {
 	// 2. البحث عن آخر شمعة مكتملة البيانات
 	while (
 		i >= 0 &&
-		(q.high[i] === null || q.low[i] === null || q.close[i] === null)
+		(q.high[i] === null || q.low[i] === null) /* || q.close[i] === null */
 	) {
 		i--;
 	}
@@ -271,6 +288,8 @@ export const gtCndlYahoo = response => {
 		}
 		return { error: "All candles are null and no market price found" };
 	}
+	console.log( meta.marketState);
+	
 	// 4. إرجاع الشمعة الحقيقية مع معلومات السوق
 	return [
 		{
@@ -278,10 +297,10 @@ export const gtCndlYahoo = response => {
 			open: q.open[i] || q.close[i],
 			high: q.high[i],
 			low: q.low[i],
-			close: q.close[i],
-			volume: q.volume[i] || 0,
+			// close: q.close[i],
 			currency: meta.currency,
 			marketState: meta.marketState, // إضافة حالة السوق هنا أيضاً
+			rg: regularPeriod,
 		},
 	];
 };
