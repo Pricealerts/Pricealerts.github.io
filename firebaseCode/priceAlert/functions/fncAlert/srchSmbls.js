@@ -151,19 +151,21 @@ async function checkAndSendAlerts() {
 			promises.push(sendTelegramMessage(dlt.chtIdMsg, dlt.message));
 			continue;
 		}
+		if (!candles?.marketState) continue;
 		const statusChanged = meta?.st !== candles?.meta?.st;
 		const isMarketClosed = candles?.marketState === "CLOSED";
 		if (statusChanged || isMarketClosed) {
 			const rglrId = id.slice(2);
 			const exchangeDate = new Date(Date.now() + candles.meta.gm * 1000);
-			meta.oDay = exchangeDate.getUTCDate();
+			const newMeta = candles.meta;
+			newMeta.oDay = exchangeDate.getUTCDate();
 			const { id, tid, ...stData } = allAlerts[k];
 			const rsltDt = {
 				...stData,
 				action: "setAlert",
 				id: rglrId,
 				telegramChatId: rglrChatId,
-				mt: meta,
+				mt: newMeta,
 			};
 			promises.push(cAllDatabase(rsltDt));
 		}

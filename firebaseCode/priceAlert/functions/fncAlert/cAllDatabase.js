@@ -156,7 +156,6 @@ async function dltAlrt(data) {
 async function cntctUser(data, alrtAdd) {
 	const idChat = data.telegramChatId;
 	let rspns = {};
-
 	try {
 		const callDb = db.ref(`allChatId/cht${idChat}`);
 		const getChId = await callDb.get();

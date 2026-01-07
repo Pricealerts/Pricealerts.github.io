@@ -32,7 +32,12 @@ let priceUpdateInterval;
 let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
 let factorPric = 1;
 // --- معالجات الأحداث ---
-startPage();
+
+document.addEventListener("DOMContentLoaded", () => {
+    startPage();
+});
+
+
 async function startPage() {
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
@@ -47,6 +52,8 @@ async function startPage() {
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 		if (localStorage.alrtsStorg) {
 			const strg = JSON.parse(localStorage.alrtsStorg);
+			console.log(strg);
+			
 			renderAlerts(strg); // تحميل التنبيهات من الشيت للعرض
 		} else {
 			await loadUserAlertsDisplay();
