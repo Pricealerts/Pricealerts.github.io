@@ -52,7 +52,7 @@ async function startPage() {
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 		if (localStorage.alrtsStorg) {
 			const strg = JSON.parse(localStorage.alrtsStorg);
-			console.log(strg);
+			//console.log(strg);
 			
 			renderAlerts(strg); // تحميل التنبيهات من الشيت للعرض
 		} else {

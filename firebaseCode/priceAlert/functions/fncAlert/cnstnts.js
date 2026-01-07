@@ -288,6 +288,8 @@ export const gtCndlYahoo = response => {
 		}
 		return { error: "All candles are null and no market price found" };
 	}
+	console.log('meta.marketState is : ');
+	
 	console.log( meta.marketState);
 	
 	// 4. إرجاع الشمعة الحقيقية مع معلومات السوق

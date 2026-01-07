@@ -143,7 +143,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 				t: alertData.targetPrice, // t بدلاً من targetPrice
 				c: alertData.alertCondition, // c بدلاً من alertCondition
 			};
-			const alrtAddAry = [["id" + id], [alrtAdd]];
+			const alrtAddAry = ["id" + id, alrtAdd];
 			strg.push(alrtAddAry);
 		} else {
 			const alrtDlt = strg.filter(item => item[0] != id);

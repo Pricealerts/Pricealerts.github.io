@@ -143,7 +143,7 @@ async function fetchTradingPairs(exchangeId) {
 					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
 					console.log("ime is :" + nmbrDays);
 				}
-				if (nmbrDays < 30 && localExSmbls) {
+				if (nmbrDays < 30 ) {
 					symbols = localExSmbls.symbols;
 				} else {
 					data = await ftchFnctn(exchange.exchangeInfoUrl, {

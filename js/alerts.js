@@ -8,6 +8,9 @@ async function loadUserAlertsDisplay() {
 		});
 		let aryRslt = Object.entries(rslt);
 		// تحويل المصفوفة إلى نص JSON قبل الحفظ
+		if(!aryRslt) aryRslt = []
+		console.log(aryRslt);
+		
 		localStorage.setItem("alrtsStorg", JSON.stringify(aryRslt));
 		renderAlerts(aryRslt);
 	} catch (err) {
@@ -43,6 +46,10 @@ function renderAlerts(alerts) {
 			alertId: alert[0],
 			telegramChatId: "cht" + telegramChatId,
 		});
+		//console.log('sdfsf is :');
+		
+		//console.log(EXCHANGES[exchangeId].name);
+		
 		listItem.innerHTML = `
 			<span class="alert-info" >
 				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>

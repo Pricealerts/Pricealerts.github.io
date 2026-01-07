@@ -154,6 +154,9 @@ async function checkAndSendAlerts() {
 		if (!candles?.marketState) continue;
 		const statusChanged = meta?.st !== candles?.meta?.st;
 		const isMarketClosed = candles?.marketState === "CLOSED";
+		console.log('statusChanged is : '+statusChanged);
+		console.log('isMarketClosed is : '+isMarketClosed);
+		
 		if (statusChanged || isMarketClosed) {
 			const rglrId = id.slice(2);
 			const exchangeDate = new Date(Date.now() + candles.meta.gm * 1000);
