@@ -151,31 +151,40 @@ async function checkAndSendAlerts() {
 			promises.push(sendTelegramMessage(dlt.chtIdMsg, dlt.message));
 			continue;
 		}
-		if (!candles?.marketState) continue;
-		const statusChanged = meta?.st !== candles?.meta?.st;
-		const isMarketClosed = candles?.marketState === "CLOSED";
-		console.log('statusChanged is : '+statusChanged);
-		console.log('isMarketClosed is : '+isMarketClosed);
-		
-		if (statusChanged || isMarketClosed) {
+
+		const newMeta = candles[0]?.meta;
+		if (!newMeta) continue;
+		const statusChanged = meta?.st !== newMeta?.st;
+		//const isMarketClosed = candles[0]?.marketState === "CLOSED";
+		console.log("statusChanged is : " + statusChanged);
+		//console.log("isMarketClosed is : " + isMarketClosed);
+
+		if (statusChanged /* || isMarketClosed */) {
 			const rglrId = id.slice(2);
-			const exchangeDate = new Date(Date.now() + candles.meta.gm * 1000);
-			const newMeta = candles.meta;
+			const exchangeDate = new Date(Date.now() + newMeta.gm * 1000);
 			newMeta.oDay = exchangeDate.getUTCDate();
-			const { id, tid, ...stData } = allAlerts[k];
+			const { i, tid,mt, ...stData } = allAlerts[k];
+			console.log("Full rglrId Object : ", JSON.stringify(rglrId, null, 2));
+			
 			const rsltDt = {
-				...stData,
 				action: "setAlert",
 				id: rglrId,
 				telegramChatId: rglrChatId,
+				exchangeId,
+				symbol,
+				targetPrice,
+				alertCondition,
 				mt: newMeta,
 			};
+			console.log("Full rsltDt Object : ", JSON.stringify(rsltDt, null, 2));
 			promises.push(cAllDatabase(rsltDt));
 		}
 	}
 	allAlerts = [];
 	await chngOfDb(promises);
 }
+
+
 
 /**
  * دالة لجلب بيانات الشموع (OHLCV) من المنصة المحددة لفترة معينة.
@@ -312,12 +321,18 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 
 async function chngOfDb(promises) {
 	if (!promises || promises.length == 0) return "walo";
+	/* // بدلاً من طلبين منفصلين، يمكنك دمج البيانات في طلب تحديث واحد
+const updates = {};
+updates[`alerts/${id1}`] = rsltDt1;
+updates[`alerts/${id2}`] = rsltDt2;
+
+await firebase.database().ref().update(updates); */
 	try {
 		await Promise.all(promises);
 		promises = null;
 		return { success: true };
 	} catch (error) {
-		console.error("error respons", error.message);
+		console.error("error respons", error);
 		return { success: false, error: error.message };
 	}
 }

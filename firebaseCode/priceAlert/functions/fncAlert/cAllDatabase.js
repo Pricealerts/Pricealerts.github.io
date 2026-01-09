@@ -19,13 +19,18 @@ async function cAllDatabase(data) {
 	//data.uid = btoa(data.userEmail);
 
 	if (!data.paid) data.paid = false;
+	console.log("rah dakhl");
 	try {
 		const action = data.action;
 		let rspns;
+
+		console.log("rspns is : " + rspns);
 		if (action == "gtAlerts") {
 			rspns = await gtAlerts(data);
 		} else if (action == "setAlert") {
-			rspns = await setAlert(data);
+			console.log("rah setAlert");
+
+			rspns = await setAlerte(data);
 		} else if (action === "dltAlrt") {
 			rspns = await dltAlrt(data);
 		} else if (
@@ -40,11 +45,13 @@ async function cAllDatabase(data) {
 		) {
 			rspns = await sndEmail(data, db);
 		}
+		console.log(rspns);
 
 		return rspns;
 	} catch (error) {
-		console.error("❌ Error in cAllDatabase:", error.message);
-		throw new Error(error.message);
+		console.log("error action = " + data.action);
+
+		console.error("❌ Error in cAllDatabase:", error);
 	}
 }
 
@@ -71,7 +78,9 @@ async function gtAlerts(data) {
 }
 
 ///// the functions
-async function setAlert(data) {
+async function setAlerte(data) {
+	const rspns = {};
+
 	if (
 		!data.id ||
 		!data.exchangeId ||
@@ -80,7 +89,7 @@ async function setAlert(data) {
 		!data.telegramChatId ||
 		!data.alertCondition
 	) {
-		throw "الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.";
+		console.log("الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.");
 	}
 	const alrtAdd = {
 		e: data.exchangeId, // e بدلاً من exchangeId
@@ -90,7 +99,6 @@ async function setAlert(data) {
 		//  r: new Date().toLocaleString(), // requestTime
 	};
 	if (data.mt) alrtAdd.mt = data.mt;
-	const rspns = {};
 	try {
 		if (data.isAlrd) {
 			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
@@ -101,7 +109,7 @@ async function setAlert(data) {
 			await sendTelegramMessage(data.telegramChatId, message);
 			return { status: "success" };
 		}
-		const okUser = await cntctUser(data, alrtAdd);
+		const okUser = await cntctUser(data);
 		if (!okUser.okRspns) {
 			return okUser;
 		}
@@ -112,7 +120,9 @@ async function setAlert(data) {
 		rspns.status = "notSuccess";
 		rspns.message = String(error);
 		// make sure we reference the symbol correctly
-		console.error(`فشل إرسال إشعار تيليجرام لـ ${alrtAdd.symbol} : `, error);
+		console.error(`فشل تخزين لـ ${data.symbol} : `, error);
+		console.log(error);
+
 		return rspns;
 	}
 }
@@ -153,7 +163,7 @@ async function dltAlrt(data) {
 	}
 }
 
-async function cntctUser(data, alrtAdd) {
+async function cntctUser(data) {
 	const idChat = data.telegramChatId;
 	let rspns = {};
 	try {
@@ -162,14 +172,12 @@ async function cntctUser(data, alrtAdd) {
 		let gtChIdExixst;
 		if (!getChId.exists()) {
 			let message = `لقد قمت بتعين تنبيه على  ${
-				EXCHANGES_CONFIG[alrtAdd.exchangeId].name
+				EXCHANGES_CONFIG[data.exchangeId].name
 			}! 
-				ل<b> ${alrtAdd.symbol} </b>  
+				ل<b> ${data.symbol} </b>  
 				(الشرط: السعر   ${
-					alrtAdd.alertCondition === "l"
-						? "أقل من أو يساوي"
-						: "أعلى من أو يساوي"
-				} ${alrtAdd.targetPrice} )
+					data.alertCondition === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
+				} ${data.targetPrice} )
 				سيتم تبليغك فور تحقيق الشرط
 				شكرا`;
 			const sendMsg = await sendTelegramMessage(idChat, message);
@@ -203,7 +211,7 @@ async function cntctUser(data, alrtAdd) {
 		rspns.status = "notSuccess";
 		rspns.okRspns = false;
 		rspns.error = error;
-		console.error(`فشل إرسال في cntctUser    ${alrtAdd.symbol}  is : ${error}`);
+		console.log(`فشل  في cntctUser    ${data.symbol}  is : ${error}`);
 		return rspns;
 	}
 }

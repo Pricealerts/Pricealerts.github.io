@@ -137,7 +137,7 @@ export const EXCHANGES_CONFIG = {
 		}),
 		intervalMap: { "1m": "60", "5m": "300", "15m": "900", "1h": "3600" },
 	},
-	nasdaq: {
+	nasdaqe: {
 		name: "NASDAQ",
 		candlestickUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
 		usdtSuffix: "-USD",
@@ -175,7 +175,7 @@ export const exchs = [
 	"nasdaq",
 ];
 exchs.forEach(ex => {
-	EXCHANGES_CONFIG[ex] = { ...EXCHANGES_CONFIG.nasdaq };
+	EXCHANGES_CONFIG[ex] = { ...EXCHANGES_CONFIG.nasdaqe };
 	EXCHANGES_CONFIG[ex].name = ex; //.toLowerCase()
 });
 /**
@@ -288,9 +288,8 @@ export const gtCndlYahoo = response => {
 		}
 		return { error: "All candles are null and no market price found" };
 	}
-	console.log('meta.marketState is : ');
 	
-	console.log( meta.marketState);
+	//console.log("Full mt Object:", JSON.stringify(mt, null, 2));
 	
 	// 4. إرجاع الشمعة الحقيقية مع معلومات السوق
 	return [
@@ -300,9 +299,9 @@ export const gtCndlYahoo = response => {
 			high: q.high[i],
 			low: q.low[i],
 			// close: q.close[i],
+			meta: mt,
 			currency: meta.currency,
 			marketState: meta.marketState, // إضافة حالة السوق هنا أيضاً
-			rg: regularPeriod,
 		},
 	];
 };

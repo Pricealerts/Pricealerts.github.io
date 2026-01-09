@@ -55,7 +55,7 @@ export const proxyRequestV2 = onRequest(
 
 export const scheduledTask = onSchedule(
 	{
-		schedule: "every 5 minutes",
+		schedule: "every 1440 minutes",
 		region: "europe-west1",
 		memory: "256MiB",
 		maxInstances: 1,
