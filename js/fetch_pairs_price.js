@@ -301,7 +301,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 					.forEach(el => (el.innerHTML = currentPrice));
 			}
 			rfrsh = 0;
-			checkForBrowserAlerts(); // فحص تنبيهات المتصفح عند تحديث السعر
+			checkForBrowserAlerts(); // فحص تنبيهات للتطبيق عند تحديث السعر
 			return currentPrice;
 		} else {
 			currentPriceDisplay.textContent = "السعر غير متاح.";

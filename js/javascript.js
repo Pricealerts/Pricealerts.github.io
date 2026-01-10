@@ -19,7 +19,7 @@ const conditionGreaterThanOrEqual = gebi(
 const alertTypeBrowserCheckbox = gebi("alertTypeBrowser"); // تم تغيير الاسم
 const alertTypeTelegramCheckbox = gebi("alertTypeTelegram"); // تم تغيير الاسم
 const telegramChatIdContainer = gebi("telegramChatIdContainer");
-const telegramChatIdInput = gebi("telegramChatId");
+const tlgChtIdInpt = gebi("telegramChatId");
 const setAlertButton = gebi("setAlertButton");
 const alertStatus = gebi("alertStatus");
 const alertsList = gebi("alertsList");
@@ -29,7 +29,7 @@ let currentExchangeId = exchangeSelect.value;
 let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
-let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات المتصفح المحلية
+let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات للتطبيق المحلية
 let factorPric = 1;
 // --- معالجات الأحداث ---
 
@@ -41,11 +41,12 @@ async function startPage() {
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
 
-	requestNotificationPermission(); // طلب إذن الإشعارات للمتصفح
+	requestNotificationPermission(); // طلب إذن الإشعارات للتطبق
 	if (localStorage.getItem("exchangeChoz")) {
 		exchangeSelect.value = localStorage.getItem("exchangeChoz");
 	}
 	let chtIdSlct = "";
+	const slChId = gebi("chtIdSlct");
 	const chtIdStrg = {
 		ch1: localStorage.getItem("chtId1") || "",
 		ch2: localStorage.getItem("chtId2") || "",
@@ -58,11 +59,12 @@ async function startPage() {
 	if (chtIdStrg.ch3.length > 0)
 		chtIdSlct += `<option value="${chtIdStrg.ch3}">${chtIdStrg.ch3}</option>`;
 	if (chtIdSlct.length > 0) {
-		gebi("chtIdSlct").style.display = "block";
-		gebi("chtIdSlct").innerHTML = chtIdSlct;
-		telegramChatIdInput.style.display = "none";
+		slChId.style.display = "block";
+		slChId.innerHTML = chtIdSlct;
+		slChId.addEventListener('change',() => {tlgChtIdInpt.value =slChId.value})
+		tlgChtIdInpt.style.display = "none";
 	} else if (localStorage.getItem("idChat")) {
-		telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
+		tlgChtIdInpt.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
 		telegramChatId = localStorage.getItem("idChat");
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 		if (localStorage.alrtsStorg) {
@@ -75,7 +77,7 @@ async function startPage() {
 		}
 		//
 	} else {
-		telegramChatIdInput.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
+		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
 		gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 	}
 	// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
@@ -104,12 +106,12 @@ async function startPage() {
 			telegramChatIdContainer.style.display = "block";
 		} else {
 			telegramChatIdContainer.style.display = "none";
-			telegramChatIdInput.value = ""; // مسح Chat ID إذا تم إلغاء تحديد تيليجرام
+			tlgChtIdInpt.value = ""; // مسح Chat ID إذا تم إلغاء تحديد تيليجرام
 		}
 		alertStatus.textContent = "";
 	});
 
-	// طلب إذن الإشعارات عند اختيار تنبيه المتصفح  "/imgs/web/icon-512.png"
+	// طلب إذن الإشعارات عند اختيار تنبيه للتطبيق  "/imgs/web/icon-512.png"
 	alertTypeBrowserCheckbox.addEventListener("change", () => {
 		if (alertTypeBrowserCheckbox.checked) {
 			requestNotificationPermission();

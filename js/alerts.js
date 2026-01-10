@@ -76,7 +76,7 @@ function renderAlerts(alerts) {
 // --- وظائف التنبيهات (تم تبسيطها) ---
 function requestNotificationPermission() {
 	if (!("Notification" in window)) {
-		// alert("هذا المتصفح لا يدعم إشعارات سطح المكتب.");
+		// alert("هذا للتطبيق لا يدعم إشعارات سطح المكتب.");
 	} else if (Notification.permission === "default") {
 		Notification.requestPermission().then(permission => {
 			if (permission === "granted") {
@@ -127,6 +127,9 @@ function checkForBrowserAlerts() {
 				}
 
 				if (shouldTrigger) {
+					setTimeout(() => {
+						alertStatus.textContent ='';
+					}, 3000);
 					showBrowserNotification(
 						alert.symbol,
 						currentPrice,
@@ -134,8 +137,9 @@ function checkForBrowserAlerts() {
 						alert.alertCondition
 					);
 					alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
-					alertStatus.textContent = `تم إرسال تنبيه المتصفح لـ ${alert.symbol}.`;
+					alertStatus.textContent = `تم إرسال تنبيه للتطبيق لـ ${alert.symbol}.`;
 					alertStatus.style.color = "green";
+					
 				}
 			}
 		});

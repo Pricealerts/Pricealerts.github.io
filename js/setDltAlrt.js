@@ -4,7 +4,7 @@ setAlertButton.addEventListener("click", async () => {
 
 	if (!isTelegramAlert && !isBrowserAlert) {
 		alertStatus.textContent =
-			"الرجاء اختيار نوع واحد على الأقل من التنبيهات (تيليجرام أو المتصفح).";
+			"الرجاء اختيار نوع واحد على الأقل من التنبيهات (تيليجرام أو التطبيق).";
 		alertStatus.style.color = "red";
 		return;
 	}
@@ -13,7 +13,7 @@ setAlertButton.addEventListener("click", async () => {
 	const alertCondition = document.querySelector(
 		'input[name="alertCondition"]:checked'
 	).value;
-	telegramChatId = telegramChatIdInput.value.trim();
+	telegramChatId = tlgChtIdInpt.value.trim();
 
 	if (isNaN(targetPrice) || targetPrice <= 0) {
 		alertStatus.textContent = "الرجاء إدخال سعر مستهدف صحيح.";
@@ -35,7 +35,7 @@ setAlertButton.addEventListener("click", async () => {
 
 	localStorage.setItem("exchangeChoz", currentExchangeId);
 
-	// التعامل مع تنبيه المتصفح محليًا
+	// التعامل مع تنبيه للتطبيق محليًا
 	if (isBrowserAlert) {
 		activeBrowserAlerts.push({
 			exchangeId: currentExchangeId,
@@ -45,7 +45,7 @@ setAlertButton.addEventListener("click", async () => {
 			alertType: "browser", // هذا للحفاظ على التمييز
 			status: "Active",
 		});
-		alertStatus.textContent = `تم تعيين تنبيه المتصفح لـ ${selectedSymbol}.`;
+		alertStatus.textContent = `تم تعيين تنبيه للتطبيق لـ ${selectedSymbol}.`;
 		alertStatus.style.color = "green";
 		checkForBrowserAlerts(); // فحص فوري
 	}
@@ -87,14 +87,14 @@ setAlertButton.addEventListener("click", async () => {
 				`تم تعيين تنبيه تيليجرام لـ ${selectedSymbol}.`;
 			alertStatus.style.color = "green";
 			//targetPriceInput.value = "";
-			// لا نمسح telegramChatIdInput إذا تم تعيين تنبيه تيليجرام بنجاح
+			// لا نمسح tlgChtIdInpt إذا تم تعيين تنبيه تيليجرام بنجاح
 		}
 	}
 
-	if (!isTelegramAlert && isBrowserAlert) {
-		// إذا تم تعيين تنبيه متصفح فقط
+	/* if (!isTelegramAlert && isBrowserAlert) {
+		// إذا تم تعيين تنبيه التطبيق فقط
 		targetPriceInput.value = "";
-	}
+	} */
 });
 
 async function deleteAlert(alert) {
