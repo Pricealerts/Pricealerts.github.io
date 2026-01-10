@@ -8,9 +8,9 @@ async function loadUserAlertsDisplay() {
 		});
 		let aryRslt = Object.entries(rslt);
 		// تحويل المصفوفة إلى نص JSON قبل الحفظ
-		if(!aryRslt) aryRslt = []
+		if (!aryRslt) aryRslt = [];
 		console.log(aryRslt);
-		
+
 		localStorage.setItem("alrtsStorg", JSON.stringify(aryRslt));
 		renderAlerts(aryRslt);
 	} catch (err) {
@@ -47,9 +47,9 @@ function renderAlerts(alerts) {
 			telegramChatId: "cht" + telegramChatId,
 		});
 		//console.log('sdfsf is :');
-		
+
 		//console.log(EXCHANGES[exchangeId].name);
-		
+
 		listItem.innerHTML = `
 			<span class="alert-info" >
 				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>
@@ -83,6 +83,8 @@ function requestNotificationPermission() {
 				console.log("تم منح إذن الإشعارات.");
 			} else {
 				console.warn("لم يتم منح إذن الإشعارات.");
+				alertStatus.textContent = "لم يتم منح إذن الإشعارات.";
+				alertStatus.style.color = "red";
 			}
 		});
 	}
@@ -128,7 +130,7 @@ function checkForBrowserAlerts() {
 
 				if (shouldTrigger) {
 					setTimeout(() => {
-						alertStatus.textContent ='';
+						alertStatus.textContent = "";
 					}, 3000);
 					showBrowserNotification(
 						alert.symbol,
@@ -139,7 +141,6 @@ function checkForBrowserAlerts() {
 					alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
 					alertStatus.textContent = `تم إرسال تنبيه للتطبيق لـ ${alert.symbol}.`;
 					alertStatus.style.color = "green";
-					
 				}
 			}
 		});
