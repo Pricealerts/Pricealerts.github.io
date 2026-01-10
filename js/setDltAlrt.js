@@ -69,7 +69,7 @@ setAlertButton.addEventListener("click", async () => {
 			targetPrice: targetPrice,
 			alertCondition: alertCondition,
 			telegramChatId: telegramChatId,
-			f: factorPric, 
+			f: factorPric,
 			isAlrd: false,
 		};
 		const prc = currentPriceDisplay.textContent;
@@ -178,4 +178,3 @@ async function manageAlertOnFirebase(action, alertData = null) {
 	}
 }
 
-const alrtsStorg = {};

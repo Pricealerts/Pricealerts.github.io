@@ -34,9 +34,8 @@ let factorPric = 1;
 // --- معالجات الأحداث ---
 
 document.addEventListener("DOMContentLoaded", () => {
-    startPage();
+	startPage();
 });
-
 
 async function startPage() {
 	// --- التهيئة عند بدء التشغيل ---
@@ -46,14 +45,30 @@ async function startPage() {
 	if (localStorage.getItem("exchangeChoz")) {
 		exchangeSelect.value = localStorage.getItem("exchangeChoz");
 	}
-	if (localStorage.getItem("idChat")) {
+	let chtIdSlct = "";
+	const chtIdStrg = {
+		ch1: localStorage.getItem("chtId1") || "",
+		ch2: localStorage.getItem("chtId2") || "",
+		ch3: localStorage.getItem("chtId3") || "",
+	};
+	if (chtIdStrg.ch1.length > 0)
+		chtIdSlct += `<option value="${chtIdStrg.ch1}">${chtIdStrg.ch1}</option>`;
+	if (chtIdStrg.ch2.length > 0)
+		chtIdSlct += `<option value="${chtIdStrg.ch2}">${chtIdStrg.ch2}</option>`;
+	if (chtIdStrg.ch3.length > 0)
+		chtIdSlct += `<option value="${chtIdStrg.ch3}">${chtIdStrg.ch3}</option>`;
+	if (chtIdSlct.length > 0) {
+		gebi("chtIdSlct").style.display = "block";
+		gebi("chtIdSlct").innerHTML = chtIdSlct;
+		telegramChatIdInput.style.display = "none";
+	} else if (localStorage.getItem("idChat")) {
 		telegramChatIdInput.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
 		telegramChatId = localStorage.getItem("idChat");
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 		if (localStorage.alrtsStorg) {
 			const strg = JSON.parse(localStorage.alrtsStorg);
 			//console.log(strg);
-			
+
 			renderAlerts(strg); // تحميل التنبيهات من الشيت للعرض
 		} else {
 			await loadUserAlertsDisplay();

@@ -100,9 +100,7 @@
 					<button class="crbtBtn">BNB</button>
 					<button class="crbtBtn">BTC</button>
 				</div>
-				<p id="noteYahoo" style="color: #1d87f9; display: none">
-					<strong>ملاحظة:</strong> تم تحميل البيانات من موقع Yahoo Finance
-				</p>
+				
 				<div class="dropdown-container">
 					<input
 						type="text"
@@ -114,6 +112,9 @@
 					/>
 					<div class="dropdown-list" id="dropdownList"></div>
 					<select id="dsf"></select>
+					<p id="noteYahoo" style="color: #1d87f9; display: none">
+					<strong>ملاحظة:</strong> تم تحميل البيانات من موقع Yahoo Finance
+				</p>
 				</div>
 			</div>
 
@@ -218,7 +219,7 @@
 					<input
 						type="text"
 						id="telegramChatId"
-						placeholder="أدخل معرّف دردشة تيليجرام"
+						placeholder="أدخل معرّف دردشة التيليجرام"
 					/>
 				</div>
 
@@ -299,10 +300,8 @@
 									navigator.serviceWorker.controller
 								) {
 									console.log("🔄 تم تحديث الموقع");
-
 									// خيار 1: إعادة تحميل مباشرة
 									window.location.reload();
-
 									// خيار 2 (أفضل): إشعار المستخدم
 									// alert("تم تحديث الموقع، سيتم إعادة تحميل الصفحة");
 								}
