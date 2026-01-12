@@ -110,6 +110,7 @@ async function checkAndSendAlerts() {
 			tid: telegramChatId,
 			i: id,
 			mt: meta,
+			f: factorPric,
 		} = allAlerts[k];
 
 		const candles = rsltcandles[symbol];
@@ -117,13 +118,14 @@ async function checkAndSendAlerts() {
 		let actualTriggerPrice = null;
 		const rglrChatId = telegramChatId.slice(3);
 		if (candles && candles.length > 0) {
+			const trgtFctor = targetPrice * factorPric;
 			for (const candle of candles) {
-				if (alertCondition === "l" && candle.low <= targetPrice) {
+				if (alertCondition === "l" && candle.low <= trgtFctor) {
 					// less
 					triggeredByHistoricalPrice = true;
 					actualTriggerPrice = candle.low;
 					break;
-				} else if (alertCondition === "g" && candle.high >= targetPrice) {
+				} else if (alertCondition === "g" && candle.high >= trgtFctor) {
 					//greater
 					triggeredByHistoricalPrice = true;
 					actualTriggerPrice = candle.high;
@@ -155,17 +157,10 @@ async function checkAndSendAlerts() {
 		const newMeta = candles[0]?.meta;
 		if (!newMeta) continue;
 		const statusChanged = meta?.st !== newMeta?.st;
-		//const isMarketClosed = candles[0]?.marketState === "CLOSED";
-		console.log("statusChanged is : " + statusChanged);
-		//console.log("isMarketClosed is : " + isMarketClosed);
-
-		if (statusChanged /* || isMarketClosed */) {
+		if (statusChanged) {
 			const rglrId = id.slice(2);
 			const exchangeDate = new Date(Date.now() + newMeta.gm * 1000);
-			newMeta.oDay = exchangeDate.getUTCDate();
-			const { i, tid,mt, ...stData } = allAlerts[k];
-			console.log("Full rglrId Object : ", JSON.stringify(rglrId, null, 2));
-			
+			newMeta.oDy = exchangeDate.getUTCDate();
 			const rsltDt = {
 				action: "setAlert",
 				id: rglrId,
@@ -175,16 +170,14 @@ async function checkAndSendAlerts() {
 				targetPrice,
 				alertCondition,
 				mt: newMeta,
+				f: factorPric,
 			};
-			console.log("Full rsltDt Object : ", JSON.stringify(rsltDt, null, 2));
 			promises.push(cAllDatabase(rsltDt));
 		}
 	}
 	allAlerts = [];
 	await chngOfDb(promises);
 }
-
-
 
 /**
  * دالة لجلب بيانات الشموع (OHLCV) من المنصة المحددة لفترة معينة.

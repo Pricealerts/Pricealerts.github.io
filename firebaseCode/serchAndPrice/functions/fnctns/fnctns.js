@@ -207,7 +207,7 @@ async function sendTelegramMessage(chatId, messageText) {
 }
 
 //get pice of symbole
-async function price(smbl) {
+/* async function price(smbl) {
 	const urlPrice = `https://query1.finance.yahoo.com/v8/finance/chart/${smbl}?interval=1h&range=1d`;
 	try {
 		const response = await axios.get(urlPrice);
@@ -222,12 +222,14 @@ async function price(smbl) {
 
 		// ✅ تحسين: البحث عن آخر سعر إغلاق ليس null
 		let lastClose = null;
-		if (q?.close && q.close.length > 0) {
-			// نمر على المصفوفة من الخلف للأمام لنجد أول رقم حقيقي
-			lastClose = q.close
-				.slice()
-				.reverse()
-				.find(p => p !== null && p !== undefined);
+		const prices = q?.close;
+		if (prices) {
+			for (let i = prices.length - 1; i >= 0; i--) {
+				if (prices[i] !== null && prices[i] !== undefined) {
+					lastClose = prices[i];
+					break;
+				}
+			}
 		}
 
 		// ✅ الحالة 1: استخدام آخر سعر إغلاق موجود في المصفوفة
@@ -250,7 +252,128 @@ async function price(smbl) {
 		console.error("Axios error:", error.message);
 		return { error: "Failed to fetch data", details: error.message };
 	}
+} */
+
+async function price2(smbl) {
+    // 1. محاولة جلب السعر للرمز الأصلي أولاً
+    const urlPrice = (s) => `https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1h&range=1d`;
+    
+    try {
+        let response = await axios.get(urlPrice(smbl));
+        let result = response.data?.chart?.result?.[0];
+
+        // 2. إذا لم يجد الرمز، نبحث عن رموز مشابهة (Suggestion)
+        if (!result) {
+            console.log(`🔍 الرمز ${smbl} غير موجود، جاري البحث عن اقتراحات...`);
+            const searchUrl = `https://query1.finance.yahoo.com/v1/finance/search?q=${smbl}`;
+            const searchRes = await axios.get(searchUrl);
+            const bestMatch = searchRes.data?.quotes?.[0]?.symbol; // أول نتيجة هي الأدق غالباً
+
+            if (bestMatch && bestMatch !== smbl) {
+                //console.log(`✅ تم العثور على رمز مشابه: ${bestMatch}`);
+                // إعادة المحاولة بالرمز الجديد
+                response = await axios.get(urlPrice(bestMatch));
+                result = response.data?.chart?.result?.[0];
+                if (!result) return { error: "Symbol not found", smbl };
+            } else {
+                return { error: "No matching symbol found", smbl };
+            }
+        }
+
+        const q = result.indicators?.quote?.[0];
+        const meta = result.meta;
+
+        // البحث عن آخر سعر إغلاق (Loop)
+        let lastClose = null;
+        const prices = q?.close;
+        if (prices) {
+            for (let i = prices.length - 1; i >= 0; i--) {
+                if (prices[i] !== null && prices[i] !== undefined) {
+                    lastClose = prices[i];
+                    break;
+                }
+            }
+        }
+
+        // إرجاع النتيجة (مع ذكر الرمز الحقيقي الذي تم استخدامه)
+        return {
+            symbol: meta.symbol, // الرمز النهائي (قد يختلف عن smbl الأصلي)
+            close: lastClose || meta.regularMarketPrice,
+            currency: meta.currency,
+            name: meta.longName || meta.shortName
+        };
+
+    } catch (error) {
+        console.error("Error:", error);
+        return { error: "Failed to fetch data", details: error.message };
+    }
 }
 
+
+async function price(smbl) {
+    const urlPrice = (s) => `https://query1.finance.yahoo.com/v8/finance/chart/${s}?interval=1h&range=1d`;
+    const searchUrl = (s) => `https://query2.finance.yahoo.com/v1/finance/search?q=${s}`;
+
+    // إعداد الـ Headers لمحاكاة متصفح حقيقي وتجنب الـ 404 أو المنع
+    const config = {
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+    };
+
+    try {
+        let response;
+        let result;
+
+        try {
+            // المحاولة الأولى: الرمز الأصلي
+            response = await axios.get(urlPrice(smbl), config);
+            result = response.data?.chart?.result?.[0];
+        } catch (e) {
+            // إذا أعطى 404، نترك result فارغة لننتقل للبحث
+            result = null;
+        }
+
+        // إذا لم يجد الرمز أو حدث خطأ، نبحث عن اقتراحات
+        if (!result) {
+            console.log(`🔍 جاري البحث عن بديل لـ: ${smbl}`);
+            const searchRes = await axios.get(searchUrl(smbl), config);
+            const bestMatch = searchRes.data?.quotes?.[0]?.symbol;
+
+            if (bestMatch) {
+                console.log(`✅ وجدنا رمزاً مطابقاً: ${bestMatch}`);
+                response = await axios.get(urlPrice(bestMatch), config);
+                result = response.data?.chart?.result?.[0];
+            }
+        }
+
+        if (!result) return { error: "Symbol not found", smbl };
+
+        const q = result.indicators?.quote?.[0];
+        const meta = result.meta;
+
+        // استخراج السعر بذكاء
+        let lastClose = null;
+        if (q?.close) {
+            for (let i = q.close.length - 1; i >= 0; i--) {
+                if (q.close[i] !== null && q.close[i] !== undefined) {
+                    lastClose = q.close[i];
+                    break;
+                }
+            }
+        }
+
+        return {
+            symbol: meta.symbol,
+            close: lastClose || meta.regularMarketPrice,
+            currency: meta.currency,
+            name: meta.longName || meta.shortName
+        };
+
+    } catch (error) {
+        return { 
+            error: "Failed to fetch data", 
+            details: error.response?.data?.chart?.error?.description || error.message 
+        };
+    }
+}
 
 export { srchSmbls, price, stocksExchange, getExchangeSymbols, sendMesageFn };

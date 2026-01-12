@@ -18,7 +18,7 @@ async function cAllDatabase(data) {
 	if (!postsRef) postsRef = db.ref("alerts");
 	//data.uid = btoa(data.userEmail);
 
-	if (!data.paid) data.paid = false;
+	if (!data.p) data.p = false; // paid
 	console.log("rah dakhl");
 	try {
 		const action = data.action;
@@ -96,6 +96,7 @@ async function setAlerte(data) {
 		s: data.symbol, // s بدلاً من symbol
 		t: data.targetPrice, // t بدلاً من targetPrice
 		c: data.alertCondition, // c بدلاً من alertCondition
+		f: data.f, //f: factorPric,
 		//  r: new Date().toLocaleString(), // requestTime
 	};
 	if (data.mt) alrtAdd.mt = data.mt;
@@ -103,7 +104,7 @@ async function setAlerte(data) {
 		if (data.isAlrd) {
 			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
 				alrtAdd.s
-			}</b> بلغت <b>${alrtAdd.t}</b> (الشرط: السعر ${
+			}</b> بلغت <b>${alrtAdd.prc}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${alrtAdd.t})`;
 			await sendTelegramMessage(data.telegramChatId, message);
@@ -146,15 +147,19 @@ async function dltAlrt(data) {
 
 		// تعديل العداد بطريقة آمنة باستخدام transaction
 		if (data.alrtOk) {
-			await dtCall.transaction(idChat => {
+			/* await dtCall.transaction(idChat => {
 				if (!idChat) {
-					return { counter: 1 }; // إذا لم تكن البيانات موجودة
+					return { c: 1 }; // إذا لم تكن البيانات موجودة
 				}
-
-				idChat.counter = (idChat.counter || 1) + 1;
+				idChat.c = (idChat.c || 0) + 1;
 				return idChat;
-			});
+			}); */
+			// بديل أسرع إذا كنت تريد فقط زيادة العداد بمقدار 1
+		await dtCall.update({
+			c: admin.database.ServerValue.increment(1),
+		});
 		}
+		
 
 		return { status: "success" };
 	} catch (error) {
@@ -183,8 +188,8 @@ async function cntctUser(data) {
 			const sendMsg = await sendTelegramMessage(idChat, message);
 			if (sendMsg.success) {
 				gtChIdExixst = {};
-				gtChIdExixst.counter = 0;
-				gtChIdExixst.paid = data.paidOrNo;
+				gtChIdExixst.c = 0; //counter
+				gtChIdExixst.p = data.paidOrNo;
 				await callDb.set(gtChIdExixst);
 				//rspns.status = "success";
 				rspns.okRspns = true;
@@ -198,9 +203,9 @@ async function cntctUser(data) {
 		}
 		//gtChIdExixst = getChId.val();
 		rspns.okRspns = true;
-		/* if (gtChIdExixst.counter < 100 || gtChIdExixst.paid) {
+		/* if (gtChIdExixst.c < 100 || gtChIdExixst.p) {
 			rspns.okRspns = true;
-		} else if (gtChIdExixst.counter > 99 && !gtChIdExixst.paid) {
+		} else if (gtChIdExixst.c > 99 && !gtChIdExixst.p) {
 			rspns.status = "notPaid";
 			rspns.okRspns = false;
 		} else {

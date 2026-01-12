@@ -110,8 +110,20 @@ const EXCHANGES = {
 		usdDsply: "inline-block",
 	},
 };
-
-const exchs = ["nyse", "xetra", "lse", "TSE", "HKSE", "NSE", "other","nasdaq"];
+const exchs = [
+	"HKEX", //
+	"LSE",
+	"NSE",
+	"SIX", //
+	"XSWX", //
+	"XPAR", //
+	"XSHG", //
+	"XSHE", //
+	"XSES",
+	"nyse",
+	"nasdaq",
+	"other"
+];
 exchs.forEach(ex => {
 	EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
 	EXCHANGES[ex].name = ex; //.toLowerCase()

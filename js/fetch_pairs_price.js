@@ -5,7 +5,6 @@ const FIREBASE_WEB_ALERT_URL =
 	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
 let currencyFtch = "USD";
-let priceFtch;
 
 const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
@@ -129,11 +128,16 @@ async function fetchTradingPairs(exchangeId) {
 				break;
 			case "nasdaq":
 			case "nyse":
-			case "xetra":
-			case "lse":
-			case "TSE":
-			case "HKSE":
+			case "XSES":
+			case "LSE":
 			case "NSE":
+			case "HKEX":
+			case "SIX":
+			case "XSWX":
+			case "XPAR":
+			case "XSHG":
+			case "XPAR":
+			case "XSHE":
 				let nmbrDays = 100;
 				let localExSmbls = localStorage.getItem(exchangeId);
 				const today = Date.now();
@@ -142,18 +146,16 @@ async function fetchTradingPairs(exchangeId) {
 					const locaTim = localExSmbls.time;
 					nmbrDays = Math.floor((today - locaTim) / (1000 * 60 * 60 * 24));
 				}
-				if (nmbrDays < 30 ) {
+				if (nmbrDays < 30) {
 					symbols = localExSmbls.symbols;
 				} else {
 					data = await ftchFnctn(exchange.exchangeInfoUrl, {
 						action: "stocksExchange",
 						querySmble: exchangeId,
 					});
-
 					// storage data
 					const tolclStrg = { symbols: data, time: today };
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
-
 					symbols = data;
 				}
 				break;
@@ -173,8 +175,7 @@ async function fetchTradingPairs(exchangeId) {
 				const div = createDiv(symbol);
 				dropdownList.appendChild(div);
 			});
-			selectedSymbol = symbols[0];
-			searchPrice.value = selectedSymbol;
+			searchPrice.value = symbols[0];
 			setTimeout(() => {
 				startPriceUpdates();
 			}, 100);
@@ -191,7 +192,7 @@ async function fetchTradingPairs(exchangeId) {
 		console.log("3awd wla " + error);
 
 		rfrsh++;
-		if (rfrsh < 5) {
+		if (rfrsh < 3) {
 			fetchTradingPairs(exchangeId);
 		}
 	}
@@ -269,21 +270,31 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				break;
 			case "nasdaq":
 			case "nyse":
-			case "xetra":
-			case "lse":
-			case "TSE":
-			case "HKSE":
+			case "XSES":
+			case "LSE":
 			case "NSE":
+			case "HKEX":
+			case "SIX":
+			case "XSWX":
+			case "XPAR":
+			case "XSHG":
+			case "XPAR":
+			case "XSHE":
 			case "other":
 				rslt = await ftchFnctn(exchange.exchangeInfoUrl, {
 					action: "price",
 					querySmble: symbol,
 				});
-
+				console.log(rslt);
+				if (rslt.symbol != symbol) gebi("searchPrice").value = rslt.symbol;
 				currencyFtch = rslt.currency;
 				price = rslt.close;
-				priceFtch = price;
 				usdDsply.value = currencyFtch;
+				if (!usdDsply.value) {
+					usdDsply.innerHTML += `<option value="${currencyFtch}">${currencyFtch}</option>`;
+					usdDsply.value = currencyFtch;
+				}
+
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
@@ -314,7 +325,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 		currentPriceDisplay.textContent = "خطأ في جلب السعر.";
 		currentPrice = null;
 		rfrsh++;
-		if (rfrsh < 5) {
+		if (rfrsh < 3) {
 			console.log("3awd wla rfrsh : " + rfrsh);
 			fetchCurrentPrice(exchangeId, symbol, isPriceUpdate);
 		}
@@ -326,6 +337,7 @@ function startPriceUpdates() {
 	if (priceUpdateInterval) {
 		clearInterval(priceUpdateInterval);
 	}
+	selectedSymbol = searchPrice.value;
 	if (selectedSymbol && currentExchangeId) {
 		fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
 		priceUpdateInterval = setInterval(
@@ -337,4 +349,3 @@ function startPriceUpdates() {
 		currentPrice = null;
 	}
 }
-

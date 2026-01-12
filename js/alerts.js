@@ -110,7 +110,7 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 
 function checkForBrowserAlerts() {
 	if (currentPrice === null) return;
-
+	selectedSymbol = searchPrice.value;
 	activeBrowserAlerts
 		.filter(alert => alert.status === "Active")
 		.forEach(alert => {

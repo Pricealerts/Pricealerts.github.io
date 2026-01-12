@@ -8,7 +8,7 @@ setAlertButton.addEventListener("click", async () => {
 		alertStatus.style.color = "red";
 		return;
 	}
-
+	selectedSymbol = searchPrice.value;
 	const targetPrice = parseFloat(targetPriceInput.value);
 	const alertCondition = document.querySelector(
 		'input[name="alertCondition"]:checked'

@@ -58,23 +58,21 @@ async function startPage() {
 		chtIdSlct += `<option value="${chtIdStrg.ch2}">${chtIdStrg.ch2}</option>`;
 	if (chtIdStrg.ch3.length > 0)
 		chtIdSlct += `<option value="${chtIdStrg.ch3}">${chtIdStrg.ch3}</option>`;
+
 	if (chtIdSlct.length > 0) {
 		slChId.style.display = "block";
 		slChId.innerHTML = chtIdSlct;
-		slChId.addEventListener('change',() => {tlgChtIdInpt.value =slChId.value})
+		slChId.addEventListener("change", () => {
+			tlgChtIdInpt.value = slChId.value;
+			telegramChatId = slChId.value;
+		});
 		tlgChtIdInpt.style.display = "none";
+		await loadUserAlertsDisplay();
 	} else if (localStorage.getItem("idChat")) {
 		tlgChtIdInpt.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
 		telegramChatId = localStorage.getItem("idChat");
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
-		if (localStorage.alrtsStorg) {
-			const strg = JSON.parse(localStorage.alrtsStorg);
-			//console.log(strg);
-
-			renderAlerts(strg); // تحميل التنبيهات من الشيت للعرض
-		} else {
-			await loadUserAlertsDisplay();
-		}
+		await loadUserAlertsDisplay();
 		//
 	} else {
 		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
@@ -193,7 +191,6 @@ function createDiv(symbol) {
 }
 function gtPrcOfOther(symbol) {
 	searchPrice.value = symbol;
-	selectedSymbol = symbol;
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
 	//usdDsply.value = currency;
@@ -223,31 +220,38 @@ function updateTargetPrice() {
 usdDsply.addEventListener("change", async () => {
 	let priceCurrencyFtch = 1;
 
-	let url = EXCHANGES.nasdaq.exchangeInfoUrl;
+	const url = EXCHANGES.nasdaq.exchangeInfoUrl;
 	if (currencyFtch !== "USD") {
-		let smbl = currencyFtch + "USD=X";
-		let response = await fetch(url, {
+		const smbl = currencyFtch + "USD=X"; // 3omlt elsahm bnsba ldolar
+		const response = await fetch(url, {
 			method: "POST",
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ action: "price", querySmble: smbl }),
 		});
 		console.log(response);
-		let rslt = await response.json();
+		const rslt = await response.json();
 
-		priceCurrencyFtch = rslt.close;
+		priceCurrencyFtch = rslt.close || 1;
 	}
 
 	let priceNewCrncy = 1;
-	let smbl2 = usdDsply.value + "USD=X";
-	let response = await fetch(url, {
-		method: "POST",
-		headers: { "Content-Type": "application/json" },
-		body: JSON.stringify({ action: "price", querySmble: smbl2 }),
-	});
-	let rslt = await response.json();
-	priceNewCrncy = rslt.close;
-	factorPric = priceFtch / priceNewCrncy;
-	currentPriceDisplay.textContent = priceCurrencyFtch * factorPric;
+	const cnvrt = usdDsply.value;
+	if (cnvrt !== "USD") {
+		const smbl2 = cnvrt + "USD=X"; // l3omala libaghin n7wloha bnsba ldolar
+		const response = await fetch(url, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ action: "price", querySmble: smbl2 }),
+		});
+
+		const rslt = await response.json();
+		priceNewCrncy = rslt.close || 1;
+	}
+
+	factorPric = priceCurrencyFtch / priceNewCrncy;
+	const rsltFnl = currentPrice * factorPric;
+	currentPriceDisplay.textContent = rsltFnl;
+	targetPriceInput.value = rsltFnl;
 });
 
 /* instalation app */
