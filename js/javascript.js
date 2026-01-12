@@ -23,13 +23,14 @@ const tlgChtIdInpt = gebi("telegramChatId");
 const setAlertButton = gebi("setAlertButton");
 const alertStatus = gebi("alertStatus");
 const alertsList = gebi("alertsList");
+const alertsListNtf = gebi("alertsListNtf");
 
 let telegramChatId;
 let currentExchangeId = exchangeSelect.value;
 let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
-let activeBrowserAlerts = []; // قائمة منفصلة لتنبيهات للتطبيق المحلية
+let brwsrAlrts = []; // قائمة منفصلة لتنبيهات للتطبيق المحلية
 let factorPric = 1;
 // --- معالجات الأحداث ---
 
@@ -40,11 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
 async function startPage() {
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
-
-	requestNotificationPermission(); // طلب إذن الإشعارات للتطبق
-	if (localStorage.getItem("exchangeChoz")) {
+	//requestNotificationPermission(); // طلب إذن الإشعارات للتطبق
+	if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz");
+	if (localStorage.getItem("brwsrAlrts")) {
+		brwsrAlrts = JSON.parse(localStorage.getItem("brwsrAlrts"));
+		renderAlNotfcation();
 	}
+
 	let chtIdSlct = "";
 	const slChId = gebi("chtIdSlct");
 	const chtIdStrg = {
@@ -228,7 +232,6 @@ usdDsply.addEventListener("change", async () => {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ action: "price", querySmble: smbl }),
 		});
-		console.log(response);
 		const rslt = await response.json();
 
 		priceCurrencyFtch = rslt.close || 1;
@@ -261,7 +264,6 @@ window.addEventListener("beforeinstallprompt", e => {
 	e.preventDefault();
 	deferredPrompt = e;
 	// Update UI notify the user they can install the PWA
-
 	gebi("dvdw").style.display = "block";
 });
 

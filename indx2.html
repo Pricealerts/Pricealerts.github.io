@@ -35,7 +35,7 @@
 		<!-- end OG Meta for Social shares -->
 
 		<title>منبه الأسعار</title>
-		<link rel="stylesheet" href="https://pricealerts.github.io/style.min.css" />
+		<link rel="stylesheet" href="./style.min.css" />
 		<!-- Poure applecation -->
 		<link rel="manifest" href="./manifest.json" />
 		<meta name="theme-color" content="#f0f2f5" />
@@ -144,7 +144,10 @@
 			<div class="alert-section">
 				<h2>إعداد التنبيه</h2>
 				<!-- <p class="note">
-                <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر <strong>تيليجرام</strong> فقط (وتُحذف تلقائيًا بعد التفعيل). تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
+                <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر 
+				<strong>تيليجرام</strong> 
+				فقط (وتُحذف تلقائيًا بعد التفعيل)
+				. تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
             </p> -->
 				<label for="targetPrice">السعر المستهدف :</label>
 				<input
@@ -154,7 +157,6 @@
 					step="any"
 					oninput="updateTargetPrice()"
 				/>
-
 				<div class="alert-condition-selection">
 					<label>تنبيه عندما يكون السعر:</label>
 					<div>
@@ -183,7 +185,6 @@
 						></label>
 					</div>
 				</div>
-
 				<div class="alert-type-selection">
 					<span>نوع التنبيه:</span>
 					<div>
@@ -232,9 +233,16 @@
 			</div>
 
 			<div class="active-alerts-section">
-				<h2>تنبيهاتي النشطة (تيليجرام)</h2>
+				<h2>تنبيهاتي النشطة ( تيليجرام )</h2>
 				<!-- <p class="small-note">التنبيهات التي تظهر هنا ستعمل في الخلفية وستُحذف تلقائيًا بعد إرسالها.</p>  -->
 				<ul id="alertsList">
+					<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>
+				</ul>
+			</div>
+			
+			<div class="active-alerts-section">
+				<h2>تنبيهاتي النشطة ( تطبيق )</h2>
+				<ul id="alertsListNtf">
 					<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>
 				</ul>
 			</div>

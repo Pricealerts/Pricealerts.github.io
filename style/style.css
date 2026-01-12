@@ -246,7 +246,7 @@ button:active {
     color: #0056b3;
 }
 
-.delete-button {
+.delete-button ,.delete-notif {
     background-color: #dc3545; /* أحمر للحذف */
     color: white;
     padding: 8px 15px;
@@ -256,7 +256,7 @@ button:active {
     width: auto; /* لجعله يأخذ حجمه الطبيعي */
 }
 
-.delete-button:hover {
+.delete-button:hover ,.delete-notif:hover{
     background-color: #c82333;
 }
 
@@ -299,7 +299,7 @@ button:active {
         width: 100%; /* اجعل النص يأخذ عرض كامل */
     }
 
-    .delete-button {
+    .delete-button ,.delete-notif {
         width: 100%; /* زر الحذف يأخذ عرض كامل */
         margin-right: 0; /* إزالة المسافة الجانبية */
         margin-top: 10px; /* إضافة مسافة علوية */

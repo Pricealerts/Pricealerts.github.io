@@ -20,8 +20,8 @@ async function loadUserAlertsDisplay() {
 			'<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات.</li>';
 	}
 }
-
 function renderAlerts(alerts) {
+	//const allAlrts = [...alerts,...brwsrAlrts]
 	alertsList.innerHTML = "";
 	if (!alerts || alerts.length === 0) {
 		alertsList.innerHTML =
@@ -72,7 +72,6 @@ function renderAlerts(alerts) {
 		});
 	});
 }
-
 // --- وظائف التنبيهات (تم تبسيطها) ---
 function requestNotificationPermission() {
 	if (!("Notification" in window)) {
@@ -89,7 +88,6 @@ function requestNotificationPermission() {
 		});
 	}
 }
-
 function showBrowserNotification(symbol, price, targetPrice, condition) {
 	let conditionText = "";
 	if (condition === "l") {
@@ -97,7 +95,7 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 	} else if (condition === "g") {
 		conditionText = `أصبح ≤ ${targetPrice} USDT`;
 	}
-
+	dltNtf(idDlt);
 	if (Notification.permission === "granted") {
 		new Notification(`تنبيه سعر ${symbol}!`, {
 			body: `وصل السعر إلى ${price} USDT. ${conditionText}`, //https://www.google.com/s2/favicons?domain=binance.com
@@ -107,41 +105,81 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 		requestNotificationPermission();
 	}
 }
-
 function checkForBrowserAlerts() {
 	if (currentPrice === null) return;
-	selectedSymbol = searchPrice.value;
-	activeBrowserAlerts
-		.filter(alert => alert.status === "Active")
-		.forEach(alert => {
-			if (
-				alert.symbol === selectedSymbol &&
-				alert.exchangeId === currentExchangeId
-			) {
-				let shouldTrigger = false;
-				if (alert.alertCondition === "l" && currentPrice <= alert.targetPrice) {
-					shouldTrigger = true;
-				} else if (
-					alert.alertCondition === "g" &&
-					currentPrice >= alert.targetPrice
-				) {
-					shouldTrigger = true;
-				}
 
-				if (shouldTrigger) {
-					setTimeout(() => {
-						alertStatus.textContent = "";
-					}, 3000);
-					showBrowserNotification(
-						alert.symbol,
-						currentPrice,
-						alert.targetPrice,
-						alert.alertCondition
-					);
-					alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
-					alertStatus.textContent = `تم إرسال تنبيه للتطبيق لـ ${alert.symbol}.`;
-					alertStatus.style.color = "green";
-				}
+	brwsrAlrts.forEach(alert => {
+		if (
+			alert.symbol === selectedSymbol &&
+			alert.exchangeId === currentExchangeId
+		) {
+			let shouldTrigger = false;
+			if (alert.alertCondition === "l" && currentPrice <= alert.targetPrice) {
+				shouldTrigger = true;
+			} else if (
+				alert.alertCondition === "g" &&
+				currentPrice >= alert.targetPrice
+			) {
+				shouldTrigger = true;
 			}
+
+			if (shouldTrigger) {
+				setTimeout(() => {
+					alertStatus.textContent = "";
+				}, 3000);
+				showBrowserNotification(
+					alert.symbol,
+					currentPrice,
+					alert.targetPrice,
+					alert.alertCondition
+				);
+				dltNtf(alert.id);
+				alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
+				//alertStatus.textContent = `تم إرسال تنبيه للتطبيق لـ ${alert.symbol}.`;
+				//alertStatus.style.color = "green";
+			}
+		}
+	});
+}
+
+function renderAlNotfcation() {
+	alertsListNtf.innerHTML = "";
+	if (!brwsrAlrts || brwsrAlrts.length === 0) {
+		alertsListNtf.innerHTML =
+			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
+		return;
+	}
+	brwsrAlrts.forEach(alert => {
+		const { id, exchangeId, symbol, targetPrice, alertCondition } = alert;
+		let conditionText = "";
+		if (alertCondition === "l") {
+			conditionText = "عندما يصبح السعر أصغر أو يساوي";
+		} else if (alertCondition === "g") {
+			conditionText = "عندما يصبح السعر أكبر أو يساوي";
+		}
+		const listItem = document.createElement("li");
+		listItem.id = id;
+		listItem.innerHTML = `
+			<span  class="alert-info" >
+				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>
+				${conditionText} ${targetPrice} (النوع: تطبيق)
+			</span>
+			<button class="delete-notif" 
+			data-alert='${id}'
+			>حذف</button>
+		`;
+		alertsListNtf.appendChild(listItem);
+	});
+	document.querySelectorAll(".delete-notif").forEach(button => {
+		button.addEventListener("click", event => {
+			const idDlt = event.target.dataset.alert;
+			dltNtf(idDlt);
 		});
+	});
+}
+
+function dltNtf(idDlt) {
+	gebi(idDlt).remove();
+	brwsrAlrts = brwsrAlrts.filter(el => el.id != idDlt);
+	localStorage.setItem("brwsrAlrts", JSON.stringify(brwsrAlrts));
 }

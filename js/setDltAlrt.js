@@ -35,18 +35,41 @@ setAlertButton.addEventListener("click", async () => {
 
 	localStorage.setItem("exchangeChoz", currentExchangeId);
 
+	// إنشاء معرف فريد للتنبيه
+	const alertId = Date.now().toString();
 	// التعامل مع تنبيه للتطبيق محليًا
 	if (isBrowserAlert) {
-		activeBrowserAlerts.push({
+		brwsrAlrts.push({
+			id: alertId,
 			exchangeId: currentExchangeId,
 			symbol: selectedSymbol,
 			targetPrice: targetPrice,
 			alertCondition: alertCondition,
-			alertType: "browser", // هذا للحفاظ على التمييز
-			status: "Active",
+			/* alertType: "browser", // هذا للحفاظ على التمييز
+			status: "Active", */
 		});
 		alertStatus.textContent = `تم تعيين تنبيه للتطبيق لـ ${selectedSymbol}.`;
 		alertStatus.style.color = "green";
+		localStorage.setItem("brwsrAlrts",JSON.stringify(brwsrAlrts));
+		renderAlNotfcation();
+		/* let conditionText = "";
+		if (alertCondition === "l") {
+			conditionText = "عندما يصبح السعر أصغر أو يساوي";
+		} else if (alertCondition === "g") {
+			conditionText = "عندما يصبح السعر أكبر أو يساوي";
+		}
+		const listItem = document.createElement("li");
+		listItem.innerHTML = `
+			<span class="alert-info" >
+				<strong>${EXCHANGES[currentExchangeId].name} - ${selectedSymbol}</strong>
+				${conditionText} ${targetPrice} 
+				(النوع: تطبيق)
+			</span>
+			<button class="delete-button" 
+			data-alert='${alertId}'
+			>حذف</button>
+		`;
+		alertsList.appendChild(listItem); */
 		checkForBrowserAlerts(); // فحص فوري
 	}
 
@@ -57,9 +80,6 @@ setAlertButton.addEventListener("click", async () => {
 			await loadUserAlertsDisplay();
 			gebi("telegramChatIdNote").style.display = "none";
 		}
-
-		// إنشاء معرف فريد للتنبيه
-		const alertId = Date.now().toString();
 
 		const newTelegramAlert = {
 			id: alertId,
@@ -102,9 +122,6 @@ async function deleteAlert(alert) {
 		id: alert.alertId,
 		telegramChatId: alert.telegramChatId,
 	});
-	/* if (success) {
-		// loadUserAlertsDisplay() سيتم استدعاؤها في manageAlertOnFirebase عند النجاح
-	} */
 }
 
 // دالة لتعيين/حذف التنبيهات على  farebase
@@ -178,3 +195,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 	}
 }
 
+const arry1 = ["dadidi", "oussama"];
+const arr2 = ["sali", "yassin", ...arry1];
+//atarr2.push(arry1)
+console.log(arr2);
