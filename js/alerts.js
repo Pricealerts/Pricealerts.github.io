@@ -88,7 +88,7 @@ function requestNotificationPermission() {
 		});
 	}
 }
-function showBrowserNotification(symbol, price, targetPrice, condition) {
+function showBrowserNotification2(symbol, price, targetPrice, condition) {
 	let conditionText = "";
 	if (condition === "l") {
 		conditionText = `أصبح ≥ ${targetPrice} USDT`;
@@ -105,6 +105,24 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 		requestNotificationPermission();
 	}
 }
+function showBrowserNotification(symbol, price, targetPrice, condition) {
+    let conditionText = condition === "l" ? `أصبح ≥ ${targetPrice} USDT` : `أصبح ≤ ${targetPrice} USDT`;
+
+    if (Notification.permission === "granted") {
+        // المحاولة عبر Service Worker (أفضل للهواتف)
+        navigator.serviceWorker.ready.then(function(registration) {
+            registration.showNotification(`تنبيه سعر ${symbol}!`, {
+                body: `وصل السعر إلى ${price} USDT. ${conditionText}`,
+                icon: "../imgs/web/icon-512.png",
+                vibrate: [200, 100, 200], // إضافة اهتزاز للهاتف
+                tag: 'price-alert' // لمنع تكرار التنبيهات
+            });
+        });
+    } else {
+        Notification.requestPermission();
+    }
+}
+
 function checkForBrowserAlerts() {
 	if (currentPrice === null) return;
 
