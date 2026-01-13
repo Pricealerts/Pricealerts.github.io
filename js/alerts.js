@@ -9,8 +9,6 @@ async function loadUserAlertsDisplay() {
 		let aryRslt = Object.entries(rslt);
 		// تحويل المصفوفة إلى نص JSON قبل الحفظ
 		if (!aryRslt) aryRslt = [];
-		console.log(aryRslt);
-
 		localStorage.setItem("alrtsStorg", JSON.stringify(aryRslt));
 		renderAlerts(aryRslt);
 	} catch (err) {
@@ -88,7 +86,7 @@ function requestNotificationPermission() {
 		});
 	}
 }
-function showBrowserNotification2(symbol, price, targetPrice, condition) {
+/* function showBrowserNotification2(symbol, price, targetPrice, condition) {
 	let conditionText = "";
 	if (condition === "l") {
 		conditionText = `أصبح ≥ ${targetPrice} USDT`;
@@ -104,60 +102,146 @@ function showBrowserNotification2(symbol, price, targetPrice, condition) {
 	} else if (Notification.permission === "default") {
 		requestNotificationPermission();
 	}
-}
+} */
 function showBrowserNotification(symbol, price, targetPrice, condition) {
-    let conditionText = condition === "l" ? `أصبح ≥ ${targetPrice} USDT` : `أصبح ≤ ${targetPrice} USDT`;
+	let conditionText =
+		condition === "l"
+			? `أصبح ≥ ${targetPrice} USDT`
+			: `أصبح ≤ ${targetPrice} USDT`;
 
-    if (Notification.permission === "granted") {
-        // المحاولة عبر Service Worker (أفضل للهواتف)
-        navigator.serviceWorker.ready.then(function(registration) {
-            registration.showNotification(`تنبيه سعر ${symbol}!`, {
-                body: `وصل السعر إلى ${price} USDT. ${conditionText}`,
-                icon: "../imgs/web/icon-512.png",
-                vibrate: [200, 100, 200], // إضافة اهتزاز للهاتف
-                tag: 'price-alert' // لمنع تكرار التنبيهات
-            });
-        });
-    } else {
-        Notification.requestPermission();
-    }
+	if (Notification.permission === "granted") {
+		// المحاولة عبر Service Worker (أفضل للهواتف)
+		navigator.serviceWorker.ready.then(function (registration) {
+			registration.showNotification(`تنبيه سعر ${symbol}!`, {
+				body: `وصل السعر إلى ${price} USDT. ${conditionText}`,
+				icon: "../imgs/web/icon-512.png",
+				vibrate: [200, 100, 200], // إضافة اهتزاز للهاتف
+				tag: "price-alert", // لمنع تكرار التنبيهات
+			});
+		});
+	} else {
+		requestNotificationPermission();
+	}
 }
 
 function checkForBrowserAlerts() {
 	if (currentPrice === null) return;
-
-	brwsrAlrts.forEach(alert => {
-		if (
-			alert.symbol === selectedSymbol &&
-			alert.exchangeId === currentExchangeId
-		) {
-			let shouldTrigger = false;
-			if (alert.alertCondition === "l" && currentPrice <= alert.targetPrice) {
-				shouldTrigger = true;
-			} else if (
-				alert.alertCondition === "g" &&
-				currentPrice >= alert.targetPrice
-			) {
-				shouldTrigger = true;
-			}
-
-			if (shouldTrigger) {
-				setTimeout(() => {
-					alertStatus.textContent = "";
-				}, 3000);
-				showBrowserNotification(
-					alert.symbol,
-					currentPrice,
-					alert.targetPrice,
-					alert.alertCondition
-				);
-				dltNtf(alert.id);
-				alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
-				//alertStatus.textContent = `تم إرسال تنبيه للتطبيق لـ ${alert.symbol}.`;
-				//alertStatus.style.color = "green";
-			}
-		}
+	const slrtsSmbl = brwsrAlrts.filter(alert => alert.symbol === selectedSymbol);
+	slrtsSmbl.forEach( alert => {
+		hndlAlrt(alert);
 	});
+	/* let symbolsMap = new Map();
+	let aryAlrt =[];
+	brwsrAlrts.forEach( alert => {
+		if (!symbolsMap.has(alert.symbol)) {
+			symbolsMap.set(alert.symbol, true);
+			aryAlrt.push(alert);
+		}
+		//hndlAlrt(alert);
+		currentExchangeId = alert.exchangeId;
+		selectedSymbol = alert.symbol;
+		//await fetchCurrentPrice(alert.exchangeId, alert.symbol);
+	}); */
+
+	function hndlAlrt(alert) {
+		let shouldTrigger = false;
+		if (alert.alertCondition === "l" && currentPrice <= alert.targetPrice) {
+			shouldTrigger = true;
+		} else if (
+			alert.alertCondition === "g" &&
+			currentPrice >= alert.targetPrice
+		) {
+			shouldTrigger = true;
+		}
+		if (shouldTrigger) {
+			showBrowserNotification(
+				alert.symbol,
+				currentPrice,
+				alert.targetPrice,
+				alert.alertCondition
+			);
+			dltNtf(alert.id);
+			alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
+		}
+	}
+}
+
+
+async function checkForBrowserAlerts2() { // أضفنا async هنا
+    if (currentPrice === null) return;
+
+    // معالجة تنبيهات العملة المختارة حالياً
+    const slrtsSmbl = brwsrAlrts.filter(alert => alert.symbol === selectedSymbol);
+    slrtsSmbl.forEach(alert => {
+        hndlAlrt(alert, currentPrice); 
+    });
+
+    // معالجة كافة التنبيهات الأخرى
+    for (const alert of brwsrAlrts) { // استخدام for...of بدلاً من forEach
+        // تحديث البيانات مؤقتاً لجلب السعر
+        let priceForThisAlert = await fetchCurrentPrice(alert.exchangeId, alert.symbol);
+        
+        hndlAlrt(alert, priceForThisAlert);
+    }
+}
+
+async function checkForBrowserAlerts3() {
+    if (brwsrAlrts.length === 0) return;
+
+    // 1. إنشاء مصفوفة من الوعود (Promises) لجميع التنبيهات
+    const promises = brwsrAlrts.map(async (alert) => {
+        try {
+            // جلب السعر لكل تنبيه بشكل منفصل
+            const price = await fetchCurrentPrice(alert.exchangeId, alert.symbol);
+            
+            // التحقق من الشرط
+            let shouldTrigger = false;
+            if (alert.alertCondition === "l" && price <= alert.targetPrice) {
+                shouldTrigger = true;
+            } else if (alert.alertCondition === "g" && price >= alert.targetPrice) {
+                shouldTrigger = true;
+            }
+
+            if (shouldTrigger && alert.status !== "Triggered") {
+                showBrowserNotification(
+                    alert.symbol,
+                    price,
+                    alert.targetPrice,
+                    alert.alertCondition
+                );
+                alert.status = "Triggered";
+                dltNtf(alert.id);
+            }
+        } catch (error) {
+            console.error(`خطأ في جلب سعر ${alert.symbol}:`, error);
+        }
+    });
+
+    // 2. تشغيل جميع الطلبات في وقت واحد وانتظار اكتمالها
+    await Promise.all(promises);
+}
+
+// تعديل دالة hndlAlrt لتستقبل السعر كـ Parameter لضمان الدقة
+function hndlAlrt(alert, priceToCheck) {
+    if (!priceToCheck) return;
+
+    let shouldTrigger = false;
+    if (alert.alertCondition === "l" && priceToCheck <= alert.targetPrice) {
+        shouldTrigger = true;
+    } else if (alert.alertCondition === "g" && priceToCheck >= alert.targetPrice) {
+        shouldTrigger = true;
+    }
+
+    if (shouldTrigger && alert.status !== "Triggered") {
+        showBrowserNotification(
+            alert.symbol,
+            priceToCheck,
+            alert.targetPrice,
+            alert.alertCondition
+        );
+        dltNtf(alert.id);
+        alert.status = "Triggered";
+    }
 }
 
 function renderAlNotfcation() {
@@ -200,4 +284,8 @@ function dltNtf(idDlt) {
 	gebi(idDlt).remove();
 	brwsrAlrts = brwsrAlrts.filter(el => el.id != idDlt);
 	localStorage.setItem("brwsrAlrts", JSON.stringify(brwsrAlrts));
+	if (!brwsrAlrts || brwsrAlrts.length === 0) {
+		alertsListNtf.innerHTML =
+			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
+	}
 }

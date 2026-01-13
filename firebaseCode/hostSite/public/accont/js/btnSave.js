@@ -45,10 +45,24 @@ function vrfInpts(el) {
 slctAll(".inptSave").forEach(el => vrfInpts(el));
 
 let userId, userBr;
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth,async user => {
 	if (user) {
 		userBr = user;
 		userId = user.uid;
+		try {
+			const userRef = ref(db, "users/" + user.uid);
+		await get(userRef).then(async snapshot => {
+			const snp = snapshot.exists();
+			if (snp) {
+				const { lastLogin, paid, status, ...restUsr } = snapshot.val();
+				for (const key in restUsr) {
+					localStorage[key] = restUsr[key];
+				}
+				strtFunctn()
+			}})
+		} catch (error) {
+			
+		}
 	} else {
 		window.location.href = "/signin";
 	}

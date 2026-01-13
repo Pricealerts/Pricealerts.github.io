@@ -98,7 +98,7 @@ async function startPage() {
 	});
 
 	searchPrice.addEventListener("change", () => {
-		startPriceUpdates();
+		//startPriceUpdates();
 		alertStatus.textContent = "";
 	});
 

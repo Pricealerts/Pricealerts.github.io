@@ -1,12 +1,16 @@
 <!DOCTYPE html><html lang="ar"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Profile Card</title><link rel="icon" href="https://pricealerts.github.io/imgs/web/favicon.ico" sizes="any"><link rel="canonical" href="https://pricealerts.web.app/signin/index.html"><meta name="description" content="منصة Price Alerts لتنبيه أسعار العملات الرقمية والأسهم العالمية من عشر منصات تداول و 11 بورصة. تنبيهات فورية وسريعة."><meta name="keywords" content="تنبيه أسعار, عملات رقمية, أسهم, بورصة, تنبيهات سعر, تداول, Binance, KuCoin, nasdaq,nyse, OKX"><meta name="author" content="Price Alerts"><meta name="robots" content="index, follow"><meta property="og:title" content="Price Alerts - تنبيهات أسعار العملات الرقمية والأسهم"><meta property="og:description" content="تنبيهات سعرية فورية لـ 10 منصات تداول و 11 بورصة أسهم."><meta property="og:url" content="https://pricealerts.web.app/"><meta property="og:type" content="website"><meta property="og:image" content="https://pricealerts.web.app/imgs/web/apple-touch-icon.png"><title>حسابي</title><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"><link rel="stylesheet" href="https://pricealerts.github.io/style/navbar.css"><link rel="stylesheet" href="./style.css"><link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet"></head><body><div id="pirantCntynr" class="pirantCntynr"></div><div id="cntnr" class="hidjs cler"><div id="divplac" class="dvPlc"><span class="clrear cler">×</span><hr><div id="containerImg"><img id="imagePr"><div id="cropCircle"><span class="arrow arrow-left">⇔</span> <span class="arrow arrow-right">⇔</span> <button id="btnCrop" class="okbtn cler btnCrop" style="padding:7px;background-color:#01544c">حدد</button><div id="resizeHandle"></div></div><button class="okbtn" onclick="document.getElementById('input-file').click()">أعد التحميل</button></div><canvas id="result" style="display:none"></canvas><br></div></div><form id="formSave" class="profile-container" action="#"><div class="profile-photo"><label for="qdfd" id="drop-area"><input id="input-file" class="inptSave" type="file" accept="image/*" hidden><div class="imgCv"><img src="/imgs/camera-square-svgrepo-com.svg" alt=""></div><img id="base64Pctr" src="/imgs/user-svgrepo-com.svg" draggable="false"></label></div><h1 id="userName" class="user-name inptSave" contenteditable="true"></h1><p id="uesrEmail" class="user-email"></p><div class="chatIds"><br><br>معرّفات دردشة التيليجرام (Chat ID) : الخاص بك<br><br><p id="chtIdNote" class="small-note"><strong>ملاحظة:</strong> إذا لم يكن لديك معرف دردشة تيليجرام، <a href="https://t.me/Crypto_prices_alerts_bot" target="_blank">أدخل الى هذا البوت</a> للحصول على معرف دردشتك.<br></p><br><label for="chtId1">Chat ID 1</label><br><input type="text" id="chtId1" class="inptSave" placeholder="أدخل معرّف دردشة تيليجرام"><br><br><label for="chtId2">Chat ID 2</label><br><input type="text" id="chtId2" class="inptSave" placeholder="أدخل معرّف دردشة تيليجرام"><br><br><label for="chtId3">Chat ID 3</label><br><input type="text" id="chtId3" class="inptSave" placeholder="أدخل معرّف دردشة تيليجرام"></div><p id="rspns"></p><button id="saveBtn" type="submit" class="saveBtn">حفظ التغيرات</button></form><div id="sgnOutInLink" class="exsitAcoont">تسجبل الخروج <img src="/imgs/web/signout-svgrepo-com.svg" alt=""></div><script src="https://pricealerts.github.io/js/navbar.js"></script><script>function gebi(el) {
 				return document.getElementById(el);
 			}
-			gebi("base64Pctr").src = UserImage || "/imgs/web/apple-touch-icon.png";
-			gebi("userName").innerText = localStorage.userName || "إسمك";
-			gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
-			gebi("chtId1").value = localStorage.chtId1 || "";
-			gebi("chtId2").value = localStorage.chtId2 || "";
-			gebi("chtId3").value = localStorage.chtId3 || "";
+			let prmyrInpts;
+			function strtFunctn() {
+				gebi("base64Pctr").src = UserImage || "/imgs/web/apple-touch-icon.png";
+				gebi("userName").innerText = localStorage.userName || "إسمك";
+				gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
+				gebi("chtId1").value = localStorage.chtId1 || "";
+				gebi("chtId2").value = localStorage.chtId2 || "";
+				gebi("chtId3").value = localStorage.chtId3 || "";
+				prmyrInpts = valInpts();
+			}
 			function valInpts() {
 				return (
 					gebi("userName").innerText +
@@ -14,5 +18,4 @@
 					gebi("chtId2").value +
 					gebi("chtId3").value
 				);
-			}
-			const prmyrInpts = valInpts();</script><script type="module" src="./js.min.js"></script></body></html>
+			}</script><script type="module" src="./js.min.js"></script></body></html>

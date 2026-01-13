@@ -36,6 +36,9 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
 				symbols = allPrices.map(s => s.symbol);
+				const dd = allPrices.find(obj => obj.symbol == "DASHUSDT").price;
+				console.log(dd);
+				
 				break;
 			case "mexc":
 				response = await fetch(urlCrpts);
@@ -339,7 +342,9 @@ function startPriceUpdates() {
 	}
 	selectedSymbol = searchPrice.value;
 	if (selectedSymbol && currentExchangeId) {
-		fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
+			fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
+
+		
 		priceUpdateInterval = setInterval(
 			() => fetchCurrentPrice(currentExchangeId, selectedSymbol),
 			EXCHANGES[currentExchangeId].intervalData

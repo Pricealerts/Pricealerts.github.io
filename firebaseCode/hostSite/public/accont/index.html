@@ -172,12 +172,16 @@
 			function gebi(el) {
 				return document.getElementById(el);
 			}
-			gebi("base64Pctr").src = UserImage || "/imgs/web/apple-touch-icon.png";
-			gebi("userName").innerText = localStorage.userName || "إسمك";
-			gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
-			gebi("chtId1").value = localStorage.chtId1 || "";
-			gebi("chtId2").value = localStorage.chtId2 || "";
-			gebi("chtId3").value = localStorage.chtId3 || "";
+			let prmyrInpts;
+			function strtFunctn() {
+				gebi("base64Pctr").src = UserImage || "/imgs/web/apple-touch-icon.png";
+				gebi("userName").innerText = localStorage.userName || "إسمك";
+				gebi("uesrEmail").innerHTML = localStorage.userEmail || "إيميلك";
+				gebi("chtId1").value = localStorage.chtId1 || "";
+				gebi("chtId2").value = localStorage.chtId2 || "";
+				gebi("chtId3").value = localStorage.chtId3 || "";
+				prmyrInpts = valInpts();
+			}
 			function valInpts() {
 				return (
 					gebi("userName").innerText +
@@ -186,8 +190,6 @@
 					gebi("chtId3").value
 				);
 			}
-			const prmyrInpts = valInpts();
-			
 		</script>
 		<!-- btn save -->
 		<!-- <script type="module" src="./jsAccont/btnSave.js"></script>

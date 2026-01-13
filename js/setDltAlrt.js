@@ -50,6 +50,9 @@ setAlertButton.addEventListener("click", async () => {
 		});
 		alertStatus.textContent = `تم تعيين تنبيه للتطبيق لـ ${selectedSymbol}.`;
 		alertStatus.style.color = "green";
+		setTimeout(() => {
+			alertStatus.textContent ="";
+		}, 3000);
 		localStorage.setItem("brwsrAlrts",JSON.stringify(brwsrAlrts));
 		renderAlNotfcation();
 		/* let conditionText = "";
