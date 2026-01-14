@@ -38,7 +38,7 @@ async function fetchTradingPairs(exchangeId) {
 				symbols = allPrices.map(s => s.symbol);
 				const dd = allPrices.find(obj => obj.symbol == "DASHUSDT").price;
 				console.log(dd);
-				
+
 				break;
 			case "mexc":
 				response = await fetch(urlCrpts);
@@ -200,7 +200,12 @@ async function fetchTradingPairs(exchangeId) {
 		}
 	}
 }
-async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
+async function fetchCurrentPrice(
+	exchangeId,
+	symbol,
+	isPrcUpdt = false,
+	brwsrAlrt = false
+) {
 	const exchange = EXCHANGES[exchangeId];
 	if (!exchange) return null;
 	try {
@@ -304,11 +309,12 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 				break;
 		}
 		//console.log(data);
-
+		
 		if (price !== null) {
+			if (brwsrAlrt) return price;
 			currentPrice = price;
 			currentPriceDisplay.textContent = `${currentPrice} `;
-			if (isPriceUpdate) {
+			if (isPrcUpdt) {
 				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
 				document
 					.querySelectorAll(".prcTrgt")
@@ -330,7 +336,7 @@ async function fetchCurrentPrice(exchangeId, symbol, isPriceUpdate = false) {
 		rfrsh++;
 		if (rfrsh < 3) {
 			console.log("3awd wla rfrsh : " + rfrsh);
-			fetchCurrentPrice(exchangeId, symbol, isPriceUpdate);
+			fetchCurrentPrice(exchangeId, symbol, isPrcUpdt);
 		}
 		return null;
 	}
@@ -342,9 +348,8 @@ function startPriceUpdates() {
 	}
 	selectedSymbol = searchPrice.value;
 	if (selectedSymbol && currentExchangeId) {
-			fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
+		fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
 
-		
 		priceUpdateInterval = setInterval(
 			() => fetchCurrentPrice(currentExchangeId, selectedSymbol),
 			EXCHANGES[currentExchangeId].intervalData
