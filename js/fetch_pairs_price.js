@@ -321,13 +321,13 @@ async function fetchCurrentPrice(
 					.forEach(el => (el.innerHTML = currentPrice));
 			}
 			rfrsh = 0;
-			checkForBrowserAlerts(); // فحص تنبيهات للتطبيق عند تحديث السعر
-			return currentPrice;
+		    await checkForBrowserAlerts(); // فحص تنبيهات للتطبيق عند تحديث السعر
+			//return currentPrice;
 		} else {
 			currentPriceDisplay.textContent = "السعر غير متاح.";
 			currentPrice = null;
 			rfrsh = 0;
-			return null;
+		//	return null;
 		}
 	} catch (error) {
 		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
@@ -338,7 +338,7 @@ async function fetchCurrentPrice(
 			console.log("3awd wla rfrsh : " + rfrsh);
 			fetchCurrentPrice(exchangeId, symbol, isPrcUpdt);
 		}
-		return null;
+		//return null;
 	}
 }
 

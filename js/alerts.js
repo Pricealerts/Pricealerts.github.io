@@ -126,7 +126,7 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 
 async function checkForBrowserAlerts() {
 	if (currentPrice === null) return;
-	hndlAlrt( currentPrice, selectedSymbol);
+	hndlAlrt(currentPrice, selectedSymbol);
 
 	let symbolsMap = new Map();
 	let aryAlrts = [];
@@ -144,14 +144,12 @@ async function checkForBrowserAlerts() {
 			true
 		);
 		if (!price) return;
-		hndlAlrt( price, alert.symbol);
+		hndlAlrt(price, alert.symbol);
 	});
 	await Promise.all(promeses);
 
-	function hndlAlrt( curentPrice, slctdSmbl) {
-		const slctSmbl = brwsrAlrts.filter(
-			alert => alert.symbol === slctdSmbl
-		);
+	function hndlAlrt(curentPrice, slctdSmbl) {
+		const slctSmbl = brwsrAlrts.filter(alert => alert.symbol === slctdSmbl);
 		slctSmbl.forEach(alert => {
 			let shouldTrigger = false;
 			if (alert.alertCondition === "l" && curentPrice <= alert.targetPrice) {
@@ -175,10 +173,6 @@ async function checkForBrowserAlerts() {
 		});
 	}
 }
-
-
-
-
 
 function renderAlNotfcation() {
 	alertsListNtf.innerHTML = "";
