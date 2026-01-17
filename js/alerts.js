@@ -124,44 +124,57 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 	}
 }
 
+
+
 async function checkForBrowserAlerts() {
 	if (brwsrAlrts.length === 0) return;
-	hndlAlrt(currentPrice, selectedSymbol);
 
+	// 1. فلترة العملات الفريدة لتقليل عدد طلبات الـ API
 	let symbolsMap = new Map();
-	let aryAlrts = [];
+	let uniqueAlerts = [];
 	brwsrAlrts.forEach(alert => {
 		if (!symbolsMap.has(alert.symbol)) {
 			symbolsMap.set(alert.symbol, true);
-			aryAlrts.push(alert);
+			uniqueAlerts.push(alert);
 		}
 	});
-	const promeses = aryAlrts.map(alert => {
-		const price = fetchCurrentPrice(
-			alert.exchangeId,
-			alert.symbol,
-			false,
-			true
-		);
-		if (!price) return;
-		hndlAlrt(price, alert.symbol);
-	});
-	await Promise.all(promeses);
 
-	function hndlAlrt(curentPrice, slctdSmbl) {
-		const slctSmblAlrt = brwsrAlrts.filter(alert => alert.symbol === slctdSmbl);
-		console.log('slctSmblAlrt is : '+JSON.stringify(slctSmblAlrt));
-		
-		slctSmblAlrt.forEach(alert => {
-			let shouldTrigger = false;
-			if (alert.alertCondition === "l" && curentPrice <= alert.targetPrice) {
-				shouldTrigger = true;
-			} else if (
-				alert.alertCondition === "g" &&
-				curentPrice >= alert.targetPrice
-			) {
-				shouldTrigger = true;
+	// 2. إنشاء الوعود ومعالجتها بشكل متوازي
+	const alertPromises = uniqueAlerts.map(async uniqueAlert => {
+		try {
+			// إضافة await هنا ضرورية جداً للحصول على السعر الفعلي
+			const price = await fetchCurrentPrice(
+				uniqueAlert.exchangeId,
+				uniqueAlert.symbol,
+				false,
+				true
+			);
+
+			// نمرر السعر والرمز لدالة المعالجة
+			if (price) {
+				hndlAlrt(price, uniqueAlert.symbol);
 			}
+		} catch (error) {
+			console.error(`خطأ في جلب سعر ${uniqueAlert.symbol}:`, error);
+		}
+	});
+
+	// الانتظار حتى تنتهي جميع عمليات جلب الأسعار
+	await Promise.all(alertPromises);
+
+	// دالة المعالجة الداخلية
+	function hndlAlrt(curentPrice, slctdSmbl) {
+		const alertsForThisSymbol = brwsrAlrts.filter(
+			alert => alert.symbol === slctdSmbl
+		);
+
+		alertsForThisSymbol.forEach(alert => {
+			let shouldTrigger = false;
+			if (alert.alertCondition === "l" && curentPrice <= alert.targetPrice)
+				shouldTrigger = true;
+			else if (alert.alertCondition === "g" && curentPrice >= alert.targetPrice)
+				shouldTrigger = true;
+
 			if (shouldTrigger) {
 				showBrowserNotification(
 					alert.symbol,
@@ -169,8 +182,8 @@ async function checkForBrowserAlerts() {
 					alert.targetPrice,
 					alert.alertCondition
 				);
+				// مسح التنبيه بعد تنفيذه لمنع التكرار
 				dltNtf(alert.id);
-				//alert.status = "Triggered"; // لمنع التنبيه المتكرر على نفس السعر
 			}
 		});
 	}
@@ -221,8 +234,3 @@ function dltNtf(idDlt) {
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 	}
 }
-
-
-
-
-
