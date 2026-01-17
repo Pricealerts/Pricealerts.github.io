@@ -1,7 +1,7 @@
 // استيراد مكتبة Firebase Admin SDK
 import { getDatabase } from "firebase-admin/database";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
-import { checkAndSendAlerts, sendTelegramMessage } from "./srchSmbls.js";
+import { sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
 
 //import { sndEmail } from "./sndEmail.js";
@@ -104,7 +104,7 @@ async function setAlerte(data) {
 		if (data.isAlrd) {
 			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
 				alrtAdd.s
-			}</b> بلغت <b>${alrtAdd.prc}</b> (الشرط: السعر ${
+			}</b> بلغت <b>${data.prc}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${alrtAdd.t})`;
 			await sendTelegramMessage(data.telegramChatId, message);
@@ -155,11 +155,10 @@ async function dltAlrt(data) {
 				return idChat;
 			}); */
 			// بديل أسرع إذا كنت تريد فقط زيادة العداد بمقدار 1
-		await dtCall.update({
-			c: admin.database.ServerValue.increment(1),
-		});
+			await dtCall.update({
+				c: admin.database.ServerValue.increment(1),
+			});
 		}
-		
 
 		return { status: "success" };
 	} catch (error) {
@@ -187,13 +186,14 @@ async function cntctUser(data) {
 				شكرا`;
 			const sendMsg = await sendTelegramMessage(idChat, message);
 			if (sendMsg.success) {
-				gtChIdExixst = {};
-				gtChIdExixst.c = 0; //counter
-				gtChIdExixst.p = data.paidOrNo;
+				gtChIdExixst = { c: 0, /* //counter */ /* p: data.paidOrNo  */};
 				await callDb.set(gtChIdExixst);
 				//rspns.status = "success";
 				rspns.okRspns = true;
+				console.log('rsl');
 			} else {
+				console.log('marslch');
+				
 				rspns.status = "notSuccess";
 				rspns.okRspns = false;
 				rspns.msg = sendMsg;

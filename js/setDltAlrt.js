@@ -169,6 +169,8 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		alertStatus.textContent =
 			"فشل التأكد من معرّف دردشة التيليجرام (Chat ID) الخاص بك يرجى التأكد منه وإعادة المحاولة";
 		alertStatus.style.color = "red";
+		console.log(data);
+		
 		return false;
 	} else {
 		alertStatus.textContent = `فشل ${
@@ -179,8 +181,3 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		return false;
 	}
 }
-
-const arry1 = ["dadidi", "oussama"];
-const arr2 = ["sali", "yassin", ...arry1];
-//atarr2.push(arry1)
-console.log(arr2);

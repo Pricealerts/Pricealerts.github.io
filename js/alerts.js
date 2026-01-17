@@ -222,13 +222,5 @@ function dltNtf(idDlt) {
 
 
 
-let result = [1, 2, 3, 4].reduce((acc, n) => {
-	acc.push(n * 2);
-	return acc;
-}, []);
-console.log(result); // Output: [2, 4, 6, 8]
-
-
-
 
 
