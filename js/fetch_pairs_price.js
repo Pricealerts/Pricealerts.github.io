@@ -400,18 +400,7 @@ function startPriceUpdates() {
 		console.log("انقطع الاتصال، جاري المحاولة مرة أخرى...");
 	};
 } */
-async function fetchMexcPrice(symbol = "BTCUSDT") {
-	try {
-		const response = await fetch(
-			`https://api.mexc.com/api/v3/ticker/price?symbol=${symbol}`
-		);
-		const data = await response.json();
-		// ميكس تعيد السعر في حقل اسمه price أيضاً
-		return parseFloat(data.price);
-	} catch (error) {
-		console.error("خطأ في جلب سعر MEXC:", error);
-	}
-}
+
 
 document.addEventListener("visibilitychange", async () => {
 	if (document.hidden && binanceSocket)

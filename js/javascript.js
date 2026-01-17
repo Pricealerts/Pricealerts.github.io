@@ -68,6 +68,8 @@ async function startPage() {
 	if (chtIdSlct.length > 0) {
 		slChId.style.display = "block";
 		slChId.innerHTML = chtIdSlct;
+		telegramChatId = chtIdStrg.ch1 || chtIdStrg.ch2 || chtIdStrg.ch3;
+		tlgChtIdInpt.value = telegramChatId;
 		slChId.addEventListener("change", () => {
 			tlgChtIdInpt.value = slChId.value;
 			telegramChatId = slChId.value;

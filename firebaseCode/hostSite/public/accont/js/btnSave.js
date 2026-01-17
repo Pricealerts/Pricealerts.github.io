@@ -45,6 +45,7 @@ function vrfInpts(el) {
 slctAll(".inptSave").forEach(el => vrfInpts(el));
 
 let userId, userBr;
+
 onAuthStateChanged(auth,async user => {
 	if (user) {
 		userBr = user;
@@ -59,6 +60,7 @@ onAuthStateChanged(auth,async user => {
 					localStorage[key] = restUsr[key];
 				}
 				strtFunctn()
+			}else{console.log('is not');
 			}})
 		} catch (error) {
 			
@@ -169,4 +171,7 @@ function base64ToBlob(base64) {
 	return new Blob([new Uint8Array(array)], { type: mime });
 }
 
-console.log("hadi jdida 7");
+
+
+
+console.log("hadi jdida 8");
