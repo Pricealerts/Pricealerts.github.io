@@ -52,7 +52,8 @@ async function startPage() {
 	}
 
 	let chtIdSlct = "";
-	const slChId = gebi("chtIdSlct");
+	const slChId = gebi("chtIdSlct") || '';
+	telegramChatId = localStorage.getItem("idChat")|| '';
 	const chtIdStrg = {
 		ch1: localStorage.getItem("chtId1") || "",
 		ch2: localStorage.getItem("chtId2") || "",
@@ -76,9 +77,8 @@ async function startPage() {
 		});
 		tlgChtIdInpt.style.display = "none";
 		await loadUserAlertsDisplay();
-	} else if (localStorage.getItem("idChat")) {
-		tlgChtIdInpt.value = localStorage.getItem("idChat"); // استرجاع Chat ID من التخزين المحلي
-		telegramChatId = localStorage.getItem("idChat");
+	} else if (telegramChatId.length > 0) {
+		tlgChtIdInpt.value = telegramChatId;
 		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
 		await loadUserAlertsDisplay();
 		//
@@ -202,7 +202,7 @@ function gtPrcOfOther(symbol) {
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
 	//usdDsply.value = currency;
-		startPriceUpdates();
+	startPriceUpdates();
 }
 // Hide dropdown when clicking outside
 document.addEventListener("click", function (e) {
