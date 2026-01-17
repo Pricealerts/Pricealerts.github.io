@@ -32,6 +32,8 @@ let currentPrice = null;
 let priceUpdateInterval;
 let brwsrAlrts = []; // قائمة منفصلة لتنبيهات للتطبيق المحلية
 let factorPric = 1;
+let binanceSocket = null;
+let binanceSocketSmbl = null;
 // --- معالجات الأحداث ---
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -198,9 +200,7 @@ function gtPrcOfOther(symbol) {
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
 	//usdDsply.value = currency;
-	setTimeout(() => {
 		startPriceUpdates();
-	}, 100);
 }
 // Hide dropdown when clicking outside
 document.addEventListener("click", function (e) {

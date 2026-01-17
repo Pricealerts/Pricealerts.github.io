@@ -32,13 +32,10 @@ async function fetchTradingPairs(exchangeId) {
 
 		let response, data;
 		switch (exchangeId) {
-			case "binance":
+			case "binance": //tickerPriceUrl
 				response = await fetch(exchange.tickerPriceUrl);
 				allPrices = await response.json();
 				symbols = allPrices.map(s => s.symbol);
-				const dd = allPrices.find(obj => obj.symbol == "DASHUSDT").price;
-				console.log(dd);
-
 				break;
 			case "mexc":
 				response = await fetch(urlCrpts);
@@ -64,9 +61,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "coingecko":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-				//console.log(data);
 
-				// coingecko doesn't return symbol symbols, it returns coin IDs
 				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
 				break;
 			case "okx":
@@ -96,8 +91,6 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(urlCrpts);
 				data = await response.json();
 				allPrices = await data.data;
-				console.log(allPrices);
-
 				symbols = await allPrices.map(s => s.symbol);
 
 				break;
@@ -179,9 +172,9 @@ async function fetchTradingPairs(exchangeId) {
 				dropdownList.appendChild(div);
 			});
 			searchPrice.value = symbols[0];
-			setTimeout(() => {
-				startPriceUpdates();
-			}, 100);
+			//setTimeout(() => {
+			startPriceUpdates();
+			//}, 100);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -203,7 +196,7 @@ async function fetchTradingPairs(exchangeId) {
 async function fetchCurrentPrice(
 	exchangeId,
 	symbol,
-	isPrcUpdt = false,
+	prmrFtch = false,
 	brwsrAlrt = false
 ) {
 	const exchange = EXCHANGES[exchangeId];
@@ -216,7 +209,30 @@ async function fetchCurrentPrice(
 		let response, data, rslt;
 		switch (exchangeId) {
 			case "binance":
-				price = allPrices.find(obj => obj.symbol == symbol).price;
+				if (prmrFtch) {
+					if (binanceSocket) binanceSocket.close();
+					price = allPrices.find(obj => obj.symbol == symbol).price;
+					symbol = symbol.toLowerCase();
+					binanceSocket = new WebSocket(
+						`wss://stream.binance.com:9443/ws/${symbol}@ticker`
+					);
+					binanceSocketSmbl = symbol;
+					binanceSocket.onmessage = event => {
+						const data = JSON.parse(event.data);
+						currentPrice = parseFloat(data.c); // 'c' تعني السعر الحالي (Current/Last price)
+						currentPriceDisplay.textContent = `${currentPrice} `;
+					};
+				} else if (brwsrAlrt) {
+					const response = await fetch(
+						`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
+					);
+					const data = await response.json();
+					price = parseFloat(data.price);
+					return price;
+				} else {
+					await checkForBrowserAlerts();
+					return null;
+				}
 				break;
 			case "mexc":
 				price = allPrices.find(obj => obj.symbol == symbol).price;
@@ -235,7 +251,6 @@ async function fetchCurrentPrice(
 						data.msg || JSON.stringify(data)
 					);
 					rfrsh++;
-					console.log("rah f kucoin");
 
 					if (rfrsh < 5) {
 						fetchTradingPairs(exchangeId);
@@ -293,7 +308,6 @@ async function fetchCurrentPrice(
 					action: "price",
 					querySmble: symbol,
 				});
-				console.log(rslt);
 				if (rslt.symbol != symbol) gebi("searchPrice").value = rslt.symbol;
 				currencyFtch = rslt.currency;
 				price = rslt.close;
@@ -308,26 +322,19 @@ async function fetchCurrentPrice(
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
 				break;
 		}
-		//console.log(data);
-		
+		rfrsh = 0;
 		if (price !== null) {
 			if (brwsrAlrt) return price;
 			currentPrice = price;
 			currentPriceDisplay.textContent = `${currentPrice} `;
-			if (isPrcUpdt) {
+			if (prmrFtch) {
 				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف
 				document
 					.querySelectorAll(".prcTrgt")
 					.forEach(el => (el.innerHTML = currentPrice));
 			}
-			rfrsh = 0;
-		    await checkForBrowserAlerts(); // فحص تنبيهات للتطبيق عند تحديث السعر
+			await checkForBrowserAlerts(); // فحص تنبيهات للتطبيق عند تحديث السعر
 			//return currentPrice;
-		} else {
-			currentPriceDisplay.textContent = "السعر غير متاح.";
-			currentPrice = null;
-			rfrsh = 0;
-		//	return null;
 		}
 	} catch (error) {
 		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
@@ -336,7 +343,7 @@ async function fetchCurrentPrice(
 		rfrsh++;
 		if (rfrsh < 3) {
 			console.log("3awd wla rfrsh : " + rfrsh);
-			fetchCurrentPrice(exchangeId, symbol, isPrcUpdt);
+			fetchCurrentPrice(exchangeId, symbol, prmrFtch);
 		}
 		//return null;
 	}
@@ -348,6 +355,10 @@ function startPriceUpdates() {
 	}
 	selectedSymbol = searchPrice.value;
 	if (selectedSymbol && currentExchangeId) {
+		if (binanceSocket && binanceSocketSmbl !== selectedSymbol)
+			binanceSocket.close();
+		else if (binanceSocket && binanceSocketSmbl === selectedSymbol) return;
+
 		fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
 
 		priceUpdateInterval = setInterval(
@@ -359,3 +370,52 @@ function startPriceUpdates() {
 		currentPrice = null;
 	}
 }
+
+/* function wbSckt(symbol) {
+	if (binanceSocket) binanceSocket.close();
+	// إنشاء اتصال مع بينانس
+	symbol = symbol.toLowerCase();
+	binanceSocket = new WebSocket(
+		`wss://stream.binance.com:9443/ws/${symbol}@ticker`
+	);
+
+	// ماذا نفعل عندما تصل بيانات جديدة؟
+	binanceSocket.onmessage = event => {
+		const data = JSON.parse(event.data);
+		const currentPrice = parseFloat(data.c); // 'c' تعني السعر الحالي (Current/Last price)
+
+		console.log(`السعر اللحظي لـ ${symbol.toUpperCase()}: ${currentPrice}`);
+
+		// هنا يمكنك استدعاء دالة التحقق من التنبيهات
+		// checkForBrowserAlerts(currentPrice);
+	};
+
+	// في حالة حدوث خطأ
+	binanceSocket.onerror = error => {
+		console.error("خطأ في الاتصال:", error);
+	};
+
+	// في حالة انقطع الاتصال (أعد الاتصال تلقائياً)
+	binanceSocket.onclose = () => {
+		console.log("انقطع الاتصال، جاري المحاولة مرة أخرى...");
+	};
+} */
+async function fetchMexcPrice(symbol = "BTCUSDT") {
+	try {
+		const response = await fetch(
+			`https://api.mexc.com/api/v3/ticker/price?symbol=${symbol}`
+		);
+		const data = await response.json();
+		// ميكس تعيد السعر في حقل اسمه price أيضاً
+		return parseFloat(data.price);
+	} catch (error) {
+		console.error("خطأ في جلب سعر MEXC:", error);
+	}
+}
+
+document.addEventListener("visibilitychange", async () => {
+	if (document.hidden && binanceSocket)
+		binanceSocket.close(); // إغلاق الاتصال فوراً
+	/* else if (!document.hidden && currentExchangeId && selectedSymbol)
+		await fetchCurrentPrice(currentExchangeId, selectedSymbol, true); */
+});

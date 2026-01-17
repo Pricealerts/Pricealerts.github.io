@@ -3,7 +3,7 @@ const EXCHANGES = {
 		name: "Binance",
 		exchangeInfoUrl: "https://api.binance.com/api/v3/exchangeInfo",
 		tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
-		usdtSuffix: "USDT",
+		usdtSuffix: "USDT",// "https://api.binance.com/api/v3/klines"
 		intervalData: 10000,
 		crptChos: "block",
 		usdDsply: "none",

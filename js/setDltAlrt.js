@@ -55,24 +55,6 @@ setAlertButton.addEventListener("click", async () => {
 		}, 3000);
 		localStorage.setItem("brwsrAlrts",JSON.stringify(brwsrAlrts));
 		renderAlNotfcation();
-		/* let conditionText = "";
-		if (alertCondition === "l") {
-			conditionText = "عندما يصبح السعر أصغر أو يساوي";
-		} else if (alertCondition === "g") {
-			conditionText = "عندما يصبح السعر أكبر أو يساوي";
-		}
-		const listItem = document.createElement("li");
-		listItem.innerHTML = `
-			<span class="alert-info" >
-				<strong>${EXCHANGES[currentExchangeId].name} - ${selectedSymbol}</strong>
-				${conditionText} ${targetPrice} 
-				(النوع: تطبيق)
-			</span>
-			<button class="delete-button" 
-			data-alert='${alertId}'
-			>حذف</button>
-		`;
-		alertsList.appendChild(listItem); */
 		checkForBrowserAlerts(); // فحص فوري
 	}
 
