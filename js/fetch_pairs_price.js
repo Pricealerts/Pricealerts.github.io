@@ -227,9 +227,9 @@ async function fetchCurrentPrice(
 						`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
 					);
 					const data = await response.json();
-					console.log('data is : '+data.price);
 					
 					price = parseFloat(data.price);
+					console.log('data is : '+price);
 					return price;
 				} else {
 					await checkForBrowserAlerts();
@@ -410,3 +410,4 @@ document.addEventListener("visibilitychange", async () => {
 	/* else if (!document.hidden && currentExchangeId && selectedSymbol)
 		await fetchCurrentPrice(currentExchangeId, selectedSymbol, true); */
 });
+

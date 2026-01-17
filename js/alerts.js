@@ -125,7 +125,7 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 }
 
 async function checkForBrowserAlerts() {
-	if (currentPrice === null) return;
+	if (brwsrAlrts.length === 0) return;
 	hndlAlrt(currentPrice, selectedSymbol);
 
 	let symbolsMap = new Map();
@@ -149,8 +149,10 @@ async function checkForBrowserAlerts() {
 	await Promise.all(promeses);
 
 	function hndlAlrt(curentPrice, slctdSmbl) {
-		const slctSmbl = brwsrAlrts.filter(alert => alert.symbol === slctdSmbl);
-		slctSmbl.forEach(alert => {
+		const slctSmblAlrt = brwsrAlrts.filter(alert => alert.symbol === slctdSmbl);
+		console.log('slctSmblAlrt is : '+JSON.stringify(slctSmblAlrt));
+		
+		slctSmblAlrt.forEach(alert => {
 			let shouldTrigger = false;
 			if (alert.alertCondition === "l" && curentPrice <= alert.targetPrice) {
 				shouldTrigger = true;
