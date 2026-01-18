@@ -212,25 +212,25 @@ async function fetchCurrentPrice(
 				if (prmrFtch) {
 					if (binanceSocket) binanceSocket.close();
 					price = allPrices.find(obj => obj.symbol == symbol).price;
-					symbol = symbol.toLowerCase();
+					const symbolL = symbol.toLowerCase();
 					binanceSocket = new WebSocket(
-						`wss://stream.binance.com:9443/ws/${symbol}@ticker`
+						`wss://stream.binance.com:9443/ws/${symbolL}@ticker`
 					);
 					binanceSocketSmbl = symbol;
 					binanceSocket.onmessage = event => {
 						const data = JSON.parse(event.data);
 						currentPrice = parseFloat(data.c); // 'c' تعني السعر الحالي (Current/Last price)
 						currentPriceDisplay.textContent = `${currentPrice} `;
+						hndlAlrt(currentPrice, symbol);
 					};
 				} else if (brwsrAlrt) {
 					const response = await fetch(
 						`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`
 					);
 					const data = await response.json();
-					
-					price = parseFloat(data.price);
+					price = data.price;
 					console.log('data is : '+price);
-					return price;
+					//return price;
 				} else {
 					await checkForBrowserAlerts();
 					return null;
@@ -326,8 +326,8 @@ async function fetchCurrentPrice(
 		}
 		rfrsh = 0;
 		if (price !== null) {
-			if (brwsrAlrt) return price;
-			currentPrice = price;
+			if (brwsrAlrt) return parseFloat(price);
+			currentPrice = parseFloat(price);
 			currentPriceDisplay.textContent = `${currentPrice} `;
 			if (prmrFtch) {
 				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف

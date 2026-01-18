@@ -128,7 +128,7 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 
 async function checkForBrowserAlerts() {
 	if (brwsrAlrts.length === 0) return;
-
+hndlAlrt(currentPrice, selectedSymbol);
 	// 1. فلترة العملات الفريدة لتقليل عدد طلبات الـ API
 	let symbolsMap = new Map();
 	let uniqueAlerts = [];
@@ -162,7 +162,9 @@ async function checkForBrowserAlerts() {
 	// الانتظار حتى تنتهي جميع عمليات جلب الأسعار
 	await Promise.all(alertPromises);
 
-	// دالة المعالجة الداخلية
+	
+}
+// دالة المعالجة الداخلية
 	function hndlAlrt(curentPrice, slctdSmbl) {
 		const alertsForThisSymbol = brwsrAlrts.filter(
 			alert => alert.symbol === slctdSmbl
@@ -187,8 +189,6 @@ async function checkForBrowserAlerts() {
 			}
 		});
 	}
-}
-
 function renderAlNotfcation() {
 	alertsListNtf.innerHTML = "";
 	if (!brwsrAlrts || brwsrAlrts.length === 0) {
