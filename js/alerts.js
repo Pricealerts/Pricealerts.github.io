@@ -86,23 +86,7 @@ function requestNotificationPermission() {
 		});
 	}
 }
-/* function showBrowserNotification2(symbol, price, targetPrice, condition) {
-	let conditionText = "";
-	if (condition === "l") {
-		conditionText = `أصبح ≥ ${targetPrice} USDT`;
-	} else if (condition === "g") {
-		conditionText = `أصبح ≤ ${targetPrice} USDT`;
-	}
-	dltNtf(idDlt);
-	if (Notification.permission === "granted") {
-		new Notification(`تنبيه سعر ${symbol}!`, {
-			body: `وصل السعر إلى ${price} USDT. ${conditionText}`, //https://www.google.com/s2/favicons?domain=binance.com
-			icon: "../imgs/web/icon-512.png", // يمكنك تغيير الأيقونة حسب المنصة
-		});
-	} else if (Notification.permission === "default") {
-		requestNotificationPermission();
-	}
-} */
+
 function showBrowserNotification(symbol, price, targetPrice, condition) {
 	let conditionText =
 		condition === "l"

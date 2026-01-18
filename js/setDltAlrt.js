@@ -11,7 +11,7 @@ setAlertButton.addEventListener("click", async () => {
 	selectedSymbol = searchPrice.value;
 	const targetPrice = parseFloat(targetPriceInput.value);
 	const alertCondition = document.querySelector(
-		'input[name="alertCondition"]:checked'
+		'input[name="alertCondition"]:checked',
 	).value;
 	telegramChatId = tlgChtIdInpt.value.trim();
 
@@ -51,9 +51,9 @@ setAlertButton.addEventListener("click", async () => {
 		alertStatus.textContent = `تم تعيين تنبيه للتطبيق لـ ${selectedSymbol}.`;
 		alertStatus.style.color = "green";
 		setTimeout(() => {
-			alertStatus.textContent ="";
+			alertStatus.textContent = "";
 		}, 3000);
-		localStorage.setItem("brwsrAlrts",JSON.stringify(brwsrAlrts));
+		localStorage.setItem("brwsrAlrts", JSON.stringify(brwsrAlrts));
 		renderAlNotfcation();
 		checkForBrowserAlerts(); // فحص فوري
 	}
@@ -103,7 +103,7 @@ setAlertButton.addEventListener("click", async () => {
 });
 
 async function deleteAlert(alert) {
-	const success = await manageAlertOnFirebase("dltAlrt", {
+	await manageAlertOnFirebase("dltAlrt", {
 		id: alert.alertId,
 		telegramChatId: alert.telegramChatId,
 	});
@@ -136,7 +136,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			action === "setAlert" ? "تم تعيين" : "تم حذف"
 		} التنبيه بنجاح.`;
 		alertStatus.style.color = "green";
-		let strg = JSON.parse(localStorage.alrtsStorg);
+		let strg = JSON.parse(localStorage.alrtsStorg) || {};
 		const id = alertData.id;
 		if (action === "setAlert") {
 			const alrtAdd = {
@@ -158,6 +158,11 @@ async function manageAlertOnFirebase(action, alertData = null) {
 
 		setTimeout(() => {
 			alertStatus.textContent = "";
+			if (alertData.isAlrd) {
+				const alrtDlt2 = strg.filter(item => item[0] != "id" + id);
+				localStorage.setItem("alrtsStorg", JSON.stringify(alrtDlt2));
+				renderAlerts(alrtDlt2);
+			}
 		}, 3000);
 		return true;
 	} else if (data.status == "notPaid") {
@@ -170,7 +175,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 			"فشل التأكد من معرّف دردشة التيليجرام (Chat ID) الخاص بك يرجى التأكد منه وإعادة المحاولة";
 		alertStatus.style.color = "red";
 		console.log(data);
-		
+
 		return false;
 	} else {
 		alertStatus.textContent = `فشل ${

@@ -33,11 +33,11 @@ function vrfInpts(el) {
 		if (newInpts != prmyrInpts || file) {
 			gebi("saveBtn").style.backgroundColor = "#007bff";
 			gebi("saveBtn").style.cursor = "pointer";
-            isChnge = true
+			isChnge = true;
 		} else {
 			gebi("saveBtn").style.backgroundColor = "#444";
 			gebi("saveBtn").style.cursor = "not-allowed";
-            isChnge = false
+			isChnge = false;
 		}
 	});
 }
@@ -46,25 +46,25 @@ slctAll(".inptSave").forEach(el => vrfInpts(el));
 
 let userId, userBr;
 
-onAuthStateChanged(auth,async user => {
+onAuthStateChanged(auth, async user => {
 	if (user) {
 		userBr = user;
 		userId = user.uid;
 		try {
 			const userRef = ref(db, "users/" + user.uid);
-		await get(userRef).then(async snapshot => {
-			const snp = snapshot.exists();
-			if (snp) {
-				const { lastLogin, paid, status, ...restUsr } = snapshot.val();
-				for (const key in restUsr) {
-					localStorage[key] = restUsr[key];
+			await get(userRef).then(async snapshot => {
+				const snp = snapshot.exists();
+				if (snp) {
+					const { lastLogin, paid, status, ...restUsr } = snapshot.val();
+					for (const key in restUsr) {
+						localStorage[key] = restUsr[key];
+					}
+					strtFunctn();
+				} else {
+					console.log("is not");
 				}
-				strtFunctn()
-			}else{console.log('is not');
-			}})
-		} catch (error) {
-			
-		}
+			});
+		} catch (error) {}
 	} else {
 		window.location.href = "/signin";
 	}
@@ -86,7 +86,7 @@ async function updateUserData(bodySet) {
 
 gebi("formSave").addEventListener("submit", async e => {
 	e.preventDefault();
-    if (!isChnge) return false
+	if (!isChnge) return false;
 	gebi("rspns").innerText = "جاري الحفظ ...";
 	gebi("rspns").style.color = "black";
 	/////////////////////////// jiht limage
@@ -113,9 +113,9 @@ gebi("formSave").addEventListener("submit", async e => {
 	}
 	const bodySet = {
 		userName: gebi("userName").innerText || "",
-		chtId1: gebi("chtId1").value || "",
-		chtId2: gebi("chtId2").value || "",
-		chtId3: gebi("chtId3").value || "",
+		c1: gebi("chtId1").value || "",
+		c2: gebi("chtId2").value || "",
+		c3: gebi("chtId3").value || "",
 	};
 	if (file) {
 		// ===== تغيير الصورة من Base64 =====
@@ -170,8 +170,5 @@ function base64ToBlob(base64) {
 
 	return new Blob([new Uint8Array(array)], { type: mime });
 }
-
-
-
 
 console.log("hadi jdida 8");

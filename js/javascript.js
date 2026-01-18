@@ -51,7 +51,6 @@ async function startPage() {
 		renderAlNotfcation();
 	}
 
-	let chtIdSlct = "";
 	const slChId = gebi("chtIdSlct") || '';
 	telegramChatId = localStorage.getItem("idChat")|| '';
 	const chtIdStrg = {
@@ -59,12 +58,8 @@ async function startPage() {
 		ch2: localStorage.getItem("chtId2") || "",
 		ch3: localStorage.getItem("chtId3") || "",
 	};
-	if (chtIdStrg.ch1.length > 0)
-		chtIdSlct += `<option value="${chtIdStrg.ch1}">${chtIdStrg.ch1}</option>`;
-	if (chtIdStrg.ch2.length > 0)
-		chtIdSlct += `<option value="${chtIdStrg.ch2}">${chtIdStrg.ch2}</option>`;
-	if (chtIdStrg.ch3.length > 0)
-		chtIdSlct += `<option value="${chtIdStrg.ch3}">${chtIdStrg.ch3}</option>`;
+	const chtIdSlct = Object.values(chtIdStrg).filter(Boolean)
+	.map(id => `<option value="${id}">${id}</option>`).join("");
 
 	if (chtIdSlct.length > 0) {
 		slChId.style.display = "block";
