@@ -38,23 +38,26 @@ setAlertButton.addEventListener("click", async () => {
 	// إنشاء معرف فريد للتنبيه
 	const alertId = Date.now().toString();
 	// التعامل مع تنبيه للتطبيق محليًا
+
+	const newAlrtPrs = {
+		//id: alertId,
+		e: currentExchangeId,
+		s: selectedSymbol,
+		t: targetPrice,
+		c: alertCondition,
+		f: factorPric,
+		isAlrd: false,
+	};
 	if (isBrowserAlert) {
-		brwsrAlrts.push({
-			id: alertId,
-			exchangeId: currentExchangeId,
-			symbol: selectedSymbol,
-			targetPrice: targetPrice,
-			alertCondition: alertCondition,
-			/* alertType: "browser", // هذا للحفاظ على التمييز
-			status: "Active", */
-		});
+		newAlrtPrs.alTp = "b"; //alertType
+		brwsrAlrts.push(["id" + alertId, newAlrtPrs]);
 		alertStatus.textContent = `تم تعيين تنبيه للتطبيق لـ ${selectedSymbol}.`;
 		alertStatus.style.color = "green";
 		setTimeout(() => {
 			alertStatus.textContent = "";
 		}, 3000);
 		localStorage.setItem("brwsrAlrts", JSON.stringify(brwsrAlrts));
-		renderAlNotfcation();
+		//renderAlNotfcation();
 		checkForBrowserAlerts(); // فحص فوري
 	}
 
@@ -65,27 +68,17 @@ setAlertButton.addEventListener("click", async () => {
 			await loadUserAlertsDisplay();
 			gebi("telegramChatIdNote").style.display = "none";
 		}
+		newAlrtPrs.alTp = "t"; //alertType
 
-		const newTelegramAlert = {
-			id: alertId,
-			exchangeId: currentExchangeId,
-			symbol: selectedSymbol,
-			currenci: usdDsply.value,
-			targetPrice: targetPrice,
-			alertCondition: alertCondition,
-			telegramChatId: telegramChatId,
-			f: factorPric,
-			isAlrd: false,
-		};
 		const prc = currentPriceDisplay.textContent;
 		if (
 			(alertCondition === "l" && prc <= targetPrice) ||
 			(alertCondition === "g" && prc >= targetPrice)
 		) {
-			newTelegramAlert.isAlrd = true;
-			newTelegramAlert.prc = prc;
+			newAlrtPrs.isAlrd = true;
+			newAlrtPrs.prc = prc;
 		}
-		const success = await manageAlertOnFirebase("setAlert", newTelegramAlert);
+		const success = await manageAlertOnFirebase("setAlert", newAlrtPrs);
 		if (success) {
 			alertStatus.textContent +=
 				(isBrowserAlert ? " و" : "") +
@@ -140,12 +133,13 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		const id = alertData.id;
 		if (action === "setAlert") {
 			const alrtAdd = {
-				e: alertData.exchangeId, // e بدلاً من exchangeId
-				s: alertData.symbol, // s بدلاً من symbol
-				t: alertData.targetPrice, // t بدلاً من targetPrice
-				c: alertData.alertCondition, // c بدلاً من alertCondition
+				e: alertData.e, // e بدلاً من exchangeId
+				s: alertData.s, // s بدلاً من symbol
+				t: alertData.t, // t بدلاً من targetPrice
+				c: alertData.c, // c بدلاً من alertCondition
 			};
 			const alrtAddAry = ["id" + id, alrtAdd];
+			
 			strg.push(alrtAddAry);
 		} else {
 			const alrtDlt = strg.filter(item => item[0] != id);
@@ -153,9 +147,10 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		}
 
 		// تحويل المصفوفة إلى نص JSON قبل الحفظ
+			console.log(strg);
 		localStorage.setItem("alrtsStorg", JSON.stringify(strg));
 		renderAlerts(strg);
-
+		e;
 		setTimeout(() => {
 			alertStatus.textContent = "";
 			if (alertData.isAlrd) {
@@ -186,3 +181,15 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		return false;
 	}
 }
+
+/* const newTelegramAlert = {
+	id: alertId,
+	exchangeId: currentExchangeId,
+	symbol: selectedSymbol,
+	currenci: usdDsply.value,
+	targetPrice: targetPrice,
+	alertCondition: alertCondition,
+	telegramChatId: telegramChatId,
+	f: factorPric,
+	isAlrd: false,
+}; */

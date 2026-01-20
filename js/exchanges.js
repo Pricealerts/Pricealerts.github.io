@@ -6,7 +6,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT",// "https://api.binance.com/api/v3/klines"
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	mexc: {
 		name: "MEXC",
@@ -15,7 +15,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	kucoin: {
 		name: "KuCoin",
@@ -24,7 +24,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	coingecko: {
 		name: "CoinGecko",
@@ -33,7 +33,7 @@ const EXCHANGES = {
 		usdtSuffix: "USD",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	okx: {
 		name: "OKX",
@@ -43,7 +43,7 @@ const EXCHANGES = {
 		usdtSuffix: "-USDT",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	bybit: {
 		name: "Bybit",
@@ -52,7 +52,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	bitget: {
 		name: "Bitget",
@@ -61,7 +61,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT_SPBL",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	lbank: {
 		name: "LBank",
@@ -70,7 +70,7 @@ const EXCHANGES = {
 		usdtSuffix: "usdt", // الأحرف كلها صغيرة
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	coincap: {
 		name: "CoinCap",
@@ -80,7 +80,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	kraken: {
 		name: "Kraken",
@@ -89,7 +89,7 @@ const EXCHANGES = {
 		usdtSuffix: "USDT", // في Kraken يتم تسعير USDT مقابل الدولار فعليًا
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	coinbase: {
 		name: "Coinbase",
@@ -98,7 +98,7 @@ const EXCHANGES = {
 		usdtSuffix: "-USDT",
 		intervalData: 10000,
 		crptChos: "block",
-		usdDsply: "none",
+		crncDsply: "none",
 	},
 	nasdaq: {
 		name: "NASDAQ",
@@ -107,7 +107,7 @@ const EXCHANGES = {
 		usdtSuffix: "USD",
 		intervalData: 3600000,
 		crptChos: "none",
-		usdDsply: "inline-block",
+		crncDsply: "inline-block",
 	},
 };
 const exchs = [

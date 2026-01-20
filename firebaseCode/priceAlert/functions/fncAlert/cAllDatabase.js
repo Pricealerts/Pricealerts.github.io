@@ -76,26 +76,25 @@ async function gtAlerts(data) {
 		);
 	}
 }
-
+	
 ///// the functions
 async function setAlerte(data) {
 	const rspns = {};
-
 	if (
 		!data.id ||
-		!data.exchangeId ||
-		!data.symbol ||
-		!data.targetPrice ||
-		!data.telegramChatId ||
-		!data.alertCondition
+		!data.e ||
+		!data.s ||
+		!data.tPrc ||
+		!data.tId ||
+		!data.c
 	) {
 		console.log("الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.");
 	}
 	const alrtAdd = {
-		e: data.exchangeId, // e بدلاً من exchangeId
-		s: data.symbol, // s بدلاً من symbol
-		t: data.targetPrice, // t بدلاً من targetPrice
-		c: data.alertCondition, // c بدلاً من alertCondition
+		e: data.e, // e بدلاً من exchangeId
+		s: data.s, // s بدلاً من symbol
+		t: data.t, // t بدلاً من targetPrice
+		c: data.c, // c بدلاً من alertCondition
 		f: data.f, //f: factorPric,
 		//  r: new Date().toLocaleString(), // requestTime
 	};
@@ -107,21 +106,21 @@ async function setAlerte(data) {
 			}</b> بلغت <b>${data.prc}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${alrtAdd.t})`;
-			await sendTelegramMessage(data.telegramChatId, message);
+			await sendTelegramMessage(data.tId, message);
 			return { status: "success" };
 		}
 		const okUser = await cntctUser(data);
 		if (!okUser.okRspns) {
 			return okUser;
 		}
-		await postsRef.child(`cht${data.telegramChatId}/id${data.id}`).set(alrtAdd);
+		await postsRef.child(`cht${data.tId}/id${data.id}`).set(alrtAdd);
 		rspns.status = "success";
 		return rspns;
 	} catch (error) {
 		rspns.status = "notSuccess";
 		rspns.message = String(error);
 		// make sure we reference the symbol correctly
-		console.error(`فشل تخزين لـ ${data.symbol} : `, error);
+		console.error(`فشل تخزين لـ ${data.s} : `, error);
 		console.log(error);
 
 		return rspns;
@@ -130,7 +129,7 @@ async function setAlerte(data) {
 
 ///////// delet alert
 async function dltAlrt(data) {
-	let chatId = data.telegramChatId;
+	let chatId = data.tId;
 	let alrtId = data.id;
 
 	if (alrtId.length == 0) {
@@ -168,7 +167,7 @@ async function dltAlrt(data) {
 }
 
 async function cntctUser(data) {
-	const idChat = data.telegramChatId;
+	const idChat = data.tId;
 	let rspns = {};
 	try {
 		const callDb = db.ref(`allChatId/cht${idChat}`);
@@ -176,12 +175,12 @@ async function cntctUser(data) {
 		let gtChIdExixst;
 		if (!getChId.exists()) {
 			let message = `لقد قمت بتعين تنبيه على  ${
-				EXCHANGES_CONFIG[data.exchangeId].name
+				EXCHANGES_CONFIG[data.e].name
 			}! 
-				ل<b> ${data.symbol} </b>  
+				ل<b> ${data.s} </b>  
 				(الشرط: السعر   ${
-					data.alertCondition === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-				} ${data.targetPrice} )
+					data.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
+				} ${data.tPrc} )
 				سيتم تبليغك فور تحقيق الشرط
 				شكرا`;
 			const sendMsg = await sendTelegramMessage(idChat, message);
@@ -216,7 +215,7 @@ async function cntctUser(data) {
 		rspns.status = "notSuccess";
 		rspns.okRspns = false;
 		rspns.error = error;
-		console.log(`فشل  في cntctUser    ${data.symbol}  is : ${error}`);
+		console.log(`فشل  في cntctUser    ${data.s}  is : ${error}`);
 		return rspns;
 	}
 }

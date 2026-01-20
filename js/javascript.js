@@ -5,7 +5,7 @@ const currentPriceDisplay = gebi("currentPrice");
 const targetPriceInput = gebi("targetPrice");
 const searchPrice = gebi("searchPrice");
 const dropdownList = gebi("dropdownList");
-const usdDsply = gebi("usdDsply");
+const crncDsply = gebi("crncDsply");
 let allCrpto = [];
 let allPrices = [];
 let rfrsh = 0;
@@ -34,6 +34,9 @@ let brwsrAlrts = []; // قائمة منفصلة لتنبيهات للتطبيق 
 let factorPric = 1;
 let binanceSocket = null;
 let binanceSocketSmbl = null;
+let mexcSocket = null; 
+let mexcSocketSmbl = null; 
+let alrtsBrTg = []; // قائمة التنبيهات لكل من التطبيق وتيليجرام
 // --- معالجات الأحداث ---
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -47,8 +50,11 @@ async function startPage() {
 	if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz");
 	if (localStorage.getItem("brwsrAlrts")) {
+		//localStorage.removeItem("brwsrAlrts");
 		brwsrAlrts = JSON.parse(localStorage.getItem("brwsrAlrts"));
-		renderAlNotfcation();
+		console.log(brwsrAlrts);
+		renderAlerts(brwsrAlrts, alertsListNtf);
+		
 	}
 
 	const slChId = gebi("chtIdSlct") || '';
@@ -196,7 +202,7 @@ function gtPrcOfOther(symbol) {
 	searchPrice.value = symbol;
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
-	//usdDsply.value = currency;
+	//crncDsply.value = currency;
 	startPriceUpdates();
 }
 // Hide dropdown when clicking outside
@@ -218,7 +224,7 @@ function updateTargetPrice() {
 	}
 }
 
-usdDsply.addEventListener("change", async () => {
+crncDsply.addEventListener("change", async () => {
 	let priceCurrencyFtch = 1;
 
 	const url = EXCHANGES.nasdaq.exchangeInfoUrl;
@@ -235,7 +241,7 @@ usdDsply.addEventListener("change", async () => {
 	}
 
 	let priceNewCrncy = 1;
-	const cnvrt = usdDsply.value;
+	const cnvrt = crncDsply.value;
 	if (cnvrt !== "USD") {
 		const smbl2 = cnvrt + "USD=X"; // l3omala libaghin n7wloha bnsba ldolar
 		const response = await fetch(url, {
