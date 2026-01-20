@@ -481,7 +481,34 @@ async function fetchMexcPrice(symbol = 'BTCUSDT') {
         return null;
     }
 }
+async function fetchMexcPrice2(symbol = 'BTCUSDT') {
+    try {
+        const formattedSymbol = symbol.toUpperCase();
+        const url = `https://api.mexc.com/api/v3/ticker/price?symbol=${formattedSymbol}`;
+        
+        const response = await fetch(url, {
+            method: 'GET',
+            mode: 'cors', // حاول إضافة هذا الوضع صراحة
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
 
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error("خطأ من سيرفر ميكس:", errorData);
+            return null;
+        }
+
+        const data = await response.json();
+        return parseFloat(data.price);
+
+    } catch (error) {
+        // هنا سيخبرك إذا كان السبب Network Error (انقطاع إنترنت أو حظر متصفح)
+        console.error("فشل الطلب تماماً. السبب المحتمل:", error.message);
+        return null;
+    }
+}
 // مثال للاستخدام
-// fetchMexcPrice('ETHUSDT').then(price => console.log(price));
-console.log("الرابط المستخدم:", `https://api.mexc.com/api/v3/ticker/price?symbol=${formattedSymbol}`);
+  fetchMexcPrice2('ETHUSDT').then(price => console.log(price));
+//console.log("الرابط المستخدم:", `https://api.mexc.com/api/v3/ticker/price?symbol=${formattedSymbol}`);
