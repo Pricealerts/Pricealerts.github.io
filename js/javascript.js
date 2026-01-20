@@ -52,7 +52,6 @@ async function startPage() {
 	if (localStorage.getItem("brwsrAlrts")) {
 		//localStorage.removeItem("brwsrAlrts");
 		brwsrAlrts = JSON.parse(localStorage.getItem("brwsrAlrts"));
-		console.log(brwsrAlrts);
 		renderAlerts(brwsrAlrts, alertsListNtf);
 		
 	}

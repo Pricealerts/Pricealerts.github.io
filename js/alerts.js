@@ -20,7 +20,6 @@ async function loadUserAlertsDisplay() {
 }
 function renderAlerts(alerts ,alertsList= gebi("alertsList")) {
 	//const allAlrts = [...alerts,...brwsrAlrts]
-	console.log(alerts);
 	
 	alertsList.innerHTML = "";
 	if (!alerts || alerts.length === 0) {

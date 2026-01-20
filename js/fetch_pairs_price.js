@@ -40,7 +40,6 @@ async function fetchTradingPairs(exchangeId) {
 			case "mexc":
 				response = await fetch(urlCrpts);
 				allPrices = await response.json();
-				console.log(allPrices);
 
 				symbols = allPrices
 					//.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
@@ -280,7 +279,6 @@ async function fetchCurrentPrice(
 					);
 					const data = await response.json();
 					price = data.price;
-					console.log("data is : " + price);
 					//return price;
 				} else {
 					await checkForBrowserAlerts();
@@ -456,59 +454,35 @@ document.addEventListener("visibilitychange", async () => {
 });
 
 
-async function fetchMexcPrice(symbol = 'BTCUSDT') {
-    try {
-        // تحويل الرمز للحروف الكبيرة لضمان عمل الرابط
-        const formattedSymbol = symbol.toUpperCase().replace("_", "");
-        
-        const response = await fetch(`https://api.mexc.com/api/v3/ticker/price?symbol=${formattedSymbol}`);
-       // console.log(response);
+
+
+
+
+startMexcMultiTracking(['BTCUSDT', 'ETHUSDT', 'SOLUSDT'])
+function startMexcMultiTracking(symbols) {
+    const mexcSocketz = new WebSocket(`wss://wbs.mexc.com/ws`);
+
+    mexcSocketz.onopen = () => {
+        // تحويل المصفوفة إلى التنسيق المطلوب لميكس
+        const streams = symbols.map(s => `spot@public.deals.v3.api@${s.toUpperCase()}`);
 		
-        if (!response.ok) {
-            throw new Error(`خطأ في الاستجابة: ${response.status}`);
+        const subscribeMsg = {
+            "method": "SUBSCRIPTION",
+            "params": streams
+        };
+        mexcSocketz.send(JSON.stringify(subscribeMsg));
+        console.log(JSON.stringify(subscribeMsg));
+    };
+
+    mexcSocketz.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        if (msg.s && msg.d && msg.d.deals) {
+            const symbol = msg.s; // اسم العملة التي وصل سعرها الآن
+            const price = parseFloat(msg.d.deals[0].p);
+            console.log(`تحديث سعر: ${symbol} -> ${price}`);
+            
+            // هنا يمكنك استدعاء دالة التنبيهات الخاصة بكل عملة
+            // hndlAlrt(price, symbol);
         }
-
-        const data = await response.json();
-        
-        // البيانات تعود بالشكل التالي: { "symbol": "BTCUSDT", "price": "65000.12" }
-        const price = parseFloat(data.price);
-        
-        console.log(`سعر ${formattedSymbol} على MEXC هو: ${price}`);
-        return price;
-
-    } catch (error) {
-        console.error("فشل جلب السعر من MEXC:", error.message);
-        return null;
-    }
+    };
 }
-async function fetchMexcPrice2(symbol = 'BTCUSDT') {
-    try {
-        const formattedSymbol = symbol.toUpperCase();
-        const url = `https://api.mexc.com/api/v3/ticker/price?symbol=${formattedSymbol}`;
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            mode: 'cors', // حاول إضافة هذا الوضع صراحة
-            headers: {
-                'Accept': 'application/json'
-            }
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error("خطأ من سيرفر ميكس:", errorData);
-            return null;
-        }
-
-        const data = await response.json();
-        return parseFloat(data.price);
-
-    } catch (error) {
-        // هنا سيخبرك إذا كان السبب Network Error (انقطاع إنترنت أو حظر متصفح)
-        console.error("فشل الطلب تماماً. السبب المحتمل:", error.message);
-        return null;
-    }
-}
-// مثال للاستخدام
-  fetchMexcPrice2('ETHUSDT').then(price => console.log(price));
-//console.log("الرابط المستخدم:", `https://api.mexc.com/api/v3/ticker/price?symbol=${formattedSymbol}`);
