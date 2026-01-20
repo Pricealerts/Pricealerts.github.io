@@ -1,3 +1,5 @@
+
+
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl =
 	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
@@ -252,6 +254,8 @@ async function fetchCurrentPrice(
 					const formattedSymbol = cleanSymbol.toUpperCase();
 					mexcSocket = new WebSocket(`wss://wbs.mexc.com/ws`);
 					mexcSocket.onopen = () => {
+						console.log('rah hal');
+						
 						const subscribeMsg = {
 							method: "SUBSCRIPTION",
 							params: [`spot@public.deals.v3.api@${formattedSymbol}`],
@@ -270,6 +274,8 @@ async function fetchCurrentPrice(
 						if (msg.d && msg.d.deals && msg.d.deals.length > 0) {
 							currentPrice = parseFloat(msg.d.deals[0].p); // p هو السعر
 							currentPriceDisplay.textContent = `${currentPrice} `;
+							console.log('currentPrice is : ' + currentPrice);
+							
 							hndlAlrt(currentPrice, symbol);
 						}
 					};
@@ -447,18 +453,52 @@ function startPriceUpdates() {
 	};
 } */
 
-document.addEventListener("visibilitychange", async () => {
+/* document.addEventListener("visibilitychange", async () => {
 	if (document.hidden && binanceSocket) binanceSocket.close(); // إغلاق الاتصال فوراً
-	/* else if (!document.hidden && currentExchangeId && selectedSymbol)
-		await fetchCurrentPrice(currentExchangeId, selectedSymbol, true); */
+	else if (!document.hidden && currentExchangeId && selectedSymbol)
+		await fetchCurrentPrice(currentExchangeId, selectedSymbol, true);
 });
+ */
+
+//dadiZin()
+function dadiZin() {
+	const socket = new WebSocket("wss://wbs.mexc.com/ws");
+
+socket.onopen = () => {
+  console.log("✅ Connected to MEXC WebSocket");
+
+  const subscribeMessage = {
+    method: "SUBSCRIPTION",
+    params: [
+      "spot@public.ticker.v3.api@BTCUSDT"
+    ],
+    id: 1
+  };
+
+  socket.send(JSON.stringify(subscribeMessage));
+};
+
+socket.onmessage = (event) => {
+  const data = JSON.parse(event.data);
+
+  if (data && data.data) {
+    const ticker = data.data;
+    console.log("💰 السعر الحالي:", ticker.lastPrice);
+  }
+};
+
+socket.onerror = (error) => {
+  console.error("❌ WebSocket Error:", error);
+};
+
+socket.onclose = () => {
+  console.log("🔌 Connection closed");
+};
+
+}
 
 
-
-
-
-
-startMexcMultiTracking(['BTCUSDT', 'ETHUSDT', 'SOLUSDT'])
+//startMexcMultiTracking(['BTCUSDT', 'ETHUSDT', 'SOLUSDT'])
 function startMexcMultiTracking(symbols) {
     const mexcSocketz = new WebSocket(`wss://wbs.mexc.com/ws`);
 
@@ -486,3 +526,125 @@ function startMexcMultiTracking(symbols) {
         }
     };
 }
+
+
+
+/* 
+
+let mexcSocketdd =null;
+
+// 1. دالة بدء المراقبة الذكية
+function startSmartAlerts() {
+    // إغلاق أي اتصال قديم لتجنب التكرار
+    stopMexcTracking();
+  if (!brwsrAlrts || brwsrAlrts.length === 0) {
+        console.log("لا توجد تنبيهات لمراقبتها.");
+        return;
+    }
+    // استخراج العملات الفريدة من قائمة تنبيهاتك (brwsrAlrts)
+     const symbols = [...new Set(brwsrAlrts.map(alert => alert[1].s.toUpperCase()))];
+    
+  
+
+    // فتح اتصال WebSocket (يتخطى CORS تلقائياً)
+    mexcSocketdd = new WebSocket(`wss://wbs.mexc.com/ws`);
+
+    mexcSocketdd.onopen = () => {
+        console.log("تم الاتصال بـ MEXC لمراقبة:", symbols);
+        
+        // رسالة الاشتراك لجميع العملات في القائمة
+        const subscribeMsg = {
+            "method": "SUBSCRIPTION",
+            "params": symbols.map(s => `spot@public.deals.v3.api@${s}`)
+        };
+        mexcSocketdd.send(JSON.stringify(subscribeMsg));
+    };
+
+    mexcSocketdd.onmessage = (event) => {
+        const msg = JSON.parse(event.data);
+        
+        // التحقق من وصول بيانات السعر (تنسيق ميكس V3)
+        if (msg.s && msg.d && msg.d.deals) {
+            const currentSymbol = msg.s; // اسم العملة التي تحركت
+            const currentPrice = parseFloat(msg.d.deals[0].p); // السعر اللحظي
+            console.log(`تحديث سعر: ${currentSymbol} -> ${currentPrice}`);
+            // استدعاء دالة الفحص التي كتبناها سابقاً
+         //   hndlAlrtFromSocket(currentPrice, currentSymbol);
+        }
+    };
+
+    mexcSocketdd.onclose = () => {
+        console.log("انقطع الاتصال، سيتم إعادة المحاولة بعد 5 ثوانٍ...");
+        setTimeout(startSmartAlerts, 5000); // إعادة اتصال تلقائي
+    };
+}
+
+// 2. دالة المعالجة المعدلة لتعمل مع الـ Socket
+function hndlAlrtFromSocket(price, symbol) {
+    // نفلتر التنبيهات الخاصة بهذه العملة فقط
+    const relevantAlerts = brwsrAlrts.filter(a => a.symbol === symbol && a.status !== "Triggered");
+
+    relevantAlerts.forEach(alert => {
+        let shouldTrigger = false;
+        if (alert.alertCondition === "l" && price <= alert.targetPrice) {
+            shouldTrigger = true;
+        } else if (alert.alertCondition === "g" && price >= alert.targetPrice) {
+            shouldTrigger = true;
+        }
+
+        if (shouldTrigger) {
+            // إرسال التنبيه للمتصفح/الهاتف
+            showBrowserNotification(alert.symbol, price, alert.targetPrice, alert.alertCondition);
+            
+            // تحديث الحالة وحذف التنبيه
+            alert.status = "Triggered";
+            dltNtf(alert.id);
+        }
+    });
+}
+
+function stopMexcTracking() {
+    if (mexcSocketdd) {
+        mexcSocketdd.close();
+        mexcSocketdd = null;
+    }
+} */
+
+
+
+	const socket = new WebSocket("wss://wbs.mexc.com/ws");
+
+socket.onopen = () => {
+  console.log("✅ Connected to MEXC WebSocket");
+
+  socket.send(JSON.stringify({
+    method: "SUBSCRIPTION",
+    params: ["spot@public.ticker.v3.api@BTCUSDT"],
+    id: 1
+  }));
+};
+
+socket.onmessage = (event) => {
+  const message = JSON.parse(event.data);
+console.log(message);
+
+  // 🔄 الرد على ping
+  if (message.method === "PING") {
+    socket.send(JSON.stringify({ method: "PONG" }));
+    console.log("🔁 PONG sent");
+    return;
+  }
+
+  // 📊 بيانات السعر
+  if (message.data && message.data.lastPrice) {
+    console.log("💰 BTCUSDT:", message.data.lastPrice);
+  }
+};
+
+socket.onerror = (error) => {
+  console.error("❌ WebSocket Error:", error);
+};
+
+socket.onclose = () => {
+  console.log("🔌 Connection closed");
+};

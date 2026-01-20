@@ -53,7 +53,7 @@ async function startPage() {
 		//localStorage.removeItem("brwsrAlrts");
 		brwsrAlrts = JSON.parse(localStorage.getItem("brwsrAlrts"));
 		renderAlerts(brwsrAlrts, alertsListNtf);
-		
+		//startSmartAlerts()
 	}
 
 	const slChId = gebi("chtIdSlct") || '';
