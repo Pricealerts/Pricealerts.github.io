@@ -122,6 +122,7 @@ const exchs = [
 	"XSES",
 	"nyse",
 	"nasdaq",
+	"gateIoSmbls",
 	"other"
 ];
 exchs.forEach(ex => {

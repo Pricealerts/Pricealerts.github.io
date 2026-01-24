@@ -55,7 +55,7 @@ export const proxyRequestV2 = onRequest(
 
 export const scheduledTask = onSchedule(
 	{
-		schedule: "every 1440 minutes",
+		schedule: "every day",//schedule: "every 5 minutes",
 		region: "europe-west1",
 		memory: "256MiB",
 		maxInstances: 1,
@@ -65,7 +65,8 @@ export const scheduledTask = onSchedule(
 		try {
 			await checkAndSendAlerts();
 		} catch (error) {
-			return error;
+			 console.error("Scheduled task failed:", error);
+      throw error; // مهم جدًا لإعلام نظام الجدولة بحدوث خطأ
 		}
 	}
 );

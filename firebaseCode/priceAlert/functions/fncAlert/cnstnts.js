@@ -266,10 +266,7 @@ export const gtCndlYahoo = response => {
 	];
 	// 1. حالة عدم وجود مصفوفات بيانات (بيانات الرسوم البيانية مفقودة تماماً)
 	if (!timestamps || !q) {
-		if (meta && meta.regularMarketPrice) {
-			//console.log(`ℹ️ جلب السعر من meta - حالة السوق: ${meta.marketState}`);
-			return createMetaResponse(meta);
-		}
+		if (meta && meta.regularMarketPrice) createMetaResponse(meta);
 		return { error: "No chart or meta data available" };
 	}
 	let i = timestamps.length - 1;
@@ -283,13 +280,11 @@ export const gtCndlYahoo = response => {
 	// 3. إذا كانت كل الشموع في المصفوفة فارغة، نلجأ للـ meta
 	if (i < 0) {
 		if (meta && meta.regularMarketPrice) {
-			//console.log(`⚠️ الشموع فارغة، استخدام سعر السوق - الحالة: ${meta.marketState}`);
 			return createMetaResponse(meta);
 		}
 		return { error: "All candles are null and no market price found" };
 	}
 	
-	//console.log("Full mt Object:", JSON.stringify(mt, null, 2));
 	
 	// 4. إرجاع الشمعة الحقيقية مع معلومات السوق
 	return [

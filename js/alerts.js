@@ -1,54 +1,70 @@
 // --- وظائف مساعدة ---
 
+//import { set } from "../firebaseCode";
+
 async function loadUserAlertsDisplay() {
 	try {
 		const rslt = await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
 			action: "gtAlerts",
 			chid: telegramChatId,
 		});
-		let aryRslt = Object.entries(rslt);
-		// تحويل المصفوفة إلى نص JSON قبل الحفظ
-		if (!aryRslt) aryRslt = [];
-		localStorage.setItem("alrtsStorg", JSON.stringify(aryRslt));
-		renderAlerts(aryRslt);
+		const aryRslt = Object.entries(rslt) || [];
+		const browserAlerts = alrtsStorg.filter(alert => alert[1].alTp === "b");
+		alrtsStorg = [...browserAlerts, ...aryRslt];
+		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
+		renderAlerts();
 	} catch (err) {
-		console.error("خطأ في تحميل التنبيهات:", err.message);
-		const alertsList = gebi("alertsList");
-		alertsList.innerHTML =
+		console.error("خطأ في تحميل التنبيهات:", err);
+		gebi("alertsList").innerHTML =
 			'<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات.</li>';
 	}
 }
-function renderAlerts(alerts ,alertsList= gebi("alertsList")) {
-	//const allAlrts = [...alerts,...brwsrAlrts]
-	
-	alertsList.innerHTML = "";
+function renderAlerts() {
+	const alerts = alrtsStorg;
+	const brwAlrts = alerts.filter(alert => alert[1].alTp === "b");
+	const tlgAlrts = alerts.filter(alert => alert[1].alTp !== "b");
+
 	if (!alerts || alerts.length === 0) {
-		alertsList.innerHTML =
+		gebi("alertsListNtf").innerHTML =
+			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
+		gebi("alertsList").innerHTML =
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 		return;
 	}
 
+	gebi("alertsListNtf").innerHTML =
+		brwAlrts.length === 0
+			? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
+			: "";
+
+	gebi("alertsList").innerHTML =
+		tlgAlrts.length === 0
+			? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
+			: "";
+	let alrtlst = gebi("alertsListNtf");
 	alerts.forEach(alert => {
+		console.log(alert);
+
 		const {
 			e: exchangeId,
 			s: symbol,
 			t: targetPrice,
-			c: alertCondition,
-			alTp,
+			c: alrtCndchn, //alertCondition
+			alTp = "t",
 		} = alert[1];
-		let conditionText = "";
-		if (alertCondition === "l") {
-			conditionText = "عندما يصبح السعر أصغر أو يساوي";
-		} else if (alertCondition === "g") {
-			conditionText = "عندما يصبح السعر أكبر أو يساوي";
-		}
+		let cndtnTxt =
+			alrtCndchn === "g"
+				? "عندما يصبح السعر أكبر أو يساوي"
+				: "عندما يصبح السعر أصغر أو يساوي"; //condichionText
+
 		const listItem = document.createElement("li");
 		let dltAlrt = alert[0];
 		let tpAlrt = "(النوع: تطبيق)";
 		let btnDlt = "notif";
 		if (alTp === "t") {
+			alrtlst = gebi("alertsList");
 			dltAlrt = JSON.stringify({
-				alertId: alert[0],
+				alertId: dltAlrt,
 				telegramChatId: "cht" + telegramChatId,
 			});
 			tpAlrt = `(النوع: تيليجرام)
@@ -56,20 +72,18 @@ function renderAlerts(alerts ,alertsList= gebi("alertsList")) {
 				 ${telegramChatId}  `;
 			btnDlt = "button";
 		}
-
+		listItem.id = alert[0];
 		listItem.innerHTML = `
 			<span class="alert-info" >
 				<strong>${EXCHANGES[exchangeId].name} - ${symbol}</strong>
-				${conditionText} ${targetPrice} 
+				${cndtnTxt} ${targetPrice} 
 				${tpAlrt}
 			</span>
 			<button class="delete-${btnDlt}" 
 			data-alert='${dltAlrt}'
 			>حذف</button>
 		`;
-		console.log(listItem);
-
-		alertsList.appendChild(listItem);
+		alrtlst.appendChild(listItem);
 	});
 	document.querySelectorAll(".delete-button").forEach(button => {
 		button.addEventListener("click", event => {
@@ -121,22 +135,49 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 		requestNotificationPermission();
 	}
 }
-
 async function checkForBrowserAlerts() {
-	if (brwsrAlrts.length === 0) return;
-	hndlAlrt(currentPrice, selectedSymbol);
+	if (alrtsStorg.length === 0) return;
+	//await hndlAlrt(currentPrice, selectedSymbol);
+	//let symbolsMap = new Map();
+	let symbolsMap = [
+		...new Set(alrtsStorg.map(([, alert]) => ({ e: alert.e, s: alert.s }))),
+	];
+
+	const alertPromises = symbolsMap.map(async item => {
+		//	if(item.e == ["binanace","mexc"])return; // تخطي هذه المنصات
+		try {
+			const price = await fetchCurrentPrice(
+				item.e, // المنصة
+				item.s, // الرمز
+				false,
+				true,
+			);
+			if (price) {
+				await hndlAlrt(price, item.s);
+			}
+		} catch (error) {
+			console.error(`خطأ في جلب سعر ${item.s}:`, error);
+		}
+	});
+	await Promise.all(alertPromises);
+}
+async function checkForBrowserAlerts2() {
+	if (alrtsStorg.length === 0) return;
+	await hndlAlrt(currentPrice, selectedSymbol);
 	// 1. فلترة العملات الفريدة لتقليل عدد طلبات الـ API
 	let symbolsMap = new Map();
-	let uniqueAlerts = [];
-	brwsrAlrts.forEach(alert => {
-		if (!symbolsMap.has(alert.s)) {
-			symbolsMap.set(alert.s, true);
-			uniqueAlerts.push(alert);
+	//	let uniqueAlerts = [...new Set(alrtsStorg.map(alert => alert[1].s))].map(s => alrtsStorg.find(a => a[1].s === s));
+
+	const aryAlrts = alrtsStorg.map(alert => {
+		if (!symbolsMap.has(alert[1].s)) {
+			symbolsMap.set(alert[1].s, alert[1].e);
 		}
+		alert[1].id = alert[0]; // إضافة معرف التنبيه للكائن
+		return alert[1];
 	});
 
 	// 2. إنشاء الوعود ومعالجتها بشكل متوازي
-	const alertPromises = uniqueAlerts.map(async uniqueAlert => {
+	const alertPromises = symbolsMap.map(async uniqueAlert => {
 		try {
 			// إضافة await هنا ضرورية جداً للحصول على السعر الفعلي
 			const price = await fetchCurrentPrice(
@@ -148,7 +189,7 @@ async function checkForBrowserAlerts() {
 
 			// نمرر السعر والرمز لدالة المعالجة
 			if (price) {
-				hndlAlrt(price, uniqueAlert.s);
+				await hndlAlrt(price, uniqueAlert.s);
 			}
 		} catch (error) {
 			console.error(`خطأ في جلب سعر ${uniqueAlert.s}:`, error);
@@ -160,27 +201,34 @@ async function checkForBrowserAlerts() {
 }
 
 // دالة المعالجة الداخلية
-function hndlAlrt(curentPrice, slctdSmbl) {
-	const alertsForThisSymbol = brwsrAlrts.filter(alert => alert.s === slctdSmbl);
-
-	alertsForThisSymbol.forEach(alert => {
-		let shouldTrigger = false;
-		if (alert.c === "l" && curentPrice <= alert.t) shouldTrigger = true;
-		else if (alert.c === "g" && curentPrice >= alert.t) shouldTrigger = true;
-
-		if (shouldTrigger) {
-			showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
-			// مسح التنبيه بعد تنفيذه لمنع التكرار
-			dltNtf(alert.id);
+async function hndlAlrt(curentPrice, slctdSmbl) {
+	const alertsForThisSymbol = alrtsStorg.filter(([, a]) => a.s === slctdSmbl);
+	const proms = [];
+	alertsForThisSymbol.forEach(async alerte => {
+		const alert = alerte[1];
+		const id = alerte[0];
+		if (
+			(alert.c === "l" && curentPrice <= alert.t) ||
+			(alert.c === "g" && curentPrice >= alert.t)
+		) {
+			if (alert.alTp === "t")
+				proms.push(
+					await deleteAlert({
+						id: id,
+						telegramChatId: "cht" + telegramChatId,
+					}),
+				);
+			else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
+			dltNtf(id);
 		}
 	});
 }
 
 function dltNtf(idDlt) {
 	gebi(idDlt).remove();
-	brwsrAlrts = brwsrAlrts.filter(el => el.id != idDlt);
-	localStorage.setItem("brwsrAlrts", JSON.stringify(brwsrAlrts));
-	if (!brwsrAlrts || brwsrAlrts.length === 0) {
+	alrtsStorg = alrtsStorg.filter(([id]) => id !== idDlt);
+	localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
+	if (!alrtsStorg || alrtsStorg.length === 0) {
 		alertsListNtf.innerHTML =
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 	}

@@ -19,17 +19,13 @@ async function cAllDatabase(data) {
 	//data.uid = btoa(data.userEmail);
 
 	if (!data.p) data.p = false; // paid
-	console.log("rah dakhl");
 	try {
 		const action = data.action;
 		let rspns;
 
-		console.log("rspns is : " + rspns);
 		if (action == "gtAlerts") {
 			rspns = await gtAlerts(data);
 		} else if (action == "setAlert") {
-			console.log("rah setAlert");
-
 			rspns = await setAlerte(data);
 		} else if (action === "dltAlrt") {
 			rspns = await dltAlrt(data);
@@ -45,7 +41,6 @@ async function cAllDatabase(data) {
 		) {
 			rspns = await sndEmail(data, db);
 		}
-		console.log(rspns);
 
 		return rspns;
 	} catch (error) {
@@ -93,7 +88,7 @@ async function setAlerte(data) {
 	const alrtAdd = {
 		e: data.e, // e بدلاً من exchangeId
 		s: data.s, // s بدلاً من symbol
-		t: data.t, // t بدلاً من targetPrice
+		t: data.tPrc, // t بدلاً من targetPrice
 		c: data.c, // c بدلاً من alertCondition
 		f: data.f, //f: factorPric,
 		//  r: new Date().toLocaleString(), // requestTime
@@ -189,10 +184,7 @@ async function cntctUser(data) {
 				await callDb.set(gtChIdExixst);
 				//rspns.status = "success";
 				rspns.okRspns = true;
-				console.log('rsl');
 			} else {
-				console.log('marslch');
-				
 				rspns.status = "notSuccess";
 				rspns.okRspns = false;
 				rspns.msg = sendMsg;

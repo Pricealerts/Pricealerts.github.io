@@ -19,7 +19,7 @@ async function sgnUp(userEmail, userPassword, userName, db) {
 			return { error: "userEmail and userPassword and userName are required" };
 		}
 
-		const rspns =await getAuth()
+		const rspns = await getAuth()
 			.createUser({
 				email: userEmail,
 				password: userPassword,
@@ -35,8 +35,6 @@ async function sgnUp(userEmail, userPassword, userName, db) {
 					chtId2: "",
 					chtId3: "",
 					paid: false,
-					/* 	lastLogin: new Date().toISOString(),
-						status: "online", */
 				};
 				const rspnsDb =await db
 					.ref(`users/${user.uid}`)

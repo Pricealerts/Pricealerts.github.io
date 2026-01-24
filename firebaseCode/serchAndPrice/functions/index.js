@@ -53,7 +53,6 @@ export const proxyRequestV2 = onRequest(
 			if (!action) {
 				return res.status(400).send("Action is missing");
 			}
-
 			let repond;
 			const actionMap = {
 				smbls: srchSmbls,

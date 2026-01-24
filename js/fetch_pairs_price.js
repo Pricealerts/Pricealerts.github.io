@@ -7,11 +7,10 @@ const FIREBASE_WEB_ALERT_URL =
 	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
 let currencyFtch = "USD";
-
+let rfrsh = 0;
 const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
 // --- وظائف جلب البيانات وتحديث الأسعار ---
-
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
 
@@ -36,16 +35,16 @@ async function fetchTradingPairs(exchangeId) {
 		switch (exchangeId) {
 			case "binance": //tickerPriceUrl
 				response = await fetch(exchange.tickerPriceUrl);
-				allPrices = await response.json();
-				symbols = allPrices.map(s => s.symbol);
+				allPricesBns = await response.json();
+				symbols = allPricesBns.map(s => s.symbol);
 				break;
 			case "mexc":
 				response = await fetch(urlCrpts);
-				allPrices = await response.json();
-
-				symbols = allPrices
+				allPricesMexc = await response.json();
+				symbols = allPricesMexc
 					//.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
 					.map(s => s.symbol);
+				gtDifrns();
 				break;
 			case "kucoin":
 				response = await fetch(urlCrpts);
@@ -92,8 +91,8 @@ async function fetchTradingPairs(exchangeId) {
 			case "lbank":
 				response = await fetch(urlCrpts);
 				data = await response.json();
-				allPrices = await data.data;
-				symbols = await allPrices.map(s => s.symbol);
+				allPrices =  data.data;
+				symbols = allPrices.map(s => s.symbol);
 
 				break;
 			case "coincap":
@@ -136,6 +135,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "XSHG":
 			case "XPAR":
 			case "XSHE":
+			case "gateIoSmbls":
 				let nmbrDays = 100;
 				let localExSmbls = localStorage.getItem(exchangeId);
 				const today = Date.now();
@@ -156,6 +156,7 @@ async function fetchTradingPairs(exchangeId) {
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
 					symbols = data;
 				}
+				
 				break;
 			case "other":
 				symbols = otherPrpos;
@@ -168,15 +169,14 @@ async function fetchTradingPairs(exchangeId) {
 		if (symbols.length > 0) {
 			symbols.sort();
 			allCrpto = symbols; // حفظ جميع العملات في متغير عام
-
 			symbols.forEach(symbol => {
 				const div = createDiv(symbol);
 				dropdownList.appendChild(div);
 			});
 			searchPrice.value = symbols[0];
-			//setTimeout(() => {
+			setTimeout(() => {
 			startPriceUpdates();
-			//}, 100);
+			}, 10);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -216,7 +216,7 @@ async function fetchCurrentPrice(
 						binanceSocket.close();
 						binanceSocket = null;
 					}
-					price = allPrices.find(obj => obj.symbol == symbol).price;
+					price = allPricesBns.find(obj => obj.symbol == symbol).price;
 					const symbolL = symbol.toLowerCase();
 					binanceSocket = new WebSocket(
 						`wss://stream.binance.com:9443/ws/${symbolL}@ticker`,
@@ -247,7 +247,7 @@ async function fetchCurrentPrice(
 						mexcSocket.close();
 						mexcSocket = null;
 					}
-					price = allPrices.find(obj => obj.symbol == symbol).price;
+					price = allPricesMexc.find(obj => obj.symbol == symbol).price;
 					let cleanSymbol = symbol.replace(/[-_ ]/g, "");
 
 					mexcSocketSmbl = cleanSymbol;
@@ -529,122 +529,3 @@ function startMexcMultiTracking(symbols) {
 
 
 
-/* 
-
-let mexcSocketdd =null;
-
-// 1. دالة بدء المراقبة الذكية
-function startSmartAlerts() {
-    // إغلاق أي اتصال قديم لتجنب التكرار
-    stopMexcTracking();
-  if (!brwsrAlrts || brwsrAlrts.length === 0) {
-        console.log("لا توجد تنبيهات لمراقبتها.");
-        return;
-    }
-    // استخراج العملات الفريدة من قائمة تنبيهاتك (brwsrAlrts)
-     const symbols = [...new Set(brwsrAlrts.map(alert => alert[1].s.toUpperCase()))];
-    
-  
-
-    // فتح اتصال WebSocket (يتخطى CORS تلقائياً)
-    mexcSocketdd = new WebSocket(`wss://wbs.mexc.com/ws`);
-
-    mexcSocketdd.onopen = () => {
-        console.log("تم الاتصال بـ MEXC لمراقبة:", symbols);
-        
-        // رسالة الاشتراك لجميع العملات في القائمة
-        const subscribeMsg = {
-            "method": "SUBSCRIPTION",
-            "params": symbols.map(s => `spot@public.deals.v3.api@${s}`)
-        };
-        mexcSocketdd.send(JSON.stringify(subscribeMsg));
-    };
-
-    mexcSocketdd.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        
-        // التحقق من وصول بيانات السعر (تنسيق ميكس V3)
-        if (msg.s && msg.d && msg.d.deals) {
-            const currentSymbol = msg.s; // اسم العملة التي تحركت
-            const currentPrice = parseFloat(msg.d.deals[0].p); // السعر اللحظي
-            console.log(`تحديث سعر: ${currentSymbol} -> ${currentPrice}`);
-            // استدعاء دالة الفحص التي كتبناها سابقاً
-         //   hndlAlrtFromSocket(currentPrice, currentSymbol);
-        }
-    };
-
-    mexcSocketdd.onclose = () => {
-        console.log("انقطع الاتصال، سيتم إعادة المحاولة بعد 5 ثوانٍ...");
-        setTimeout(startSmartAlerts, 5000); // إعادة اتصال تلقائي
-    };
-}
-
-// 2. دالة المعالجة المعدلة لتعمل مع الـ Socket
-function hndlAlrtFromSocket(price, symbol) {
-    // نفلتر التنبيهات الخاصة بهذه العملة فقط
-    const relevantAlerts = brwsrAlrts.filter(a => a.symbol === symbol && a.status !== "Triggered");
-
-    relevantAlerts.forEach(alert => {
-        let shouldTrigger = false;
-        if (alert.alertCondition === "l" && price <= alert.targetPrice) {
-            shouldTrigger = true;
-        } else if (alert.alertCondition === "g" && price >= alert.targetPrice) {
-            shouldTrigger = true;
-        }
-
-        if (shouldTrigger) {
-            // إرسال التنبيه للمتصفح/الهاتف
-            showBrowserNotification(alert.symbol, price, alert.targetPrice, alert.alertCondition);
-            
-            // تحديث الحالة وحذف التنبيه
-            alert.status = "Triggered";
-            dltNtf(alert.id);
-        }
-    });
-}
-
-function stopMexcTracking() {
-    if (mexcSocketdd) {
-        mexcSocketdd.close();
-        mexcSocketdd = null;
-    }
-} */
-
-
-
-	const socket = new WebSocket("wss://wbs.mexc.com/ws");
-
-socket.onopen = () => {
-  console.log("✅ Connected to MEXC WebSocket");
-
-  socket.send(JSON.stringify({
-    method: "SUBSCRIPTION",
-    params: ["spot@public.ticker.v3.api@BTCUSDT"],
-    id: 1
-  }));
-};
-
-socket.onmessage = (event) => {
-  const message = JSON.parse(event.data);
-console.log(message);
-
-  // 🔄 الرد على ping
-  if (message.method === "PING") {
-    socket.send(JSON.stringify({ method: "PONG" }));
-    console.log("🔁 PONG sent");
-    return;
-  }
-
-  // 📊 بيانات السعر
-  if (message.data && message.data.lastPrice) {
-    console.log("💰 BTCUSDT:", message.data.lastPrice);
-  }
-};
-
-socket.onerror = (error) => {
-  console.error("❌ WebSocket Error:", error);
-};
-
-socket.onclose = () => {
-  console.log("🔌 Connection closed");
-};

@@ -1,4 +1,4 @@
-//const { document } = require("firebase-functions/v1/firestore");
+
 
 const exchangeSelect = gebi("exchangeSelect");
 const currentPriceDisplay = gebi("currentPrice");
@@ -6,37 +6,27 @@ const targetPriceInput = gebi("targetPrice");
 const searchPrice = gebi("searchPrice");
 const dropdownList = gebi("dropdownList");
 const crncDsply = gebi("crncDsply");
-let allCrpto = [];
-let allPrices = [];
-let rfrsh = 0;
-/* med email */
-/* const conditionLessThanOrEqual = gebi(
-	"conditionLessThanOrEqual"
-);
-const conditionGreaterThanOrEqual = gebi(
-	"conditionGreaterThanOrEqual"
-);  */
 const alertTypeBrowserCheckbox = gebi("alertTypeBrowser"); // تم تغيير الاسم
 const alertTypeTelegramCheckbox = gebi("alertTypeTelegram"); // تم تغيير الاسم
 const telegramChatIdContainer = gebi("telegramChatIdContainer");
 const tlgChtIdInpt = gebi("telegramChatId");
 const setAlertButton = gebi("setAlertButton");
 const alertStatus = gebi("alertStatus");
-const alertsList = gebi("alertsList");
-const alertsListNtf = gebi("alertsListNtf");
 
 let telegramChatId;
 let currentExchangeId = exchangeSelect.value;
 let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
-let brwsrAlrts = []; // قائمة منفصلة لتنبيهات للتطبيق المحلية
 let factorPric = 1;
 let binanceSocket = null;
 let binanceSocketSmbl = null;
-let mexcSocket = null; 
-let mexcSocketSmbl = null; 
-let alrtsBrTg = []; // قائمة التنبيهات لكل من التطبيق وتيليجرام
+let mexcSocket = null;
+let mexcSocketSmbl = null;
+let allCrpto = [];
+let allPricesBns = [];
+let allPricesMexc = [];
+let alrtsStorg = JSON.parse(localStorage.getItem("alrtsStorg")) || []; // لتخزين التنبيهات المحملة من التخزين المحلي
 // --- معالجات الأحداث ---
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -46,25 +36,26 @@ document.addEventListener("DOMContentLoaded", () => {
 async function startPage() {
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
-	//requestNotificationPermission(); // طلب إذن الإشعارات للتطبق
+	//await fetchTradingPairs("gateIoSmbls");
+	requestNotificationPermission(); // طلب إذن الإشعارات للتطبق
+	//localStorage.removeItem("alrtsStorg");
+	//startTradingSystem();
+	//startSmartAlerts()
+
 	if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz");
-	if (localStorage.getItem("brwsrAlrts")) {
-		//localStorage.removeItem("brwsrAlrts");
-		brwsrAlrts = JSON.parse(localStorage.getItem("brwsrAlrts"));
-		renderAlerts(brwsrAlrts, alertsListNtf);
-		//startSmartAlerts()
-	}
 
-	const slChId = gebi("chtIdSlct") || '';
-	telegramChatId = localStorage.getItem("idChat")|| '';
+	const slChId = gebi("chtIdSlct") || "";
+	telegramChatId = localStorage.getItem("idChat") || "";
 	const chtIdStrg = {
 		ch1: localStorage.getItem("chtId1") || "",
 		ch2: localStorage.getItem("chtId2") || "",
 		ch3: localStorage.getItem("chtId3") || "",
 	};
-	const chtIdSlct = Object.values(chtIdStrg).filter(Boolean)
-	.map(id => `<option value="${id}">${id}</option>`).join("");
+	const chtIdSlct = Object.values(chtIdStrg)
+		.filter(Boolean)
+		.map(id => `<option value="${id}">${id}</option>`)
+		.join("");
 
 	if (chtIdSlct.length > 0) {
 		slChId.style.display = "block";
@@ -75,23 +66,25 @@ async function startPage() {
 			tlgChtIdInpt.value = slChId.value;
 			telegramChatId = slChId.value;
 		});
+		gebi("alertsList").innerHTML =
+			'<li class="no-alerts-message">جار التحميل...</li>';
 		tlgChtIdInpt.style.display = "none";
 		await loadUserAlertsDisplay();
 	} else if (telegramChatId.length > 0) {
 		tlgChtIdInpt.value = telegramChatId;
-		alertsList.innerHTML = '<li class="no-alerts-message">جار التحميل...</li>';
+		gebi("alertsList").innerHTML =
+			'<li class="no-alerts-message">جار التحميل...</li>';
 		await loadUserAlertsDisplay();
 		//
 	} else {
 		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
+		if (alrtsStorg.length > 0) renderAlerts();
 		gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 	}
 	// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
-	if (alertTypeTelegramCheckbox.checked) {
+	if (alertTypeTelegramCheckbox.checked)
 		telegramChatIdContainer.style.display = "block";
-	} else {
-		telegramChatIdContainer.style.display = "none";
-	}
+	else telegramChatIdContainer.style.display = "none";
 
 	exchangeSelect.addEventListener("change", () => {
 		currentPriceDisplay.textContent = "--.--";
@@ -101,27 +94,18 @@ async function startPage() {
 		alertStatus.textContent = "";
 	});
 
-	searchPrice.addEventListener("change", () => {
-		//startPriceUpdates();
-		alertStatus.textContent = "";
-	});
+	searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
 
-	// إظهار/إخفاء حقل Chat ID بناءً على اختيار تيليجرام
 	alertTypeTelegramCheckbox.addEventListener("change", () => {
-		if (alertTypeTelegramCheckbox.checked) {
+		if (alertTypeTelegramCheckbox.checked)
 			telegramChatIdContainer.style.display = "block";
-		} else {
-			telegramChatIdContainer.style.display = "none";
-			tlgChtIdInpt.value = ""; // مسح Chat ID إذا تم إلغاء تحديد تيليجرام
-		}
+		else telegramChatIdContainer.style.display = "none";
 		alertStatus.textContent = "";
 	});
 
 	// طلب إذن الإشعارات عند اختيار تنبيه للتطبيق  "/imgs/web/icon-512.png"
 	alertTypeBrowserCheckbox.addEventListener("change", () => {
-		if (alertTypeBrowserCheckbox.checked) {
-			requestNotificationPermission();
-		}
+		if (alertTypeBrowserCheckbox.checked) requestNotificationPermission();
 		alertStatus.textContent = "";
 	});
 }
@@ -133,7 +117,6 @@ function gebi(el) {
 
 function showDropdown() {
 	dropdownList.style.display = "block";
-	/*  populateList(allCrpto); */
 }
 
 function hideDropdown() {
@@ -176,13 +159,13 @@ async function filterList() {
 									item.symbol
 								}')">
                     <strong>${item.symbol}</strong> — ${
-						item.shortname || item.longname || "No Name"
-					}  
+											item.shortname || item.longname || "No Name"
+										}  
                     <span style="color:gray">(
 					${item.quoteType}
 					)</span> <span style="color:gray">(${item.exchDisp})</span>
                 </div>
-            `
+            `,
 				)
 				.join("");
 		} catch (err) {
@@ -248,11 +231,9 @@ crncDsply.addEventListener("change", async () => {
 			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify({ action: "price", querySmble: smbl2 }),
 		});
-
 		const rslt = await response.json();
 		priceNewCrncy = rslt.close || 1;
 	}
-
 	factorPric = priceCurrencyFtch / priceNewCrncy;
 	const rsltFnl = currentPrice * factorPric;
 	currentPriceDisplay.textContent = rsltFnl;
