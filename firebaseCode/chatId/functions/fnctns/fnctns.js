@@ -1,0 +1,200 @@
+import { getDatabase } from "firebase-admin/database";
+import axios from "axios";
+
+const BOT_TOKENEV  = process.env.BOT_TOKEN;
+const chatIdAbdelhadi = process.env.DADI_CHAT_ID;
+let db;
+function getDb() {
+  if (!db) db = getDatabase();
+  return db;
+}
+// ------------------------
+// جلب رموز بورصة واحدة من البورصات لخرين
+// ------------------------
+async function getExchangeSymbols() {
+	 db = getDb();
+	const exchngsStk = [
+		"HKEX",
+		"LSE",
+		"NSE",
+		"SIX",
+		"XSWX",
+		"XPAR",
+		"XSHG",
+		"XSHE",
+		"XSES",
+	];
+	try {
+		const result = {};
+		const promises = exchngsStk.map(e => exchangeSymbols(e));
+		
+		promises.push(...[
+			
+			gtStocks("https://datahub.io/core/nasdaq-listings/r/nasdaq-listed.csv"),
+			gtStocks("https://datahub.io/core/nyse-other-listings/r/nyse-listed.csv"),
+			gateIoSmblsFn(),
+		]); // nasdaq
+		exchngsStk.push(...["nasdaq", "nyse", "gateIoSmbls"]);
+		const rsltsPr = await Promise.all(promises);
+		const errorProms = [];
+		for (let i = 0; i < exchngsStk.length; i++) {
+			if (rsltsPr[i].length > 5) {
+				result[exchngsStk[i]] = rsltsPr[i];
+			} else {
+				errorProms.push(sndErr(exchngsStk[i]));
+			}
+		}
+		await Promise.all(errorProms);
+		await db.ref("stockSymbols").set(result);
+		async function sndErr(exchngsStk) {
+			const messageText = `slam 3likm Abdelhadi ${exchngsStk} rah khawi 3awd chofah `;
+			await sendTelegramMessage(chatIdAbdelhadi, messageText);
+			result[exchngsStk] = await db.ref("stockSymbols").child(`${exchngsStk}`).get().val() || [];
+		}
+	} catch (error) {
+		console.log('kayn error f getExchangeSymbols : ');
+		console.log(error);
+	}
+}
+
+async function exchangeSymbols(exchange) {
+  try {
+    const url = `https://api.twelvedata.com/stocks?exchange=${exchange}`;
+    const res = await axios.get(url);
+    return res.data.data.map(i => i.symbol) || [];
+  } catch (error) {
+    console.error(`error in exchangeSymbols (${exchange}):`, error);
+    return [];
+  }
+}
+
+// -------------------------
+async function gateIoSmblsFn() {
+	try {
+		const url = "https://api.gateio.ws/api/v4/spot/tickers";
+		const res = await axios.get(url);
+		const tickers = res.data;
+		if (!Array.isArray(tickers)) {
+			console.error("البيانات المستلمة ليست مصفوفة");
+			console.log(tickers);
+			return [];
+		}
+		return tickers.map(item => item.currency_pair) || [];
+	} catch (error) {
+		console.error("فشل جلب البيانات من Gate.io:", error);
+		return [];
+	}
+}
+// -------------------------
+// ------------------------
+
+// ------------------------
+// جلب رموز   من البورصات nasdaq nyse
+// ------------------------
+
+async function gtStocks(url) {
+	const ftch = await axios.get(url);
+	const csv = ftch.data;
+	// تحويل CSV إلى مصفوفة
+	const rows = csv.split("\n").map(r => r.split(","));
+	// تجاوز الصف الأول (الرؤوس)
+	const row = rows
+		.slice(1)
+		.map(r => r[0])
+		.filter(Boolean);
+	//symbols[exchangs[i]] = row;
+	return row || [];
+}
+// ------------------------
+
+// ------------------------
+// nta3 database mn requer
+// ------------------------
+async function stocksExchange(exchange) {
+	 db = getDb();
+	try {
+		const snap = await db.ref("stockSymbols").child(exchange).get();
+		if (!snap.exists()) console.log(`لا توجد بيانات للبورصة: ${exchange}`);
+		return snap.val();
+	} catch (error) {
+		return "حدث خطأ" + error;
+	}
+}
+
+
+/////// nta3 message
+async function sendMesageFn(messageText) {
+	try {
+		const msag = `عبدالهادي جائتك رسالة من ${messageText.nameUser} 
+ايميله : ${messageText.emailUser} 
+الرسالة : ${messageText.msageUser} 
+ `;
+		await sendTelegramMessage(chatIdAbdelhadi, msag);
+		return { statusMsge: "ok" };
+	} catch (error) {
+		return { statusMsge: "no" };
+	}
+}
+
+/////// nta3 telegram
+async function sendTelegramMessage(chatId, messageText) {
+	if (!BOT_TOKENEV || BOT_TOKENEV === "YOUR_BOT_TOKENEV") {
+		return { success: false, error: "توكن بوت تيليجرام غير موجود." };
+	}
+	let rspns = {};
+	const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKENEV}/sendMessage`;
+
+	let payload = {
+		chat_id: chatId,
+		text: messageText,
+		parse_mode: "HTML",
+	};
+
+	try {
+		const response = await axios.post(TELEGRAM_API_URL, payload);
+
+		rspns = { success: true, response: response.data };
+	} catch (error) {
+		console.error(
+			"خطأ في إرسال رسالة تيليجرام:",
+			error.response ? error.response.data : error.message,
+		);
+		rspns = {
+			success: false,
+			error: error.response ? error.response.data : error.message,
+		};
+	}
+	return rspns;
+}
+
+async function gtPrice(smbl) {
+	const start = Date.now();
+	const bodySnd = {
+		action : "price",
+		smbl:smbl
+	}
+	try {
+	const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec"; // رابط apps script
+		const response = await fetch(WEB_APP_URL, {
+			method: "POST",
+			"Content-Type": "application",
+			body: JSON.stringify(bodySnd),
+		}); 
+
+		const result = await response.json();
+		const end = Date.now();
+		const dfrnc  = end - start;
+		result.dfrncFr = dfrnc;
+		return result;
+	} catch (error) {
+		return {
+			er:'error in gtPrc',
+			error: "Failed to fetch data",
+			details: error.response?.data?.chart?.error?.description || error.message,
+		};
+	}
+}
+
+export {   stocksExchange, getExchangeSymbols ,sendMesageFn, gtPrice};
+
+

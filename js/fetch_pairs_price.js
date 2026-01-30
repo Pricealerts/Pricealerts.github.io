@@ -1,10 +1,9 @@
-
-
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl =
 	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
 const FIREBASE_WEB_ALERT_URL =
 	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+
 
 let currencyFtch = "USD";
 let rfrsh = 0;
@@ -91,7 +90,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "lbank":
 				response = await fetch(urlCrpts);
 				data = await response.json();
-				allPrices =  data.data;
+				allPrices = data.data;
 				symbols = allPrices.map(s => s.symbol);
 
 				break;
@@ -136,6 +135,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "XPAR":
 			case "XSHE":
 			case "gateIoSmbls":
+				
 				let nmbrDays = 100;
 				let localExSmbls = localStorage.getItem(exchangeId);
 				const today = Date.now();
@@ -147,16 +147,21 @@ async function fetchTradingPairs(exchangeId) {
 				if (nmbrDays < 30) {
 					symbols = localExSmbls.symbols;
 				} else {
-					data = await ftchFnctn(exchange.exchangeInfoUrl, {
+					
+					/* data = await ftchFnctn("https://rqststocks-wgqzo7cltq-ew.a.run.app", {
 						action: "stocksExchange",
 						querySmble: exchangeId,
-					});
+					}); */
+					
+					data = await gtDataStocks(exchangeId)
 					// storage data
+					console.log(data);
+					
 					const tolclStrg = { symbols: data, time: today };
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
 					symbols = data;
 				}
-				
+
 				break;
 			case "other":
 				symbols = otherPrpos;
@@ -175,7 +180,8 @@ async function fetchTradingPairs(exchangeId) {
 			});
 			searchPrice.value = symbols[0];
 			setTimeout(() => {
-			startPriceUpdates();
+				startPriceUpdates();
+				//refreshWidget()
 			}, 10);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
@@ -254,8 +260,8 @@ async function fetchCurrentPrice(
 					const formattedSymbol = cleanSymbol.toUpperCase();
 					mexcSocket = new WebSocket(`wss://wbs.mexc.com/ws`);
 					mexcSocket.onopen = () => {
-						console.log('rah hal');
-						
+						console.log("rah hal");
+
 						const subscribeMsg = {
 							method: "SUBSCRIPTION",
 							params: [`spot@public.deals.v3.api@${formattedSymbol}`],
@@ -274,8 +280,8 @@ async function fetchCurrentPrice(
 						if (msg.d && msg.d.deals && msg.d.deals.length > 0) {
 							currentPrice = parseFloat(msg.d.deals[0].p); // p هو السعر
 							currentPriceDisplay.textContent = `${currentPrice} `;
-							console.log('currentPrice is : ' + currentPrice);
-							
+							console.log("currentPrice is : " + currentPrice);
+
 							hndlAlrt(currentPrice, symbol);
 						}
 					};
@@ -358,19 +364,30 @@ async function fetchCurrentPrice(
 			case "XPAR":
 			case "XSHE":
 			case "other":
-				rslt = await ftchFnctn(exchange.exchangeInfoUrl, {
+				const timeInMs = Date.now();
+				rslt = await ftchFnctnAPPs(appScrptUrl,{
 					action: "price",
-					querySmble: symbol,
+					smbl: symbol,
 				});
+				/*  rslt = await ftchFnctn(" https://rqststocks-wgqzo7cltq-ew.a.run.app",{
+					action: "gtPr",
+					querySmble: symbol,
+				});  */
+
+				console.log(rslt);
+				
 				if (rslt.symbol != symbol) gebi("searchPrice").value = rslt.symbol;
 				currencyFtch = rslt.currency;
-				price = rslt.close;
+				price = rslt.price;
 				crncDsply.value = currencyFtch;
 				if (!crncDsply.value) {
 					crncDsply.innerHTML += `<option value="${currencyFtch}">${currencyFtch}</option>`;
 					crncDsply.value = currencyFtch;
 				}
-
+				   
+      const timeInMs2 = Date.now();
+      const dfrns = timeInMs2-timeInMs;
+      console.log( dfrns);
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
@@ -464,68 +481,63 @@ function startPriceUpdates() {
 function dadiZin() {
 	const socket = new WebSocket("wss://wbs.mexc.com/ws");
 
-socket.onopen = () => {
-  console.log("✅ Connected to MEXC WebSocket");
+	socket.onopen = () => {
+		console.log("✅ Connected to MEXC WebSocket");
 
-  const subscribeMessage = {
-    method: "SUBSCRIPTION",
-    params: [
-      "spot@public.ticker.v3.api@BTCUSDT"
-    ],
-    id: 1
-  };
+		const subscribeMessage = {
+			method: "SUBSCRIPTION",
+			params: ["spot@public.ticker.v3.api@BTCUSDT"],
+			id: 1,
+		};
 
-  socket.send(JSON.stringify(subscribeMessage));
-};
+		socket.send(JSON.stringify(subscribeMessage));
+	};
 
-socket.onmessage = (event) => {
-  const data = JSON.parse(event.data);
+	socket.onmessage = event => {
+		const data = JSON.parse(event.data);
 
-  if (data && data.data) {
-    const ticker = data.data;
-    console.log("💰 السعر الحالي:", ticker.lastPrice);
-  }
-};
+		if (data && data.data) {
+			const ticker = data.data;
+			console.log("💰 السعر الحالي:", ticker.lastPrice);
+		}
+	};
 
-socket.onerror = (error) => {
-  console.error("❌ WebSocket Error:", error);
-};
+	socket.onerror = error => {
+		console.error("❌ WebSocket Error:", error);
+	};
 
-socket.onclose = () => {
-  console.log("🔌 Connection closed");
-};
-
+	socket.onclose = () => {
+		console.log("🔌 Connection closed");
+	};
 }
-
 
 //startMexcMultiTracking(['BTCUSDT', 'ETHUSDT', 'SOLUSDT'])
 function startMexcMultiTracking(symbols) {
-    const mexcSocketz = new WebSocket(`wss://wbs.mexc.com/ws`);
+	const mexcSocketz = new WebSocket(`wss://wbs.mexc.com/ws`);
 
-    mexcSocketz.onopen = () => {
-        // تحويل المصفوفة إلى التنسيق المطلوب لميكس
-        const streams = symbols.map(s => `spot@public.deals.v3.api@${s.toUpperCase()}`);
-		
-        const subscribeMsg = {
-            "method": "SUBSCRIPTION",
-            "params": streams
-        };
-        mexcSocketz.send(JSON.stringify(subscribeMsg));
-        console.log(JSON.stringify(subscribeMsg));
-    };
+	mexcSocketz.onopen = () => {
+		// تحويل المصفوفة إلى التنسيق المطلوب لميكس
+		const streams = symbols.map(
+			s => `spot@public.deals.v3.api@${s.toUpperCase()}`,
+		);
 
-    mexcSocketz.onmessage = (event) => {
-        const msg = JSON.parse(event.data);
-        if (msg.s && msg.d && msg.d.deals) {
-            const symbol = msg.s; // اسم العملة التي وصل سعرها الآن
-            const price = parseFloat(msg.d.deals[0].p);
-            console.log(`تحديث سعر: ${symbol} -> ${price}`);
-            
-            // هنا يمكنك استدعاء دالة التنبيهات الخاصة بكل عملة
-            // hndlAlrt(price, symbol);
-        }
-    };
+		const subscribeMsg = {
+			method: "SUBSCRIPTION",
+			params: streams,
+		};
+		mexcSocketz.send(JSON.stringify(subscribeMsg));
+		console.log(JSON.stringify(subscribeMsg));
+	};
+
+	mexcSocketz.onmessage = event => {
+		const msg = JSON.parse(event.data);
+		if (msg.s && msg.d && msg.d.deals) {
+			const symbol = msg.s; // اسم العملة التي وصل سعرها الآن
+			const price = parseFloat(msg.d.deals[0].p);
+			console.log(`تحديث سعر: ${symbol} -> ${price}`);
+
+			// هنا يمكنك استدعاء دالة التنبيهات الخاصة بكل عملة
+			// hndlAlrt(price, symbol);
+		}
+	};
 }
-
-
-

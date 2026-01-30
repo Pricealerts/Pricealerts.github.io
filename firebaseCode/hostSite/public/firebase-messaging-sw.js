@@ -1,10 +1,5 @@
 
-
-
-
-
-
-// firebase-messaging-sw.js
+/* // firebase-messaging-sw.js
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
 
@@ -29,4 +24,4 @@ function requestPermission() {
       console.log('Unable to get permission to notify.');
     }
   });
-}
+} */

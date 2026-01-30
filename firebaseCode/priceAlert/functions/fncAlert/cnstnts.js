@@ -249,12 +249,12 @@ export const gtCndlYahoo = response => {
 	const mt = {
 		st: regularPeriod.start,
 		end: regularPeriod.end,
-		gm: meta.gmtoffset,//gmtoffset
+		gm: meta.gmtoffset, //gmtoffset
 	};
 	// دالة مساعدة لتوليد الاستجابة التقديرية مع إضافة حالة السوق
 	const createMetaResponse = m => [
 		{
-			open: m.regularMarketPrice,
+			//open: m.regularMarketPrice,
 			high: m.regularMarketPrice,
 			low: m.regularMarketPrice,
 			// close: m.regularMarketPrice,
@@ -266,9 +266,10 @@ export const gtCndlYahoo = response => {
 	];
 	// 1. حالة عدم وجود مصفوفات بيانات (بيانات الرسوم البيانية مفقودة تماماً)
 	if (!timestamps || !q) {
-		if (meta && meta.regularMarketPrice) createMetaResponse(meta);
+		if (meta?.regularMarketPrice) return createMetaResponse(meta);
 		return { error: "No chart or meta data available" };
 	}
+
 	let i = timestamps.length - 1;
 	// 2. البحث عن آخر شمعة مكتملة البيانات
 	while (
@@ -279,18 +280,16 @@ export const gtCndlYahoo = response => {
 	}
 	// 3. إذا كانت كل الشموع في المصفوفة فارغة، نلجأ للـ meta
 	if (i < 0) {
-		if (meta && meta.regularMarketPrice) {
-			return createMetaResponse(meta);
-		}
+		if (meta?.regularMarketPrice) return createMetaResponse(meta);
+
 		return { error: "All candles are null and no market price found" };
 	}
-	
-	
+
 	// 4. إرجاع الشمعة الحقيقية مع معلومات السوق
 	return [
 		{
-			timestamp: timestamps[i],
-			open: q.open[i] || q.close[i],
+			//timestamp: timestamps[i],
+			//open: q.open[i] || q.close[i],
 			high: q.high[i],
 			low: q.low[i],
 			// close: q.close[i],

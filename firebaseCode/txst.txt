@@ -27,9 +27,12 @@ gcloud config set project hostsite-80e14
 gcloud config set account raki.chai3i@gmail.com
 
 باش نبدل القبول 
- gcloud functions add-iam-policy-binding telegramWebhook  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
+ gcloud functions add-iam-policy-binding rqstStocks  --region=europe-west1  --member="allUsers"   --role="roles/run.invoker"
 
 
+بنشئ beta service لازم تديرها في "صلاحيات المسؤول" (Administrator Privileges)
+gcloud beta services identity create --service=eventarc.googleapis.com --project=hostsite-80e14
+gcloud services enable eventarc.googleapis.com cloudrun.googleapis.com pubsub.googleapis.com // هدا قادر مديرهش
 
 
 نتاع باش تجيب الباسوورد من app gmail password
@@ -41,7 +44,7 @@ ctl + alt + s
 
 id my progects 
 hostsite-80e14
-srch-price
+srch-price //
 pricealert-31787
 telegramid-6540e
 

@@ -1,42 +1,39 @@
 /* style.css */
 
-
-
-
-
 body {
-    background-color: #f0f2f5; /* لون خلفية فاتح */
-    color: #333;
-    line-height: 1.6;
-    direction: rtl; /* الاتجاه من اليمين لليسار */
-    text-align: right; /* محاذاة النص لليمين */
-   
-    padding: 20px;
+	background-color: #f0f2f5; /* لون خلفية فاتح */
+	color: #333;
+	line-height: 1.6;
+	direction: rtl; /* الاتجاه من اليمين لليسار */
+	text-align: right; /* محاذاة النص لليمين */
+
+	padding: 20px;
 }
 
 /* --- الحاوية الرئيسية --- */
 .container {
-    background-color: #ffffff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 600px;
-    margin: auto;
-    margin-top: 20px;
+	background-color: #ffffff;
+	padding: 30px;
+	border-radius: 12px;
+	box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+	width: 100%;
+	max-width: 600px;
+	margin: auto;
+	margin-top: 20px;
 }
 
-h1, h2 {
-    color: #007bff; /* لون أزرق جذاب للعناوين */
-    text-align: center;
-    font-weight: 700;
+h1,
+h2 {
+	color: #007bff; /* لون أزرق جذاب للعناوين */
+	text-align: center;
+	font-weight: 700;
 }
 
 h2 {
-    font-size: 1.6em;
-    margin-top: 30px;
-    border-bottom: 2px solid #e0e0e0;
-    padding-bottom: 10px;
+	font-size: 1.6em;
+	margin-top: 30px;
+	border-bottom: 2px solid #e0e0e0;
+	padding-bottom: 10px;
 }
 
 /* --- الأقسام الرئيسية (الاختيار، العرض، التنبيه) --- */
@@ -45,287 +42,294 @@ h2 {
 .price-display,
 .alert-section,
 .active-alerts-section {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fdfdfd;
-    text-align: center;
+	margin-bottom: 20px;
+	padding: 15px;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	background-color: #fdfdfd;
+	text-align: center;
 }
 
 /* --- عناصر النموذج --- */
 label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 700;
-    color: #555;
+	display: block;
+	margin-bottom: 8px;
+	font-weight: 700;
+	color: #555;
 }
-.crbtBtn{
-    width: auto;
-    margin: -10px 4px 10px;
-    padding: 5px 10px;
+.crbtBtn {
+	width: auto;
+	margin: -10px 4px 10px;
+	padding: 5px 10px;
 }
 select,
 input[type="number"],
 input[type="text"] {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 1em;
-    direction: rtl; /* للتحكم في اتجاه النص داخل الحقول */
-    text-align: right;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	width: 100%;
+	padding: 12px 15px;
+	margin-bottom: 15px;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	font-size: 1em;
+	direction: rtl; /* للتحكم في اتجاه النص داخل الحقول */
+	text-align: right;
+	transition:
+		border-color 0.3s ease,
+		box-shadow 0.3s ease;
 }
 
 select:focus,
 input[type="number"]:focus,
 input[type="text"]:focus {
-    border-color: #007bff;
-    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
-    outline: none;
+	border-color: #007bff;
+	box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+	outline: none;
 }
 
 /* --- عرض السعر --- */
 .price-display {
-    text-align: center;
-    background-color: #e9f7ff; /* خلفية خفيفة للسعر */
-    border-color: #b3e0ff;
+	text-align: center;
+	background-color: #e9f7ff; /* خلفية خفيفة للسعر */
+	border-color: #b3e0ff;
 }
 
 .currentPrice {
-    display: inline-block;
-    font-size: 2.5em;
-    font-weight: 700;
-    color: #28a745; /* لون أخضر للسعر */
-    margin: 5px;
+	display: inline-block;
+	font-size: 2.5em;
+	font-weight: 700;
+	color: #28a745; /* لون أخضر للسعر */
+	margin: 5px;
 }
 
 /* --- شروط التنبيه وأنواع التنبيه (Radio/Checkbox) --- */
 .alert-condition-selection,
 .alert-type-selection {
-    margin-bottom: 20px;
-    padding: 10px 0;
-    border-top: 1px dashed #e0e0e0;
-    border-bottom: 1px dashed #e0e0e0;
+	margin-bottom: 20px;
+	padding: 10px 0;
+	border-top: 1px dashed #e0e0e0;
+	border-bottom: 1px dashed #e0e0e0;
 }
 
 .alert-condition-selection > div,
 .alert-type-selection > div {
-    display: flex;
-    align-items: center;
+	display: flex;
+	align-items: center;
 }
 
 .alert-condition-selection input[type="radio"],
 .alert-type-selection input[type="checkbox"] {
-    width: auto; /* للسماح للراديو/checkbox بأخذ حجمه الطبيعي */
-    margin-left: 10px; /* مسافة بين العنصر والنص في RTL */
-    margin-right: 0;
-    margin-bottom: 0;
-    transform: scale(1.2); /* تكبير بسيط للمربعات الدائرية/المربعة */
-    cursor: pointer;
+	width: auto; /* للسماح للراديو/checkbox بأخذ حجمه الطبيعي */
+	margin-left: 10px; /* مسافة بين العنصر والنص في RTL */
+	margin-right: 0;
+	margin-bottom: 0;
+	transform: scale(1.2); /* تكبير بسيط للمربعات الدائرية/المربعة */
+	cursor: pointer;
 }
 
 .alert-condition-selection label,
 .alert-type-selection label {
-    margin-bottom: 0;
-    cursor: pointer;
-    font-weight: 400; /* تقليل سمك الخط للنصوص الفرعية */
+	margin-bottom: 0;
+	cursor: pointer;
+	font-weight: 400; /* تقليل سمك الخط للنصوص الفرعية */
 }
 
 /* --- منطقة Chat ID الخاصة بتيليجرام --- */
 #telegramChatIdContainer {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-bottom: 1px dashed #e0e0e0;
+	margin-top: 15px;
+	padding-top: 15px;
+	border-bottom: 1px dashed #e0e0e0;
 }
 
 .small-note {
-    font-size: 0.85em;
-    color: #666;
-    margin-top: -10px; /* لتقريبها من العنصر السابق */
-    margin-bottom: 15px;
-    line-height: 1.4;
+	font-size: 0.85em;
+	color: #666;
+	margin-top: -10px; /* لتقريبها من العنصر السابق */
+	margin-bottom: 15px;
+	line-height: 1.4;
 }
 
 .note {
-    font-size: 0.9em;
-    color: #d84315; /* لون تحذيري خفيف */
-    background-color: #ffe0b2;
-    border: 1px solid #ffcc80;
-    padding: 10px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    text-align: center;
+	font-size: 0.9em;
+	color: #d84315; /* لون تحذيري خفيف */
+	background-color: #ffe0b2;
+	border: 1px solid #ffcc80;
+	padding: 10px;
+	border-radius: 6px;
+	margin-bottom: 20px;
+	text-align: center;
 }
 
 /* --- الأزرار --- */
 button {
-    background-color: #007bff;
-    color: white;
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1em;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    width: 100%;
-    margin-top: 10px;
-    font-weight: 700;
+	background-color: #007bff;
+	color: white;
+	padding: 12px 25px;
+	border: none;
+	border-radius: 8px;
+	font-size: 1.1em;
+	cursor: pointer;
+	transition:
+		background-color 0.3s ease,
+		transform 0.2s ease;
+	width: 100%;
+	margin-top: 10px;
+	font-weight: 700;
 }
 
 button:hover {
-    background-color: #0056b3;
-    transform: translateY(-2px);
+	background-color: #0056b3;
+	transform: translateY(-2px);
 }
 
 button:active {
-    transform: translateY(0);
-    background-color: #004085;
+	transform: translateY(0);
+	background-color: #004085;
 }
 
 /* --- رسائل الحالة --- */
 #alertStatus {
-    text-align: center;
-    margin-top: 20px;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: 700;
+	text-align: center;
+	margin-top: 20px;
+	padding: 10px;
+	border-radius: 6px;
+	font-weight: 700;
 }
 
 #alertStatus.success {
-    background-color: #d4edda;
-    color: #155724;
+	background-color: #d4edda;
+	color: #155724;
 }
 
 #alertStatus.error {
-    background-color: #f8d7da;
-    color: #721c24;
+	background-color: #f8d7da;
+	color: #721c24;
 }
 
 /* --- قائمة التنبيهات النشطة --- */
 .active-alerts-section ul {
-    list-style: none;
-    padding: 0;
+	list-style: none;
+	padding: 0;
 }
 
 .active-alerts-section li {
-    background-color: #f8f8f8;
-    border: 1px solid #eee;
-    padding: 12px 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.95em;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+	background-color: #f8f8f8;
+	border: 1px solid #eee;
+	padding: 12px 15px;
+	margin-bottom: 10px;
+	border-radius: 8px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 0.95em;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 }
 
 .active-alerts-section li:last-child {
-    margin-bottom: 0;
+	margin-bottom: 0;
 }
 
 .active-alerts-section .no-alerts-message {
-    text-align: center;
-    color: #888;
-    font-style: italic;
-    background-color: transparent;
-    border: none;
-    box-shadow: none;
-    padding: 20px;
+	text-align: center;
+	color: #888;
+	font-style: italic;
+	background-color: transparent;
+	border: none;
+	box-shadow: none;
+	padding: 20px;
 }
 
 .alert-info {
-    flex-grow: 1;
-    text-align: right;
+	flex-grow: 1;
+	text-align: right;
 }
 
 .alert-info strong {
-    color: #0056b3;
+	color: #0056b3;
 }
 
-.delete-button ,.delete-notif {
-    background-color: #dc3545; /* أحمر للحذف */
-    color: white;
-    padding: 8px 15px;
-    border-radius: 6px;
-    font-size: 0.9em;
-    margin-right: 15px; /* مسافة عن النص في RTL */
-    width: auto; /* لجعله يأخذ حجمه الطبيعي */
+.delete-button,
+.delete-notif {
+	background-color: #dc3545; /* أحمر للحذف */
+	color: white;
+	padding: 8px 15px;
+	border-radius: 6px;
+	font-size: 0.9em;
+	margin-right: 15px; /* مسافة عن النص في RTL */
+	width: auto; /* لجعله يأخذ حجمه الطبيعي */
 }
 
-.delete-button:hover ,.delete-notif:hover{
-    background-color: #c82333;
+.delete-button:hover,
+.delete-notif:hover {
+	background-color: #c82333;
 }
 
 /* --- تصميم متجاوب (Responsive Design) --- */
 @media (max-width: 768px) {
-    .container {
-        padding: 20px;
-        margin: 10px;
-    }
+	.container {
+		padding: 20px;
+		margin: 10px;
+	}
 
-    h1 {
-        font-size: 1.7em;
-    }
+	h1 {
+		font-size: 1.7em;
+	}
 
-    h2 {
-        font-size: 1.4em;
-    }
+	h2 {
+		font-size: 1.4em;
+	}
 
-    select,
-    input[type="number"],
-    input[type="text"],
-    button {
-        padding: 10px 12px;
-        font-size: 0.95em;
-    }
+	select,
+	input[type="number"],
+	input[type="text"],
+	button {
+		padding: 10px 12px;
+		font-size: 0.95em;
+	}
 
-    .currentPrice {
-        font-size: 2em;
-    }
+	.currentPrice {
+		font-size: 2em;
+	}
 
-    .active-alerts-section li {
-        flex-direction: column; /* ترتيب العناصر عموديًا في الشاشات الصغيرة */
-        align-items: flex-end; /* محاذاة لليمين */
-        padding: 10px;
-    }
+	.active-alerts-section li {
+		flex-direction: column; /* ترتيب العناصر عموديًا في الشاشات الصغيرة */
+		align-items: flex-end; /* محاذاة لليمين */
+		padding: 10px;
+	}
 
-    .alert-info {
-        text-align: right;
-        margin-bottom: 10px;
-        width: 100%; /* اجعل النص يأخذ عرض كامل */
-    }
+	.alert-info {
+		text-align: right;
+		margin-bottom: 10px;
+		width: 100%; /* اجعل النص يأخذ عرض كامل */
+	}
 
-    .delete-button ,.delete-notif {
-        width: 100%; /* زر الحذف يأخذ عرض كامل */
-        margin-right: 0; /* إزالة المسافة الجانبية */
-        margin-top: 10px; /* إضافة مسافة علوية */
-    }
+	.delete-button,
+	.delete-notif {
+		width: 100%; /* زر الحذف يأخذ عرض كامل */
+		margin-right: 0; /* إزالة المسافة الجانبية */
+		margin-top: 10px; /* إضافة مسافة علوية */
+	}
 }
 
 @media (max-width: 480px) {
-    body{
-        padding: 3px;
-    }
-    h1 {
-        font-size: 1.3em;
-    }
+	body {
+		padding: 3px;
+	}
+	h1 {
+		font-size: 1.3em;
+	}
 
-    .container {
-        padding: 15px;
-        margin: 0;
-    }
+	.container {
+		padding: 15px;
+		margin: 0;
+	}
 
-    .exchange-selection,
-    .currency-selection,
-    .price-display,
-    .alert-section,
-    .active-alerts-section {
-        padding: 10px;
-    }
+	.exchange-selection,
+	.currency-selection,
+	.price-display,
+	.alert-section,
+	.active-alerts-section {
+		padding: 10px;
+	}
 }
 /* --- نهاية ملف CSS --- */
 /* --- ملاحظات إضافية --- */
@@ -333,57 +337,70 @@ button:active {
    تم استخدام خطوط Google Fonts وخلفيات وألوان جذابة لتحسين تجربة المستخدم.
    التصميم متجاوب ليتناسب مع مختلف أحجام الشاشات. */
 
+.dropdown-container {
+	position: relative;
+	width: 100%;
+	z-index: 1; /* لضمان ظهورها فوق العناصر الأخرى */
+}
+.dropdown-container input {
+	position: relative;
+	background-color: transparent;
+	z-index: 3; /* لضمان ظهورها فوق القائمة المنسدلة */
+}
+.dropdown-container select {
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: 2;
+}
+select,
+input {
+	width: 100%;
+	padding: 10px;
+	box-sizing: border-box;
+	height: 45px;
+}
 
-      .dropdown-container {
-      position: relative;
-      width: 100%;
-      z-index: 1; /* لضمان ظهورها فوق العناصر الأخرى */
-    }
-    .dropdown-container input {
-        position: relative;
-        background-color: transparent;
-        z-index: 3; /* لضمان ظهورها فوق القائمة المنسدلة */
-    }
-    .dropdown-container select {
-      position: absolute; 
-      right: 0;
-      top: 0;
-      z-index: 2; 
-    }
-    select, input {
-      width: 100%;
-      padding: 10px;
-      box-sizing: border-box;
-    height: 45px;
-    }
+.custom-select {
+	position: relative;
+}
 
-    .custom-select {
-      position: relative;
-    }
+.dropdown-list {
+	position: absolute;
+	top: 40px;
+	left: 0;
+	right: 0;
+	max-height: 200px;
+	overflow-y: auto;
+	border: 1px solid #ccc;
+	background: white;
+	display: none;
+	z-index: 10;
+}
 
-    .dropdown-list {
-      position: absolute;
-      top: 40px;
-      left: 0;
-      right: 0;
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      background: white;
-      display: none;
-      z-index: 10;
-    }
+.dropdown-list div {
+	padding: 8px 10px;
+	text-align: center;
+	cursor: pointer;
+}
 
-    .dropdown-list div {
-      padding: 8px 10px;
-      text-align: center;
-      cursor: pointer;
-    }
+.dropdown-list div:hover {
+	background-color: #f0f0f0;
+}
+.alert-condition-selection img {
+	height: 25px;
+	margin-bottom: -7px;
+}
 
-    .dropdown-list div:hover {
-      background-color: #f0f0f0;
-    }
-    .alert-condition-selection img{
-            height: 25px;
-    margin-bottom: -7px;
-    }
+
+
+
+#widget-area {
+	max-width: 1000px;
+	margin: 0 auto;
+	min-height: 200px;
+}
+.loading {
+	color: #666;
+	font-style: italic;
+}

@@ -1,9 +1,24 @@
+let orgnUrls = [
+	"https://script.google.com/macros/s/AKfycbzMgCAunXYJFMRFMQJX1UrQUnJdsjoHh31bZqumyi2-f6mgrJfbBwCwTNBR0YQUQD9ZSQ/exec" ,
+	"https://script.google.com/macros/s/AKfycbz_bPV0YD_u56AHej1sQstTnzk4LFAPrgDkRZYw-NzI0KzUCmPmL2uUn6P-TAC1jIel7Q/exec",
+	"https://script.google.com/macros/s/AKfycbxSDIjmCkCwVU3gyFfPABhHV5EayTrMmoFa4BAWhaRZwUsTB0c4LjD-i5D5JdN9oeyv/exec",
+	"https://script.google.com/macros/s/AKfycbwOXLglGbwUkBEfO1NFxhPcWwp5SeKv01XWZto5memVSoUnVMhlseZurVHOVP2V1ZIb/exec", 
+	"https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec"
+];
+let rndmUrls = [];
+for (let i = orgnUrls.length; i > 0; i--) {
+	const rndm = Math.floor(Math.random() * orgnUrls.length);
+	rndmUrls.push(orgnUrls[rndm])
+	orgnUrls.splice(rndm,1)
+}
+appScrptUrl = rndmUrls[0]
+console.log(appScrptUrl);
 const EXCHANGES = {
 	binance: {
 		name: "Binance",
 		exchangeInfoUrl: "https://api.binance.com/api/v3/exchangeInfo",
 		tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
-		usdtSuffix: "USDT",// "https://api.binance.com/api/v3/klines"
+		usdtSuffix: "USDT", // "https://api.binance.com/api/v3/klines"
 		intervalData: 10000,
 		crptChos: "block",
 		crncDsply: "none",
@@ -102,14 +117,15 @@ const EXCHANGES = {
 	},
 	nasdaq: {
 		name: "NASDAQ",
-		exchangeInfoUrl: "https://proxyrequestv2-nkipfwe2qq-ew.a.run.app",
-		tickerPriceUrl: "https://proxyrequestv2-nkipfwe2qq-ew.a.run.app",
+		exchangeInfoUrl: appScrptUrl,
+		tickerPriceUrl: appScrptUrl,
 		usdtSuffix: "USD",
 		intervalData: 3600000,
 		crptChos: "none",
 		crncDsply: "inline-block",
 	},
 };
+
 const exchs = [
 	"HKEX", //
 	"LSE",
@@ -123,7 +139,7 @@ const exchs = [
 	"nyse",
 	"nasdaq",
 	"gateIoSmbls",
-	"other"
+	"other",
 ];
 exchs.forEach(ex => {
 	EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
@@ -169,3 +185,23 @@ async function ftchFnctn(url, body) {
 		throw error;
 	}
 }
+
+async function ftchFnctnAPPs(url, body) {
+	try {
+		const response = await fetch(url, {
+			method: "POST",
+			"Content-Type": "application",
+			body: JSON.stringify(body),
+		});
+		const rslt = await response.json();
+		return rslt;
+	} catch (error) {
+		console.error("Fetch error:", error);
+		throw error;
+	}
+}
+
+
+
+
+

@@ -1,4 +1,16 @@
-
+/* import {
+	auth,
+	onAuthStateChanged,
+	db,
+	ref,
+	update,
+	signOut,
+	updateProfile,
+	storage,
+	storageRef,
+	uploadBytes,
+	getDownloadURL,
+} from "https://pricealerts.github.io/firebaseCode.js"; */
 
 const exchangeSelect = gebi("exchangeSelect");
 const currentPriceDisplay = gebi("currentPrice");
@@ -34,13 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 async function startPage() {
+	//localStorage.clear()
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
-	//await fetchTradingPairs("gateIoSmbls");
-	requestNotificationPermission(); // طلب إذن الإشعارات للتطبق
-	//localStorage.removeItem("alrtsStorg");
-	//startTradingSystem();
-	//startSmartAlerts()
+	requestNotificationPermission(); 
 
 	if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz");
@@ -148,10 +157,12 @@ async function filterList() {
 		}
 		const url = EXCHANGES.other.exchangeInfoUrl;
 		try {
-			const result = await ftchFnctn(url, {
+			const result = await ftchFnctnAPPs(url, {
 				querySmble: querySmbl,
 				action: "smbls",
 			});
+			console.log(result);
+			
 			dropdownList.innerHTML = result
 				.map(
 					item => `

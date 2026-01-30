@@ -57,6 +57,18 @@ async function getExchangeSymbols() {
 	}
 }
 
+async function exchangeSymbols2(exchange) {
+  try {
+    const url = `https://api.twelvedata.com/stocks?exchange=${exchange}`;
+    const res = await axios.get(url);
+    return res.data?.data?.map(i => i.symbol) ?? [];
+  } catch (error) {
+    console.error(`error in exchangeSymbols (${exchange}):`, error);
+    return [];
+  }
+}
+
+
 async function exchangeSymbols(exchange) {
 	try {
 		const url = `https://api.twelvedata.com/stocks?exchange=${exchange}`;
@@ -65,7 +77,6 @@ async function exchangeSymbols(exchange) {
 		return res.data.data.map(i => i.symbol) || [];
 	} catch (error) {
 		console.log("error in exchangeSymbols : ", error);
-
 		return [];
 	}
 }
@@ -366,3 +377,8 @@ async function price(smbl) {
 }
 
 export { srchSmbls, price, stocksExchange, getExchangeSymbols, sendMesageFn };
+
+
+
+
+

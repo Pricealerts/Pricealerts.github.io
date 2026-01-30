@@ -1,9 +1,20 @@
-import fetch from "node-fetch"; // تأكد أنك ثبّتته في package.json
-
+import { initializeApp, getApps } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
-
+import { onSchedule } from "firebase-functions/v2/scheduler";
+import {
+	stocksExchange,
+	getExchangeSymbols,
+	sendMesageFn,
+	gtPrice
+} from "./fnctns/fnctns.js";
 // ضع توكن البوت هنا
 // رسال الإيميلات باستخدام Nodemailer
+// تهيئة التطبيق
+
+if (!getApps().length) {
+  initializeApp();
+}
+
 
 const BOT_TOKENEV = process.env.BOT_TOKEN;
 
@@ -48,10 +59,10 @@ export const telegramWebhook = onRequest(
 			console.error("Failed to send message", err);
 			res.status(500).send("Failed to send message");
 		}
-	}
+	},
 );
-/* 
-export const imageProxyPost = onRequest(
+
+export const rqstStocks = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
 		const origin = req.headers.origin;
@@ -78,30 +89,47 @@ export const imageProxyPost = onRequest(
 			return res.status(204).send("");
 		}
 
-		const { action, idImg } = req.body;
-
-		if (action !== "gtImage" || !idImg) {
-			return res.status(400).json({ error: "Invalid request" });
-		}
-
+		const { action, querySmble } = req.body;
 		try {
-			const imageUrl = `https://drive.google.com/thumbnail?id=${idImg}&sz=w800`;
-			const response = await fetch(imageUrl);
+			let repond;
+			const actionMap = {
+				stocksExchange: stocksExchange,
+				sendMessage: sendMesageFn,
+				gtPr :gtPrice
+			};
+			const executeAction = actionMap[action];
+			if (executeAction) {
+				const response = await executeAction(querySmble);
+				res.status(200).json(response);
+			} else {
+				console.log("kayn error");
 
-			if (!response.ok) {
-				return res.status(400).json({ error: "Failed to fetch image" });
+				res.status(400).send("Unknown action: " + action);
 			}
 
-			const buffer = await response.arrayBuffer();
-			res.set(
-				"Content-Type",
-				response.headers.get("content-type") || "image/png"
-			);
-
-			res.status(200).send(Buffer.from(buffer));
+			// إرسال الرد كـ JSON مباشرة دون stringify يدوي
+			return res.json(response);;
 		} catch (err) {
 			res.status(500).json({ error: "Server error" });
 		}
-	}
+	},
 );
- */
+
+// وظيفة شهرية
+export const updtSmblsMnthly = onSchedule(
+	{
+		schedule: "0 0 1 * *",
+		region: "europe-west1",
+		maxInstances: 1,
+		timeoutSeconds: 300, // 5 دقائق كافية جداً
+	},
+	async () => {
+		try {
+			await getExchangeSymbols();
+			console.log("✅ تم التحديث الشهري بنجاح");
+		} catch (error) {
+			console.error("❌ فشل التحديث الشهري:", error);
+			// لا نضع return هنا لأن الـ Scheduler لا ينتظر رداً
+		}
+	},
+);

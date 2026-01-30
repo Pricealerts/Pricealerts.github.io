@@ -46,7 +46,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const storage = getStorage(app);
 const db = getDatabase(app);
-//const provider = new GoogleAuthProvider();
+/* //const provider = new GoogleAuthProvider();
 const apdtOrSet = { set: set, updt: update };
 function setUpdtData(storUp, rfrnce, user) {
 	apdtOrSet[storUp](ref(database, rfrnce), {
@@ -66,7 +66,7 @@ function setUpdtData(storUp, rfrnce, user) {
 			"تم التسجيل وتعديل البيانات ✔️";
 	});
 	console.log("الحساب غير موجود في قاعدة البيانات");
-}
+} */
 
 // ---------------------------------------------------------
 // 4. كود الإشعارات (Notification Logic) - الكود الذي سألت عنه
@@ -111,7 +111,7 @@ export {
 	signInWithPopup,
 	signOut,
 	auth,
-	setUpdtData,
+/* 	setUpdtData, */
 	onAuthStateChanged,
 	signInWithEmailAndPassword,
 	signInWithCredential,

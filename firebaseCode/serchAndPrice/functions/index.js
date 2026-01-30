@@ -47,8 +47,7 @@ export const proxyRequestV2 = onRequest(
 
 		// --- استخراج البيانات ---
 		const rqust = req.method === "POST" ? req.body : req.query;
-		const action = rqust.action;
-		const querySmble = rqust.querySmble;
+		const { action ,querySmble} = rqust;
 		try {
 			if (!action) {
 				return res.status(400).send("Action is missing");

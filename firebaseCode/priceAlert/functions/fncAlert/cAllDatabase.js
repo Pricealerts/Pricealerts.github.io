@@ -3,6 +3,7 @@ import { getDatabase } from "firebase-admin/database";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
 import { sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
+import  { price, srchSmbls } from "./yhoCode.js";
 
 //import { sndEmail } from "./sndEmail.js";
 
@@ -40,7 +41,12 @@ async function cAllDatabase(data) {
 			].includes(action)
 		) {
 			rspns = await sndEmail(data, db);
+		}else if (action === "smbls") {
+			rspns = await  srchSmbls(data);
+		}else if (action === "smbls") {
+			rspns = await  price(data);
 		}
+
 
 		return rspns;
 	} catch (error) {

@@ -89,4 +89,11 @@ async function gtEmail(email) {
 	}
 }
 
+
+
+
+
+
+
+
 export { chngePswrd, sgnUp, gtEmail };
