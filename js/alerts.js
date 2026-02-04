@@ -4,11 +4,13 @@
 
 async function loadUserAlertsDisplay() {
 	try {
-		const rslt = await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
+		/* const rslt = await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
 			action: "gtAlerts",
 			chid: telegramChatId,
-		});
-		const aryRslt = Object.entries(rslt) || [];
+		}); */
+		const rslt = await dataAlrts(telegramChatId);
+		let aryRslt = [];
+		if (rslt) aryRslt = Object.entries(rslt) || [];
 		const browserAlerts = alrtsStorg.filter(alert => alert[1].alTp === "b");
 		alrtsStorg = [...browserAlerts, ...aryRslt];
 		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
@@ -233,3 +235,6 @@ function dltNtf(idDlt) {
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 	}
 }
+
+
+

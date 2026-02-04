@@ -10,7 +10,7 @@ import {
 	storageRef,
 	uploadBytes,
 	getDownloadURL,
-} from "https://pricealerts.github.io/firebaseCode.js";
+} from "https://pricealerts.github.io/frbsJs/firebaseCode.js";
 // const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzAoBdBnx3by3AwPW2H1zZQtGEVNiYux1DlVAj47Zz6hrTqORan378zeyDycwLXXZLJTA/exec"; // رابط apps script
 gebi("sgnOutInLink").addEventListener("click", async () => {
 	await onAuthStateChanged(auth, async user => {

@@ -1,6 +1,5 @@
 //import { user } from "firebase-functions/v1/auth";
 import { chngePswrd, sgnUp, gtEmail } from "./authnt.js";
-import nodemailer from "nodemailer";
 
 let db;
 
@@ -196,7 +195,11 @@ async function gtDb() {
 const gmailEmail = process.env.GMAIL_EMAIL;
 const gmailPassword = process.env.GMAIL_PASSWORD;
 
-// إعداد Nodemailer مرة واحدة
+
+// Firebase Function (Gen 2)
+async function sndEmailToUser(bodySnd) {
+	const nodemailer = await import('nodemailer');
+	// إعداد Nodemailer مرة واحدة
 const transporter = nodemailer.createTransport({
 	service: "gmail",
 	auth: {
@@ -204,8 +207,6 @@ const transporter = nodemailer.createTransport({
 		pass: gmailPassword,
 	},
 });
-// Firebase Function (Gen 2)
-async function sndEmailToUser(bodySnd) {
 	const { userEmail, userName, code /* , text  */ } = bodySnd;
 
 	if (!userEmail) {

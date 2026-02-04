@@ -1,4 +1,7 @@
 // ✅ 1. جعل الإعدادات ثابتاً عالمياً (Global Constant) لمرة واحدة فقط
+
+import { log } from "firebase-functions/logger";
+
 // هذا يحمي الذاكرة من التضخم ويقلل وقت التنفيذ
 export const EXCHANGES_CONFIG = {
 	binance: {
@@ -167,17 +170,19 @@ export const EXCHANGES_CONFIG = {
 export const exchs = [
 	"nyse",
 	"xetra",
-	"lse",
+	"LSE",
+	"XSHG",
 	"TSE",
 	"HKSE",
 	"NSE",
+	"XSES",
 	"other",
 	"nasdaq",
 ];
-exchs.forEach(ex => {
+/* exchs.forEach(ex => {
 	EXCHANGES_CONFIG[ex] = { ...EXCHANGES_CONFIG.nasdaqe };
 	EXCHANGES_CONFIG[ex].name = ex; //.toLowerCase()
-});
+}); */
 /**
  * دالة جلب رابط الـ API
  */
@@ -188,7 +193,7 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 		console.warn(`⚠️ Exchange "${exchangeId}" is missing in EXCHANGES_CONFIG.`);
 		return null;
 	}
-	let apiUrl;
+	let apiUrl = "";
 	switch (exchangeId) {
 		case "binance":
 		case "mexc":
@@ -220,7 +225,7 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 			const endDate = new Date().toISOString().split(".")[0] + "Z";
 			apiUrl = `${exchange.tickerPriceUrl}${symbol}/candles?start=${startDate}&end=${endDate}&granularity=300`;
 			break;
-		case "nasdaq":
+		/* case "nasdaq":
 		case "nyse":
 		case "xetra":
 		case "lse":
@@ -229,73 +234,50 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 		case "NSE":
 		case "other":
 			apiUrl = `${exchange.candlestickUrl}${symbol}?interval=${mappedInterval}&range=${limit}d`;
-			break;
+			break; */
 		default:
 			`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=5m&range=1d`;
 	}
 
 	return apiUrl;
 };
-export const gtCndlYahoo = response => {
-	const result = response.data?.chart?.result?.[0];
-	if (!result) {
-		return { error: "No data found" };
-	}
-	const timestamps = result.timestamp;
-	const q = result.indicators?.quote?.[0];
-	const meta = result.meta;
 
-	const regularPeriod = meta.currentTradingPeriod?.regular;
-	const mt = {
-		st: regularPeriod.start,
-		end: regularPeriod.end,
-		gm: meta.gmtoffset, //gmtoffset
-	};
-	// دالة مساعدة لتوليد الاستجابة التقديرية مع إضافة حالة السوق
-	const createMetaResponse = m => [
-		{
-			//open: m.regularMarketPrice,
-			high: m.regularMarketPrice,
-			low: m.regularMarketPrice,
-			// close: m.regularMarketPrice,
-			meta: mt,
-			currency: m.currency,
-			marketState: m.marketState, // يخبرك إذا كان السوق مغلقاً (CLOSED) أو مفتوحاً (REGULAR)
-			isEstimated: true,
-		},
+export const ftcgAppScrpt = stocksMap => {
+	const quota = 60;
+	const orgnUrls = [
+		"https://script.google.com/macros/s/AKfycbwZXFG47b2ccGkifQENtoRDWSBBsBno22dGehmRH1kns-AbuvMPOzLNOJzj1upiaIqK/exec",
+		// "https://script.google.com/macros/s/AKfycbwn_lZzsTUXIXQlq33rYjs0rpOOiQeMQm5neghfdvJgKPQpjDM7mNKpexZqhqilOajjJA/exec"
+		// "https://script.google.com/macros/s/AKfycbyUSD_7o1-ed8OlPABqQh2Qt8e0ENsCimPWgSmgm3SQAF-6x4WzQHbfbzk1Pql92iXF-w/exec",
 	];
-	// 1. حالة عدم وجود مصفوفات بيانات (بيانات الرسوم البيانية مفقودة تماماً)
-	if (!timestamps || !q) {
-		if (meta?.regularMarketPrice) return createMetaResponse(meta);
-		return { error: "No chart or meta data available" };
-	}
 
-	let i = timestamps.length - 1;
-	// 2. البحث عن آخر شمعة مكتملة البيانات
-	while (
-		i >= 0 &&
-		(q.high[i] === null || q.low[i] === null) /* || q.close[i] === null */
-	) {
-		i--;
+	const acsptAlrts = orgnUrls.length * quota;
+	let rndmUrls = [];
+	for (let i = orgnUrls.length; i > 0; i--) {
+		const rndm = Math.floor(Math.random() * orgnUrls.length);
+		rndmUrls.push(orgnUrls[rndm]);
+		orgnUrls.splice(rndm, 1);
 	}
-	// 3. إذا كانت كل الشموع في المصفوفة فارغة، نلجأ للـ meta
-	if (i < 0) {
-		if (meta?.regularMarketPrice) return createMetaResponse(meta);
+	let pacg = [];
+	let k = 0;
+	let restAlrt = [];
+	const symbolsOrder = Array.from(stocksMap.keys());
+	symbolsOrder.forEach(symbol => {
+		const aryAlrts = stocksMap.get(symbol);
+		pacg.push(aryAlrts);
+		if (pacg.length == quota && k < acsptAlrts) {
+			ftchFn("arryPrice", pacg, k);
+			k++;
+			pacg = [];
+		} else if (k > acsptAlrts) restAlrt.push(aryAlrts);
+	});
+	if (restAlrt.length > 0) ftchFn("restAlrt", restAlrt, 0);
+	else if (pacg.length > 0) ftchFn("arryPrice", pacg, k);
 
-		return { error: "All candles are null and no market price found" };
+	function ftchFn(action, alerts, j) {
+		fetch(rndmUrls[j], {
+			method: "post",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ action, alerts }),
+		});
 	}
-
-	// 4. إرجاع الشمعة الحقيقية مع معلومات السوق
-	return [
-		{
-			//timestamp: timestamps[i],
-			//open: q.open[i] || q.close[i],
-			high: q.high[i],
-			low: q.low[i],
-			// close: q.close[i],
-			meta: mt,
-			currency: meta.currency,
-			marketState: meta.marketState, // إضافة حالة السوق هنا أيضاً
-		},
-	];
 };

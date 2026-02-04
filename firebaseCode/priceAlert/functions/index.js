@@ -1,8 +1,6 @@
 import { initializeApp } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { cAllDatabase } from "./fncAlert/cAllDatabase.js";
-import { checkAndSendAlerts } from "./fncAlert/srchSmbls.js";
 
 initializeApp();
 export const proxyRequestV2 = onRequest(
@@ -23,20 +21,24 @@ export const proxyRequestV2 = onRequest(
 		];
 		if (allowedOrigins.includes(origin)) {
 			res.set("Access-Control-Allow-Origin", origin);
-		} else if (origin === undefined && req.body.orgn === "appsScriptDadi") {
+		} else if ( req.body.orgn === "appsScriptDadi") {
 			res.set("Access-Control-Allow-Origin", "*");
 		} else {
 			return res.status(403).send("Forbidden" + origin);
 		}
 		res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 		res.set("Access-Control-Allow-Headers", "Content-Type");
+		 if (req.method === "OPTIONS") return res.status(204).send(""); // ⬅️ مهم
+  
 		const data = req.method === "POST" ? req.body : req.query;
 		try {
 			if (!data) {
-				res.send("rah  " + data);
+				res.send("rah khawi" + data);
 				return null;
 			}
+			 const { cAllDatabase } = await import("./fncAlert/cAllDatabase.js");
 			const rslt = await cAllDatabase(data);
+			if(!rslt) return false
 			res.status(200).json(rslt);
 			//  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
 			// res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`);
@@ -55,13 +57,15 @@ export const proxyRequestV2 = onRequest(
 
 export const scheduledTask = onSchedule(
 	{
-		schedule: "every day",//schedule: "every 5 minutes",
+		schedule: "0 9 * * *" ,//evriday //schedule: "*/5 * * * *","0 9 * * *"
 		region: "europe-west1",
 		memory: "256MiB",
 		maxInstances: 1,
 		timeoutSeconds: 120, // حاول تقليلها إذا كان الجلب سريعاً
 	},
 	async () => {
+            // ✅ استيراد ملف التنبيهات (الذي يحتوي غالباً على nodemailer) ديناميكياً
+            const { checkAndSendAlerts } = await import("./fncAlert/srchSmbls.js");
 		try {
 			await checkAndSendAlerts();
 		} catch (error) {
@@ -94,3 +98,5 @@ export const handleUserCreated = auth.user().onCreate(
     return null;
   }
 ); */
+
+

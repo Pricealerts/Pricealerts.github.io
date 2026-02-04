@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EXCHANGES_CONFIG, gtapiUrl, gtCndlYahoo, exchs } from "./cnstnts.js";
+import { EXCHANGES_CONFIG, gtapiUrl, ftcgAppScrpt, exchs } from "./cnstnts.js";
 import { cAllDatabase } from "./cAllDatabase.js";
 
 // *** بيانات اعتماد Telegram Bot API ***
@@ -41,10 +41,10 @@ async function getCandles(symbolsMap) {
 			config.exchangeId,
 			symbol,
 			"5m", //config.interval,
-			1 //config.limit
+			1, //config.limit
 		).catch(err => {
 			console.error(
-				`❌ Error fetching ${symbol} from ${config.exchangeId} err is  :`
+				`❌ Error fetching ${symbol} from ${config.exchangeId} err is  :`,
 			);
 			console.error(err);
 			return null;
@@ -64,27 +64,26 @@ async function getCandles(symbolsMap) {
 
 async function checkAndSendAlerts() {
 	let data = await cAllDatabase({ action: "gtAlerts", chid: "all" });
-	if (!data) return false;
+
+	if (!data.stat) return false;
 	let allAlerts = [];
 	let symbolsMap = new Map();
-	let usersAll = Object.entries(data);
+	let stocksMap = new Map();
+	let usersAll = Object.entries(data.alerts);
 	data = null;
 	usersAll.forEach(user => {
-		const idUser = user[0];
+		const tlgId = user[0];
 		const alrts = Object.entries(user[1]);
 		alrts.forEach(alert => {
-			const alrt = alert[1];
-			const { e: exchangeId, s: symbol, mt: meta } = alrt;
-			if (meta) {
-				const now = Date.now();
-				const startTime = meta.st * 1000;
-				const endTime = meta.end * 1000;
-				const exchangeDate = new Date(Date.now() + meta.gm * 1000); // gmtoffset
-				const exchangeToday = exchangeDate.getUTCDate();
-				if ((now < startTime || now > endTime) && exchangeToday == meta.oDy)
-					return false;
-			}
+			const isStock = stocksFn(alert, tlgId);
+			console.log("alert is : " + JSON.stringify(alert));
+			console.log("isStock is : " + JSON.stringify(isStock));
 
+			if (isStock) return false;
+			console.log('fat f ');
+			
+			const alrt = alert[1];
+			const { e: exchangeId, s: symbol } = alrt;
 			const existing = symbolsMap.get(symbol);
 			if (
 				!existing ||
@@ -93,12 +92,39 @@ async function checkAndSendAlerts() {
 				symbolsMap.set(symbol, { exchangeId });
 			}
 			alrt.i = alert[0];
-			alrt.tid = idUser;
+			alrt.tid = tlgId;
 			allAlerts.push(alrt);
 		});
 	});
+	function stocksFn(alert, tlgId) {
+		const alrt = alert[1];
+		const { e: exchangeId, s: symbol, mt: meta } = alrt;
+		if (meta) {
+			const now = Date.now();
+			const startTime = meta.st * 1000;
+			const endTime = meta.end * 1000;
+			const exchangeDate = new Date(Date.now() + meta.gm * 1000); // gmtoffset
+			const exchangeToday = exchangeDate.getUTCDate();
+			if ((now < startTime || now > endTime) && exchangeToday == meta.oDy)
+				return true;
+		}
+		if (exchs.includes(exchangeId)) {
+			if (!stocksMap.has(symbol)) stocksMap.set(symbol, []);
+			stocksMap.get(symbol).push({ i: alert[0], tid: tlgId, ...alrt });
+			return true;
+		}
+		return false;
+	}
+
 	usersAll = null;
+	console.log("stocksMap is : " + JSON.stringify(stocksMap));
+	console.log("stocksMap.size is : " + JSON.stringify(stocksMap.size));
+	console.log("symbolsMap is : " + JSON.stringify(symbolsMap));
+	if (stocksMap.size > 0) ftcgAppScrpt(stocksMap);
 	const rsltcandles = await getCandles(symbolsMap);
+	console.log("rsltcandles is : " + JSON.stringify(rsltcandles));
+
+	if (!rsltcandles) return false;
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
 	let promises = [];
 	for (let k = 0; k < allAlerts.length; k++) {
@@ -114,6 +140,7 @@ async function checkAndSendAlerts() {
 		} = allAlerts[k];
 
 		const candles = rsltcandles[symbol];
+		console.log("candles is : " + JSON.stringify(candles));
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null;
 		const rglrChatId = telegramChatId.slice(3);
@@ -134,6 +161,11 @@ async function checkAndSendAlerts() {
 			}
 		} /* else {console.warn(`لم يتم الحصول على بيانات شمعة  لـ ${symbol} على 
 		${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`)} */
+		console.log(
+			"triggeredByHistoricalPrice is : " +
+				JSON.stringify(triggeredByHistoricalPrice),
+		);
+
 		if (triggeredByHistoricalPrice) {
 			const message = `🔔 تنبيه سعر ${
 				EXCHANGES_CONFIG[exchangeId].name
@@ -143,14 +175,14 @@ async function checkAndSendAlerts() {
 
 			const dlt = {
 				action: "dltAlrt",
-				telegramChatId: telegramChatId,
+				tId: telegramChatId,
 				id: id,
-				alrtOk: true,
-				chtIdMsg: rglrChatId,
-				message: message,
+				//	alrtOk: true,
 			};
+			console.log("dlt is : " + JSON.stringify(dlt));
+
 			promises.push(cAllDatabase(dlt));
-			promises.push(sendTelegramMessage(dlt.chtIdMsg, dlt.message));
+			promises.push(sendTelegramMessage(rglrChatId, message));
 			continue;
 		}
 
@@ -164,11 +196,11 @@ async function checkAndSendAlerts() {
 			const rsltDt = {
 				action: "setAlert",
 				id: rglrId,
-				telegramChatId: rglrChatId,
-				exchangeId,
-				symbol,
-				targetPrice,
-				alertCondition,
+				tId: rglrChatId,
+				e: exchangeId,
+				s: symbol,
+				tPrc: targetPrice,
+				c: alertCondition,
 				mt: newMeta,
 				f: factorPric,
 			};
@@ -226,7 +258,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 			} else {
 				console.error(
 					`خطأ من ${exchange.name} API (شموع):`,
-					datas.msg || JSON.stringify(datas)
+					datas.msg || JSON.stringify(datas),
 				);
 			}
 		} else if (exchangeId === "okx") {
@@ -235,7 +267,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 			} else {
 				console.error(
 					`خطأ من ${exchange.name} API (شموع):`,
-					datas.msg || JSON.stringify(datas)
+					datas.msg || JSON.stringify(datas),
 				);
 			}
 		} else if (exchangeId === "bybit") {
@@ -250,7 +282,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 			} else {
 				console.error(
 					`خطأ من ${exchange.name} API (شموع):`,
-					datas.ret_msg || JSON.stringify(datas)
+					datas.ret_msg || JSON.stringify(datas),
 				);
 			}
 		} else if (exchangeId === "coingecko") {
@@ -258,7 +290,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 			const fiveMinutesAgo = now - 5 * 60 * 1000;
 			// تصفية الأسعار في آخر 5 دقائق
 			const pricesLast5Min = datas.prices.filter(
-				item => item[0] >= fiveMinutesAgo
+				item => item[0] >= fiveMinutesAgo,
 			);
 
 			const open = pricesLast5Min[0][1];
@@ -288,15 +320,13 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				let dtSlc = [datas[indData]];
 				candles = dtSlc.map(exchange.parseCandle);
 			}
-		} else if (exchs.includes(exchangeId)) {
-			candles = gtCndlYahoo(axs);
 		} else {
 			if (Array.isArray(datas) && datas.length) {
 				candles = datas.map(exchange.parseCandle);
 			} else {
 				console.error(
 					`خطأ من ${exchange.name} API (شموع):`,
-					JSON.stringify(datas)
+					JSON.stringify(datas),
 				);
 			}
 		}
@@ -306,7 +336,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		console.error(
 			//${symbol}
 			`خطأ في جلب بيانات الشموع لـ  من ${exchange.name}:`,
-			error
+			error,
 		);
 		return null;
 	}
@@ -314,12 +344,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 
 async function chngOfDb(promises) {
 	if (!promises || promises.length == 0) return "walo";
-	/* // بدلاً من طلبين منفصلين، يمكنك دمج البيانات في طلب تحديث واحد
-const updates = {};
-updates[`alerts/${id1}`] = rsltDt1;
-updates[`alerts/${id2}`] = rsltDt2;
-
-await firebase.database().ref().update(updates); */
 	try {
 		await Promise.all(promises);
 		promises = null;
@@ -370,7 +394,7 @@ async function sendTelegramMessage(chatId, messageText) {
 	} catch (error) {
 		console.error(
 			"خطأ في إرسال رسالة تيليجرام:",
-			error.response ? error.response.data : error.message
+			error.response ? error.response.data : error.message,
 		);
 		rspns = {
 			success: false,

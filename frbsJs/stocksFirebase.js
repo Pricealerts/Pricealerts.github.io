@@ -1,11 +1,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { db as dbPrc } from "./firebaseCode.js";
 //import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-messaging.js";// nta3 tokn
 
 import {
 	getDatabase,
 	ref,
-	update,
-	set,
 	get,
 } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
 
@@ -23,27 +22,21 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-// تصدير الدوال إلى "window" لتعمل في الملفات العادية
-/* window.saveData = function(path, data) {
-    return set(ref(db, path), data);
-}; */
-
-window.gtDataStocks =async (exchangeId) => {
+window.gtDataStocks = async exchangeId => {
 	try {
-	const rslt = (await get(ref(db, `stockSymbols/${exchangeId}`))).val();
-	return rslt
-	
+		const rslt = (await get(ref(db, `${exchangeId}`))).val();
+		return rslt;
 	} catch (error) {
 		console.log(error);
-		return []
+		return [];
 	}
 };
-
-/* export {
-	
-	db,
-	ref,
-	update,
-	set,
-	get,
-}; */
+window.dataAlrts = async chId => {
+	try {
+		const rslt = (await get(ref(dbPrc, `alerts/cht${chId}`))).val();
+		return rslt;
+	} catch (error) {
+		console.log(error);
+		return [];
+	}
+};

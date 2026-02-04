@@ -1,8 +1,7 @@
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl =
 	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
-const FIREBASE_WEB_ALERT_URL =
-	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+const FIREBASE_WEB_ALERT_URL = "https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
 
 let currencyFtch = "USD";
@@ -33,6 +32,7 @@ async function fetchTradingPairs(exchangeId) {
 		let response, data;
 		switch (exchangeId) {
 			case "binance": //tickerPriceUrl
+			
 				response = await fetch(exchange.tickerPriceUrl);
 				allPricesBns = await response.json();
 				symbols = allPricesBns.map(s => s.symbol);
@@ -365,14 +365,14 @@ async function fetchCurrentPrice(
 			case "XSHE":
 			case "other":
 				const timeInMs = Date.now();
-				rslt = await ftchFnctnAPPs(appScrptUrl,{
+				/* rslt = await ftchFnctnAPPs(appScrptUrl,{
 					action: "price",
 					smbl: symbol,
-				});
-				/*  rslt = await ftchFnctn(" https://rqststocks-wgqzo7cltq-ew.a.run.app",{
+				}); */
+				 rslt = await ftchFnctn(frbUrl,{
 					action: "gtPr",
 					querySmble: symbol,
-				});  */
+				}); 
 
 				console.log(rslt);
 				

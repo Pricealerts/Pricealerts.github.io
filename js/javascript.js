@@ -51,8 +51,8 @@ async function startPage() {
 	await fetchTradingPairs(currentExchangeId);
 	requestNotificationPermission(); 
 
-	if (localStorage.getItem("exchangeChoz"))
-		exchangeSelect.value = localStorage.getItem("exchangeChoz");
+	/* if (localStorage.getItem("exchangeChoz"))
+		exchangeSelect.value = localStorage.getItem("exchangeChoz"); */
 
 	const slChId = gebi("chtIdSlct") || "";
 	telegramChatId = localStorage.getItem("idChat") || "";

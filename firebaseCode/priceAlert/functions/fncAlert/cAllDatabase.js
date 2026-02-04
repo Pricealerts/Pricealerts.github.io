@@ -3,7 +3,7 @@ import { getDatabase } from "firebase-admin/database";
 import { EXCHANGES_CONFIG } from "./cnstnts.js";
 import { sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
-import  { price, srchSmbls } from "./yhoCode.js";
+//import { price, srchSmbls } from "./yhoCode.js";
 
 //import { sndEmail } from "./sndEmail.js";
 
@@ -23,7 +23,6 @@ async function cAllDatabase(data) {
 	try {
 		const action = data.action;
 		let rspns;
-
 		if (action == "gtAlerts") {
 			rspns = await gtAlerts(data);
 		} else if (action == "setAlert") {
@@ -41,12 +40,13 @@ async function cAllDatabase(data) {
 			].includes(action)
 		) {
 			rspns = await sndEmail(data, db);
-		}else if (action === "smbls") {
-			rspns = await  srchSmbls(data);
-		}else if (action === "smbls") {
-			rspns = await  price(data);
-		}
-
+		} else if (action === "appscrpt") {
+			const promises = data.promises.map(prm => cAllDatabase(prm));
+			 await Promise.all(promises);
+			rspns = false;
+		}/*  else if (action === "smbls") {
+			rspns = await price(data);
+		} */
 
 		return rspns;
 	} catch (error) {
@@ -66,29 +66,22 @@ async function gtAlerts(data) {
 			dtRspns = await postsRef.child(`cht${data.chid}`).get();
 		}
 		if (!dtRspns.exists()) {
-			return false;
+			return {stat:false};
 		}
 
-		return dtRspns.val();
+		return {stat:true,alerts:dtRspns.val()} ;
 	} catch (error) {
 		// Provide an Error object
 		throw new Error(
-			"حدث خطأ: " + (error && error.message ? error.message : String(error))
+			"حدث خطأ: " + (error && error.message ? error.message : String(error)),
 		);
 	}
 }
-	
+
 ///// the functions
 async function setAlerte(data) {
 	const rspns = {};
-	if (
-		!data.id ||
-		!data.e ||
-		!data.s ||
-		!data.tPrc ||
-		!data.tId ||
-		!data.c
-	) {
+	if (!data.id || !data.e || !data.s || !data.tPrc || !data.tId || !data.c) {
 		console.log("الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.");
 	}
 	const alrtAdd = {
@@ -143,22 +136,13 @@ async function dltAlrt(data) {
 		// حذف المرجع الأساسي
 		await ref.remove();
 
-		const dtCall = db.ref(`allChatId/${chatId}`);
-
+		//const dtCall = db.ref(`allChatId/${chatId}`);
 		// تعديل العداد بطريقة آمنة باستخدام transaction
-		if (data.alrtOk) {
-			/* await dtCall.transaction(idChat => {
-				if (!idChat) {
-					return { c: 1 }; // إذا لم تكن البيانات موجودة
-				}
-				idChat.c = (idChat.c || 0) + 1;
-				return idChat;
-			}); */
-			// بديل أسرع إذا كنت تريد فقط زيادة العداد بمقدار 1
+		/* if (data.alrtOk) {
 			await dtCall.update({
 				c: admin.database.ServerValue.increment(1),
 			});
-		}
+		} */
 
 		return { status: "success" };
 	} catch (error) {
@@ -175,18 +159,16 @@ async function cntctUser(data) {
 		const getChId = await callDb.get();
 		let gtChIdExixst;
 		if (!getChId.exists()) {
-			let message = `لقد قمت بتعين تنبيه على  ${
-				EXCHANGES_CONFIG[data.e].name
-			}! 
+			let message = `لقد قمت بتعين تنبيه على  ${EXCHANGES_CONFIG[data.e].name}! 
 				ل<b> ${data.s} </b>  
-				(الشرط: السعر   ${
-					data.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-				} ${data.tPrc} )
+				(الشرط: السعر   ${data.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"} ${
+					data.tPrc
+				} )
 				سيتم تبليغك فور تحقيق الشرط
 				شكرا`;
 			const sendMsg = await sendTelegramMessage(idChat, message);
 			if (sendMsg.success) {
-				gtChIdExixst = { c: 0, /* //counter */ /* p: data.paidOrNo  */};
+				gtChIdExixst = { c: 0 /* //counter */ /* p: data.paidOrNo  */ };
 				await callDb.set(gtChIdExixst);
 				//rspns.status = "success";
 				rspns.okRspns = true;

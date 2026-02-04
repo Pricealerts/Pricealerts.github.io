@@ -15,7 +15,7 @@ import {
 	getDownloadURL,
 	storageRef,
 	storage,
-} from "https://pricealerts.github.io/firebaseCode.js";
+} from "https://pricealerts.github.io/frbsJs/firebaseCode.js";
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
 

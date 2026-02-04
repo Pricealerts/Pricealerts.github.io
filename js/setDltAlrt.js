@@ -59,7 +59,7 @@ setAlertButton.addEventListener("click", async () => {
 			(alertCondition === "l" && prc <= targetPrice) ||
 			(alertCondition === "g" && prc >= targetPrice)
 		) {
-			newAlrtPrs.isAlrd = true;
+		//	newAlrtPrs.isAlrd = true;
 			newAlrtPrs.prc = prc;
 		}
 	}
@@ -105,6 +105,8 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		}
 	} else data.status = "success";
 	if (data.status === "success") {
+		console.log('log');
+		
 		alertStatus.textContent = `${
 			action === "setAlert" ? "تم تعيين" : "تم حذف"
 		} التنبيه بنجاح.`;
