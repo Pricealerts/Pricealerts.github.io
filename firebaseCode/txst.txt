@@ -48,9 +48,11 @@ srch-price //
 pricealert-31787
 telegramid-6540e
 
-//تجيب رابط من github لازم يكون ملف js فاللول قاع 
+//تجيب رابط من githubل
 npm install git+https://github.com/Pricealerts/pricealerts-frbs.git 
 npm install git+https://github.com/Pricealerts/Pricealerts.github.io.git
+cd functions
+npm install git+https://github.com/Pricealerts/Pricealerts.github.io/frbsJs.git
 
 
 // id nta3 google oAuth
