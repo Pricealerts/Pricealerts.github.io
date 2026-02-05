@@ -17,7 +17,7 @@
     "axios": "^1.11.0",
     "firebase-admin": "^13.6.0",
     "firebase-functions": "^7.0.5",
-    "pricealerts-utils": "github:Pricealerts/pricealerts-frbs"
+    "pricealerts-utils": "github:Pricealerts/Pricealerts.github.io"
   },
   "devDependencies": {
     "firebase-functions-test": "^3.4.1"

@@ -1,8 +1,8 @@
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl =
 	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
-const FIREBASE_WEB_ALERT_URL = "https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
-
+const FIREBASE_WEB_ALERT_URL =
+	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
 let currencyFtch = "USD";
 let rfrsh = 0;
@@ -32,7 +32,6 @@ async function fetchTradingPairs(exchangeId) {
 		let response, data;
 		switch (exchangeId) {
 			case "binance": //tickerPriceUrl
-			
 				response = await fetch(exchange.tickerPriceUrl);
 				allPricesBns = await response.json();
 				symbols = allPricesBns.map(s => s.symbol);
@@ -135,7 +134,6 @@ async function fetchTradingPairs(exchangeId) {
 			case "XPAR":
 			case "XSHE":
 			case "gateIoSmbls":
-				
 				let nmbrDays = 100;
 				let localExSmbls = localStorage.getItem(exchangeId);
 				const today = Date.now();
@@ -147,16 +145,15 @@ async function fetchTradingPairs(exchangeId) {
 				if (nmbrDays < 30) {
 					symbols = localExSmbls.symbols;
 				} else {
-					
 					/* data = await ftchFnctn("https://rqststocks-wgqzo7cltq-ew.a.run.app", {
 						action: "stocksExchange",
 						querySmble: exchangeId,
 					}); */
-					
-					data = await gtDataStocks(exchangeId)
+
+					data = await gtDataStocks(exchangeId);
 					// storage data
 					console.log(data);
-					
+
 					const tolclStrg = { symbols: data, time: today };
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
 					symbols = data;
@@ -209,6 +206,7 @@ async function fetchCurrentPrice(
 ) {
 	const exchange = EXCHANGES[exchangeId];
 	if (!exchange) return null;
+		rfrsh++;
 	try {
 		let urlCrpts =
 			getPriceUrl + "?action=getPrice&urlSmbl=" + exchange.tickerPriceUrl;
@@ -369,13 +367,14 @@ async function fetchCurrentPrice(
 					action: "price",
 					smbl: symbol,
 				}); */
-				 rslt = await ftchFnctn(frbUrl,{
+				rslt = await ftchFnctn(frbUrl, {
 					action: "gtPr",
 					querySmble: symbol,
-				}); 
+				});
 
 				console.log(rslt);
-				
+				if (rslt.error && rfrsh < 3)
+					fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
 				if (rslt.symbol != symbol) gebi("searchPrice").value = rslt.symbol;
 				currencyFtch = rslt.currency;
 				price = rslt.close;
@@ -384,16 +383,16 @@ async function fetchCurrentPrice(
 					crncDsply.innerHTML += `<option value="${currencyFtch}">${currencyFtch}</option>`;
 					crncDsply.value = currencyFtch;
 				}
-				   
-      const timeInMs2 = Date.now();
-      const dfrns = timeInMs2-timeInMs;
-      console.log( dfrns);
+
+				const timeInMs2 = Date.now();
+				const dfrns = timeInMs2 - timeInMs;
+				console.log(dfrns);
 				break;
 			default:
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
 				break;
 		}
-		rfrsh = 0;
+		
 		if (price !== null) {
 			if (brwsrAlrt) return parseFloat(price);
 			currentPrice = parseFloat(price);
@@ -407,11 +406,11 @@ async function fetchCurrentPrice(
 			await checkForBrowserAlerts(); // فحص تنبيهات للتطبيق عند تحديث السعر
 			//return currentPrice;
 		}
+		rfrsh = 0;
 	} catch (error) {
 		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
 		currentPriceDisplay.textContent = "خطأ في جلب السعر.";
 		currentPrice = null;
-		rfrsh++;
 		if (rfrsh < 3) {
 			console.log("3awd wla rfrsh : " + rfrsh);
 			fetchCurrentPrice(exchangeId, symbol, prmrFtch);

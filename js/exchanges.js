@@ -9,7 +9,7 @@ let frbsUrls = [
 	"https://rqststocks-wgqzo7cltq-ew.a.run.app",
 	"https://rqststocks-yg7soqqfkq-ew.a.run.app",
 ];
-const frbUrl = gtRndmUrl(frbsUrls);
+const frbUrl = frbsUrls[1];
 const appScrptUrl = orgnUrls[0];
 const urlAlytwr = gtRndmUrl(orgnUrls);
 console.log(appScrptUrl);
@@ -210,3 +210,6 @@ async function ftchFnctnAPPs(url, body) {
 		throw error;
 	}
 }
+
+
+
