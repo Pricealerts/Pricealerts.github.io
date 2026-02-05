@@ -50,6 +50,7 @@ telegramid-6540e
 
 //تجيب رابط من github لازم يكون ملف js فاللول قاع 
 npm install git+https://github.com/Pricealerts/pricealerts-frbs.git 
+npm install git+https://github.com/Pricealerts/Pricealerts.github.io.git
 
 
 // id nta3 google oAuth
