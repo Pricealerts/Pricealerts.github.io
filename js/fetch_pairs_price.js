@@ -378,7 +378,7 @@ async function fetchCurrentPrice(
 				
 				if (rslt.symbol != symbol) gebi("searchPrice").value = rslt.symbol;
 				currencyFtch = rslt.currency;
-				price = rslt.price;
+				price = rslt.close;
 				crncDsply.value = currencyFtch;
 				if (!crncDsply.value) {
 					crncDsply.innerHTML += `<option value="${currencyFtch}">${currencyFtch}</option>`;

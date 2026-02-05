@@ -7,7 +7,7 @@ import {
 	sendMesageFn,
 	srchSmbls,
 	price,
-} from "./fnctns/fnctns.js";
+} from "pricealerts-utils";
 // ضع توكن البوت هنا
 // رسال الإيميلات باستخدام Nodemailer
 // تهيئة التطبيق

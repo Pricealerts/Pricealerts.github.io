@@ -1,6 +1,9 @@
 import { initializeApp, getApps } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
-import { price, srchSmbls } from "./fnctns/fnctns.js";
+import {
+	srchSmbls,sendMesageFn,
+	price,
+} from  "pricealerts-utils"; 
 // ضع توكن البوت هنا
 // رسال الإيميلات باستخدام Nodemailer
 // تهيئة التطبيق 
@@ -37,8 +40,9 @@ export const rqstStocks = onRequest(
 		const { action, querySmble } = req.body;
 		try {
 			const actionMap = {
-				smbls: srchSmbls,
-				price: price,
+				srchSmbls: srchSmbls,
+				sendMessage: sendMesageFn,
+				gtPr: price,
 			};
 			const executeAction = actionMap[action];
 			if (executeAction) {

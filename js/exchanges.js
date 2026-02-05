@@ -5,8 +5,11 @@ let orgnUrls = [
 	"https://script.google.com/macros/s/AKfycbwOXLglGbwUkBEfO1NFxhPcWwp5SeKv01XWZto5memVSoUnVMhlseZurVHOVP2V1ZIb/exec",
 	"https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec",
 ];
-let frbsUrls = ["https://rqststocks-wgqzo7cltq-ew.a.run.app"];
-const frbUrl = frbsUrls[0];
+let frbsUrls = [
+	"https://rqststocks-wgqzo7cltq-ew.a.run.app",
+	"https://rqststocks-yg7soqqfkq-ew.a.run.app",
+];
+const frbUrl = gtRndmUrl(frbsUrls);
 const appScrptUrl = orgnUrls[0];
 const urlAlytwr = gtRndmUrl(orgnUrls);
 console.log(appScrptUrl);
