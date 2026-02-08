@@ -1,12 +1,7 @@
 import { initializeApp, getApps } from "firebase-admin/app";
 import { onRequest } from "firebase-functions/v2/https";
-import {
-	srchSmbls,sendMesageFn,
-	price,
-} from  "pricealerts-utils"; 
-// ضع توكن البوت هنا
-// رسال الإيميلات باستخدام Nodemailer
-// تهيئة التطبيق 
+import { rtrnFn } from "./fnctns/fnctns.js";
+
 
 if (!getApps().length) {
 	initializeApp();
@@ -36,26 +31,12 @@ export const rqstStocks = onRequest(
 		if (req.method === "OPTIONS") {
 			return res.status(204).send("");
 		}
-
-		const { action, querySmble } = req.body;
+		const data = req.method === "POST" ? req.body : req.query;
+		
 		try {
-			const actionMap = {
-				srchSmbls: srchSmbls,
-				sendMessage: sendMesageFn,
-				gtPr: price,
-			};
-			const executeAction = actionMap[action];
-			if (executeAction) {
-				const response = await executeAction(querySmble);
-				res.status(200).json(response);
-			} else {
-				console.log("kayn error");
-
-				res.status(400).send("Unknown action: " + action);
-			}
-
-			// إرسال الرد كـ JSON مباشرة دون stringify يدوي
-			return res.json(response);
+			const response = await rtrnFn(data);
+			res.status(200).json(response);
+			
 		} catch (err) {
 			res.status(500).json({ error: "Server error" });
 		}

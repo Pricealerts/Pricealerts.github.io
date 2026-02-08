@@ -39,40 +39,15 @@ function startGateTracking(symbols = ["BTC_USDT", "ETH_USDT"]) {
 	};
 }
 
-// لتجربة الكود:
-//startGateTracking(['BTC_USDT', 'ETH_USDT']);
-
-async function getAllGatePrices() {
-	try {
-		const response = await fetch("https://api.gateio.ws/api/v4/spot/tickers");
-		const data = await response.json();
-
-		// البيانات تعود كمصفوفة من الكائنات
-		/* data.forEach(item => {
-             console.log(`العملة: ${item.currency_pair}, السعر: ${item.last}`);
-        }); */
-		console.log(data);
-
-		// return data;
-	} catch (error) {
-		console.error("فشل جلب البيانات:", error);
-	}
-}
-/* 
-fetch('https://api.gateio.ws/api/v4/spot/tickers', {
-    method: 'GET',
-    headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-    }
-})
-.then(res => res.json())
-.then(data => console.log(data))
-.catch(err => console.error('Error:', err));
- */
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+//// nta3 filtre
 
 function gtDifrns() {
-	const clrPrBnc = allPricesBns
+	const clrPrBnc = allPricesBnc
 		.map(s => s.symbol)
 		.map(pair => pair.replace(/(_|USDT|USDC|BTC)/g, ""));
 	const clrPrMexc = allPricesMexc
@@ -97,116 +72,184 @@ function gtDifrns() {
 //finnhubFnctn();
 
 const apiKey = "d4irn9pr01queuak9lh0d4irn9pr01queuak9lhg"; // ضع مفتاحك الخاص هنا
-const exchange = "NASDAQ"; // 'US'; // يمكنك تغييرها لـ 'AS' للبورصات الآسيوية مثلاً
 
-async function getAllSymbols() {
-	const url = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${apiKey}`;
-
+///////////////////////////////////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+///////////////////////////////////////////
+////// hada mrigl
+//connectKuCoinWS()
+async function connectKuCoinWS() {
 	try {
-		const response = await fetch(url);
-		const symbols = await response.json();
+		// الخطوة 1: الحصول على الـ Token وعناوين السيرفرات
+		const data = await ftchFnctnAPPs({ action: "kuCoinWS" });
 
-		console.log(`تم جلب ${symbols.length} شركة من بورصة ${exchange}`);
+		const { token, instanceServers } = data;
+		console.log(token, instanceServers);
+		const endpoint = instanceServers[0].endpoint;
+		const connectId = Date.now(); // معرف فريد للاتصال
 
-		// عرض أول 5 شركات كمثال
-		console.log("أمثلة من الشركات:", symbols);
-
-		// إذا أردت استخراج الرموز فقط في مصفوفة بسيطة:
-		const onlySymbols = symbols.map(s => s.symbol);
-		return onlySymbols;
-	} catch (error) {
-		console.error("خطأ في جلب البيانات:", error);
-	}
-}
-
-async function getNasdaqSymbols() {
-	const url = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${apiKey}`;
-
-	try {
-		const response = await fetch(url);
-		const allSymbols = await response.json();
-
-		// تصفية النتائج لجلب شركات NASDAQ فقط
-		const nasdaqOnly = allSymbols.filter(item => item.mic === "XNAS");
-
-		console.log(`تم العثور على ${nasdaqOnly.length} شركة في NASDAQ`);
-		console.table(nasdaqOnly); // عرض أول 10 شركات في جدول
-	} catch (error) {
-		console.error("خطأ:", error);
-	}
-}
-
-//getNasdaqSymbols();
-//getAllSymbols();
-
-async function fetchAllExchanges() {
-	// خريطة تحويل الأسماء التي طلبتها إلى الأكواد المدعومة في Finnhub
-	const exchangeMapping = [
-		{ name: "USA (NASDAQ/NYSE)", code: "US" },
-		{ name: "London (LSE)", code: "L" },
-		{ name: "Singapore (XSES)", code: "SI" },
-		{ name: "Hong Kong (HKEX)", code: "HK" },
-		{ name: "India (NSE)", code: "NS" },
-		{ name: "Switzerland (SIX/XSWX)", code: "SW" },
-		{ name: "Paris (XPAR)", code: "PA" },
-		{ name: "Shanghai (XSHG)", code: "SS" },
-		{ name: "Shenzhen (XSHE)", code: "SZ" },
-	];
-	for (const exchange of exchangeMapping) {
-		const url = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange.code}&token=${apiKey}`;
-
-		try {
-			const response = await fetch(url);
-			const data = await response.json();
-
-			console.log(`--- البورصة: ${exchange.name} ---`);
-			console.log(`عدد الرموز المتاحة: ${data.length}`);
-
-			// طباعة أول 3 رموز كمثال لكل بورصة
-			console.log(
-				"أمثلة:",
-				data.slice(0, 3).map(s => s.symbol),
-			);
-
-			// تأخير بسيط لتجنب حظر الطلبات المتتالية (Rate Limiting)
-			await new Promise(resolve => setTimeout(resolve, 500));
-		} catch (error) {
-			console.error(`خطأ في جلب بيانات ${exchange.name}:`, error);
-		}
-	}
-}
-
-//fetchAllExchanges();
-
-function finnhubWebSckt() {
-	const socket = new WebSocket("wss://ws.finnhub.io?token=d4irn9pr01queuak9lh0d4irn9pr01queuak9lhg");
-
-	// 1. عند فتح الاتصال، اشترك في الأسهم التي تريدها
-	socket.addEventListener("open", function () {
-		socket.send(JSON.stringify({ type: "subscribe", symbol: "AAPL" }));
-		socket.send(
-			JSON.stringify({ type: "subscribe", symbol: "BINANCE:BTCUSDT" }),
+		// الخطوة 2: إنشاء اتصال الـ WebSocket
+		const socket = new WebSocket(
+			`${endpoint}?token=${token}&connectId=${connectId}`,
 		);
-	});
 
-	// 2. الاستماع للأسعار اللحظية
-	socket.addEventListener("message", function (event) {
+		// عند فتح الاتصال
+		socket.onopen = () => {
+			console.log("✅ متصل بـ KuCoin WebSocket");
+
+			// الخطوة 3: الاشتراك في قناة معينة (مثلاً: سعر BTC-USDT اللحظي)
+			const subscribeMsg = {
+				id: Date.now(),
+				type: "subscribe",
+				topic: "/market/ticker:0G-USDT", // يمكنك تغيير العملة هنا
+				privateChannel: false,
+				response: true,
+			};
+			socket.send(JSON.stringify(subscribeMsg));
+		};
+
+		// استقبال البيانات
+		socket.onmessage = event => {
+			const msg = JSON.parse(event.data);
+			if (msg.type === "message") {
+				console.log("📊 بيانات السعر الحالية:", msg.data);
+			} else {
+				console.log("📩 رسالة من السيرفر:", msg);
+			}
+		};
+
+		// التعامل مع الأخطاء
+		socket.onerror = error => {
+			console.error("❌ خطأ في الاتصال:", error);
+		};
+
+		// عند إغلاق الاتصال
+		socket.onclose = () => {
+			console.log("🔌 تم قطع الاتصال");
+		};
+
+		// حافظ على الاتصال حياً (Ping) كل 20 ثانية
+		setInterval(() => {
+			if (socket.readyState === WebSocket.OPEN) {
+				socket.send(JSON.stringify({ id: Date.now(), type: "ping" }));
+			}
+		}, 20000);
+	} catch (error) {
+		console.error("⚠️ فشل في جلب الـ Token:", error);
+	}
+}
+
+//connectKuCoinWS();
+
+function connectOKX(smbl) {
+	// عنوان WebSocket الخاص بـ OKX للبيانات العامة
+	const okxWsUrl = "wss://ws.okx.com:8443/ws/v5/public";
+	const socket = new WebSocket(okxWsUrl);
+
+	socket.onopen = () => {
+		console.log("✅ متصل بـ OKX WebSocket");
+
+		// الاشتراك في سعر العملة (مثلاً BTC-USDT)
+		const subscribeMsg = {
+			op: "subscribe",
+			args: [
+				{
+					channel: "tickers",
+					instId: smbl, //"BTC-USDT"
+				},
+			],
+		};
+		socket.send(JSON.stringify(subscribeMsg));
+	};
+
+	socket.onmessage = event => {
 		const data = JSON.parse(event.data);
 
-		if (data.type === "trade") {
-			data.data.forEach(trade => {
-				console.log(
-					`السهم: ${trade.s} | السعر: ${trade.p} | الوقت: ${new Date(trade.t)}`,
-				);
-			});
+		// التأكد من أن الرسالة تحتوي على بيانات الأسعار
+		if (data.data) {
+			const price = data.data[0].last;
+			console.log(`💰 سعر BTC الآن: ${price}`);
+		} else {
+			console.log("📩 رسالة من السيرفر:", data);
 		}
-	});
+	};
 
-	// 3. التعامل مع الأخطاء
-	socket.addEventListener("error", function (event) {
-		console.error("خطأ في الاتصال:", event);
-	});
+	socket.onerror = error => {
+		console.error("❌ خطأ:", error);
+	};
+
+	socket.onclose = () => {
+		console.log("🔌 تم قطع الاتصال، جاري محاولة إعادة الاتصال...");
+		setTimeout(connectOKX, 5000); // إعادة اتصال تلقائي
+	};
+
+	// إرسال "ping" كل 20 ثانية للحفاظ على الاتصال
+	setInterval(() => {
+		if (socket.readyState === WebSocket.OPEN) {
+			socket.send("ping");
+		}
+	}, 20000);
 }
 
+//connectOKX();
 
+function connectCryptoCompare(smbl) {
+	smbl = smbl.replace("-", "~");
+	// استبدل 'YOUR_API_KEY' بمفتاحك الخاص
+	const apiKey =
+		"c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f";
+	const ccWsUrl = `wss://streamer.cryptocompare.com/v2?api_key=${apiKey}`;
+	const socket = new WebSocket(ccWsUrl);
 
+	socket.onopen = () => {
+		console.log("✅ متصل بـ CryptoCompare WebSocket");
+
+		// الاشتراك في قناة "المؤشر المجمع" (Sub ID: 5)
+		// الصيغة: {SubID}~{ExchangeName}~{FromSymbol}~{ToSymbol}
+		const subscribeMsg = {
+			action: "SubAdd",
+			subs: ["5~CCCAGG~0G~USDC"], // سعر البيتكوين المجمع مقابل الدولار    BTC~USD
+		};
+		socket.send(JSON.stringify(subscribeMsg));
+	};
+
+	socket.onmessage = event => {
+		const message = JSON.parse(event.data);
+
+		// النوع "5" هو بيانات السعر المجمع
+		if (message.TYPE === "5" && message.PRICE) {
+			console.log(`🚀 السعر المجمع (BTC): $${message.PRICE}`);
+		} else if (message.MESSAGE === "SUBSCRIBE_COMPLETE") {
+			console.log("🔔 تم الاشتراك في القناة بنجاح");
+		}
+	};
+
+	socket.onerror = error => console.error("❌ خطأ:", error);
+
+	socket.onclose = () => {
+		console.log("🔌 تم قطع الاتصال، إعادة المحاولة...");
+		setTimeout(connectCryptoCompare, 5000);
+	};
+}
+
+/* async function searchCoin() {
+    const url = 'https://min-api.cryptocompare.com/data/all/coinlist';
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    // البحث داخل البيانات
+    const coins = data.Data;
+	const smbls =Object.keys(coins)
+	console.log(smbls);
+	
+    //  for (let symbol in coins) {
+    //     if (coins[symbol].CoinName.toLowerCase() .includes(coinName.toLowerCase()) ) {
+    //         console.log(`✅ العملة: ${coins[symbol].CoinName} | الرمز: ${symbol}`);
+    //     }
+    // } 
+}
+
+// مثال: ابحث عن رمز عملة "Solana"
+searchCoin(); */

@@ -25,6 +25,8 @@ const db = getDatabase(app);
 window.gtDataStocks = async exchangeId => {
 	try {
 		const rslt = (await get(ref(db, `${exchangeId}`))).val();
+		console.log(rslt);
+		
 		return rslt;
 	} catch (error) {
 		console.log(error);

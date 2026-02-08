@@ -33,8 +33,9 @@ async function fetchTradingPairs(exchangeId) {
 		switch (exchangeId) {
 			case "binance": //tickerPriceUrl
 				response = await fetch(exchange.tickerPriceUrl);
-				allPricesBns = await response.json();
-				symbols = allPricesBns.map(s => s.symbol);
+				allPricesBnc = await response.json();
+				symbols = allPricesBnc.map(s => s.symbol);
+				
 				break;
 			case "mexc":
 				response = await fetch(urlCrpts);
@@ -42,7 +43,7 @@ async function fetchTradingPairs(exchangeId) {
 				symbols = allPricesMexc
 					//.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
 					.map(s => s.symbol);
-				gtDifrns();
+				//gtDifrns();
 				break;
 			case "kucoin":
 				response = await fetch(urlCrpts);
@@ -72,6 +73,8 @@ async function fetchTradingPairs(exchangeId) {
 						s => s.instType === "SPOT" && s.instId.endsWith(exchange.usdtSuffix)
 					) */
 					.map(s => s.instId /* .replace("-", "") */);
+				console.log(symbols);
+				
 				break;
 			case "bybit":
 				response = await fetch(exchange.exchangeInfoUrl);
@@ -145,15 +148,8 @@ async function fetchTradingPairs(exchangeId) {
 				if (nmbrDays < 30) {
 					symbols = localExSmbls.symbols;
 				} else {
-					/* data = await ftchFnctn("https://rqststocks-wgqzo7cltq-ew.a.run.app", {
-						action: "stocksExchange",
-						querySmble: exchangeId,
-					}); */
-
 					data = await gtDataStocks(exchangeId);
 					// storage data
-					console.log(data);
-
 					const tolclStrg = { symbols: data, time: today };
 					localStorage[exchangeId] = JSON.stringify(tolclStrg);
 					symbols = data;
@@ -177,7 +173,7 @@ async function fetchTradingPairs(exchangeId) {
 			});
 			searchPrice.value = symbols[0];
 			setTimeout(() => {
-				startPriceUpdates();
+					startPriceUpdates();
 				//refreshWidget()
 			}, 10);
 		} else {
@@ -194,7 +190,7 @@ async function fetchTradingPairs(exchangeId) {
 
 		rfrsh++;
 		if (rfrsh < 3) {
-			fetchTradingPairs(exchangeId);
+			//	fetchTradingPairs(exchangeId);
 		}
 	}
 }
@@ -206,7 +202,7 @@ async function fetchCurrentPrice(
 ) {
 	const exchange = EXCHANGES[exchangeId];
 	if (!exchange) return null;
-		rfrsh++;
+	rfrsh++;
 	try {
 		let urlCrpts =
 			getPriceUrl + "?action=getPrice&urlSmbl=" + exchange.tickerPriceUrl;
@@ -216,11 +212,11 @@ async function fetchCurrentPrice(
 		switch (exchangeId) {
 			case "binance":
 				if (prmrFtch) {
-					if (binanceSocket && binanceSocketSmbl != symbol) {
+						if (binanceSocket && binanceSocketSmbl != symbol) {
 						binanceSocket.close();
 						binanceSocket = null;
 					}
-					price = allPricesBns.find(obj => obj.symbol == symbol).price;
+					price = allPricesBnc.find(obj => obj.symbol == symbol).price;
 					const symbolL = symbol.toLowerCase();
 					binanceSocket = new WebSocket(
 						`wss://stream.binance.com:9443/ws/${symbolL}@ticker`,
@@ -246,7 +242,10 @@ async function fetchCurrentPrice(
 				}
 				break;
 			case "mexc":
-				if (prmrFtch) {
+				console.log(symbol);
+				
+				connectCryptoCompare(symbol)
+				/* if (prmrFtch) {
 					if (mexcSocket && mexcSocketSmbl != symbol) {
 						mexcSocket.close();
 						mexcSocket = null;
@@ -293,7 +292,7 @@ async function fetchCurrentPrice(
 				} else {
 					await checkForBrowserAlerts();
 					return null;
-				}
+				} */
 				break;
 			case "kucoin":
 				apiUrl = `${urlCrpts}&symbole=${symbol}`;
@@ -321,6 +320,8 @@ async function fetchCurrentPrice(
 				price = response[symbol].usd;
 				break;
 			case "okx":
+				if (prmrFtch) {}
+				connectOKX(symbol)
 				price = allPrices.find(obj => obj.instId == symbol).last;
 				break;
 			case "bybit":
@@ -363,21 +364,15 @@ async function fetchCurrentPrice(
 			case "XSHE":
 			case "other":
 				const timeInMs = Date.now();
-				/* rslt = await ftchFnctnAPPs(appScrptUrl,{
-					action: "price",
-					smbl: symbol,
-				}); */
-				rslt = await ftchFnctn(frbUrl, {
-					action: "gtPr",
-					querySmble: symbol,
-				});
-
+				rslt = await ftchFnctn({ action: "gtPr", smbl: symbol});
 				console.log(rslt);
-				if (rslt.error && rfrsh < 3)
-					fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
+				if (rslt.error && rfrsh < 3) {
+					//await fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
+					return false;
+				}
 				if (rslt.symbol != symbol) gebi("searchPrice").value = rslt.symbol;
 				currencyFtch = rslt.currency;
-				price = rslt.close;
+				price = rslt.price;
 				crncDsply.value = currencyFtch;
 				if (!crncDsply.value) {
 					crncDsply.innerHTML += `<option value="${currencyFtch}">${currencyFtch}</option>`;
@@ -392,7 +387,7 @@ async function fetchCurrentPrice(
 				console.error("منصة غير مدعومة لجلب السعر:", exchangeId);
 				break;
 		}
-		
+
 		if (price !== null) {
 			if (brwsrAlrt) return parseFloat(price);
 			currentPrice = parseFloat(price);
@@ -413,7 +408,7 @@ async function fetchCurrentPrice(
 		currentPrice = null;
 		if (rfrsh < 3) {
 			console.log("3awd wla rfrsh : " + rfrsh);
-			fetchCurrentPrice(exchangeId, symbol, prmrFtch);
+			//fetchCurrentPrice(exchangeId, symbol, prmrFtch);
 		}
 		//return null;
 	}

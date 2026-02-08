@@ -12,6 +12,12 @@ cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\priceAlert
 firebase deploy --only functions
 
 رفع الملف hosting
+
+cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\chatId
+firebase deploy --only functions
+cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\gtPriceSearch
+firebase deploy --only functions
+
 cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\hostSite
 firebase deploy --only hosting
 
@@ -52,7 +58,7 @@ telegramid-6540e
 npm install git+https://github.com/Pricealerts/pricealerts-frbs.git 
 cd functions
 npm install git+https://github.com/Pricealerts/Pricealerts.github.io.git
-npm install git+https://github.com/Pricealerts/Pricealerts.github.io/frbsJs.git
+npm install git+https://github.com/Pricealerts/Pricealerts.github.io/tree/frbsJs.git
 
 
 // id nta3 google oAuth

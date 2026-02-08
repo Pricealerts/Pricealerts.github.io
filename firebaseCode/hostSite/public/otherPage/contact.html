@@ -162,7 +162,7 @@
 						headers: { "Content-Type": "application/json" },
 						body: JSON.stringify({
 							action: "sendMesage",
-							querySmble: allMesage, //.toUpperCase(),
+							smbl: allMesage, //.toUpperCase(),  //smbl ==> message
 						}),
 					});
 					const rslt = await response.json();

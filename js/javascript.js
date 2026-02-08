@@ -1,17 +1,3 @@
-/* import {
-	auth,
-	onAuthStateChanged,
-	db,
-	ref,
-	update,
-	signOut,
-	updateProfile,
-	storage,
-	storageRef,
-	uploadBytes,
-	getDownloadURL,
-} from "https://pricealerts.github.io/firebaseCode.js"; */
-
 const exchangeSelect = gebi("exchangeSelect");
 const currentPriceDisplay = gebi("currentPrice");
 const targetPriceInput = gebi("targetPrice");
@@ -22,7 +8,6 @@ const alertTypeBrowserCheckbox = gebi("alertTypeBrowser"); // تم تغيير ا
 const alertTypeTelegramCheckbox = gebi("alertTypeTelegram"); // تم تغيير الاسم
 const telegramChatIdContainer = gebi("telegramChatIdContainer");
 const tlgChtIdInpt = gebi("telegramChatId");
-const setAlertButton = gebi("setAlertButton");
 const alertStatus = gebi("alertStatus");
 
 let telegramChatId;
@@ -36,9 +21,10 @@ let binanceSocketSmbl = null;
 let mexcSocket = null;
 let mexcSocketSmbl = null;
 let allCrpto = [];
-let allPricesBns = [];
+let allPricesBnc = [];
 let allPricesMexc = [];
 let alrtsStorg = JSON.parse(localStorage.getItem("alrtsStorg")) || []; // لتخزين التنبيهات المحملة من التخزين المحلي
+let othExch = false
 // --- معالجات الأحداث ---
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -49,7 +35,7 @@ async function startPage() {
 	//localStorage.clear()
 	// --- التهيئة عند بدء التشغيل ---
 	await fetchTradingPairs(currentExchangeId);
-	requestNotificationPermission(); 
+	requestNotificationPermission();
 
 	/* if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz"); */
@@ -66,7 +52,7 @@ async function startPage() {
 		.map(id => `<option value="${id}">${id}</option>`)
 		.join("");
 
-	if (chtIdSlct.length > 0) {
+	if (chtIdSlct.length) {
 		slChId.style.display = "block";
 		slChId.innerHTML = chtIdSlct;
 		telegramChatId = chtIdStrg.ch1 || chtIdStrg.ch2 || chtIdStrg.ch3;
@@ -79,7 +65,7 @@ async function startPage() {
 			'<li class="no-alerts-message">جار التحميل...</li>';
 		tlgChtIdInpt.style.display = "none";
 		await loadUserAlertsDisplay();
-	} else if (telegramChatId.length > 0) {
+	} else if (telegramChatId.length) {
 		tlgChtIdInpt.value = telegramChatId;
 		gebi("alertsList").innerHTML =
 			'<li class="no-alerts-message">جار التحميل...</li>';
@@ -87,7 +73,7 @@ async function startPage() {
 		//
 	} else {
 		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
-		if (alrtsStorg.length > 0) renderAlerts();
+		if (alrtsStorg.length) renderAlerts();
 		gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 	}
 	// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
@@ -147,25 +133,21 @@ async function filterList() {
 	if (exchangeSelect.value !== "other") {
 		const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
 		populateList(filtered);
-	} else {
-		let querySmbl = query.trim();
-		if (querySmbl.length < 2) {
-			dropdownList.innerHTML = "";
-			return;
-		} else {
-			querySmbl = encodeURIComponent(querySmbl);
-		}
-		const url = EXCHANGES.other.exchangeInfoUrl;
-		try {
-			const result = await ftchFnctnAPPs(url, {
-				querySmble: querySmbl,
-				action: "smbls",
-			});
-			console.log(result);
-			
-			dropdownList.innerHTML = result
-				.map(
-					item => `
+		return false;
+	}
+	let qs = query.trim(); //querySmbl
+	if (qs.length < 2) {
+		dropdownList.innerHTML = "";
+		return;
+	}
+	qs = encodeURIComponent(qs);
+	try {
+		const result = await ftchFnctnAPPs({ action: "smbls", smbl: qs });
+		console.log(result);
+
+		dropdownList.innerHTML = result
+			.map(
+				item => `
                 <div class="suggestion-item" onclick = "gtPrcOfOther('${
 									item.symbol
 								}')">
@@ -177,11 +159,10 @@ async function filterList() {
 					)</span> <span style="color:gray">(${item.exchDisp})</span>
                 </div>
             `,
-				)
-				.join("");
-		} catch (err) {
-			console.error("Search error:", err);
-		}
+			)
+			.join("");
+	} catch (err) {
+		console.error("Search error:", err);
 	}
 }
 
@@ -191,7 +172,8 @@ function createDiv(symbol) {
 	div.onclick = () => gtPrcOfOther(symbol);
 	return div;
 }
-function gtPrcOfOther(symbol) {
+function gtPrcOfOther(symbol,exch=false) {
+	othExch = exch
 	searchPrice.value = symbol;
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
@@ -218,39 +200,37 @@ function updateTargetPrice() {
 }
 
 crncDsply.addEventListener("change", async () => {
-	let priceCurrencyFtch = 1;
-
-	const url = EXCHANGES.nasdaq.exchangeInfoUrl;
-	if (currencyFtch !== "USD") {
-		const smbl = currencyFtch + "USD=X"; // 3omlt elsahm bnsba ldolar
-		const response = await fetch(url, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ action: "price", querySmble: smbl }),
-		});
-		const rslt = await response.json();
-
-		priceCurrencyFtch = rslt.close || 1;
-	}
-
-	let priceNewCrncy = 1;
-	const cnvrt = crncDsply.value;
-	if (cnvrt !== "USD") {
-		const smbl2 = cnvrt + "USD=X"; // l3omala libaghin n7wloha bnsba ldolar
-		const response = await fetch(url, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify({ action: "price", querySmble: smbl2 }),
-		});
-		const rslt = await response.json();
-		priceNewCrncy = rslt.close || 1;
-	}
-	factorPric = priceCurrencyFtch / priceNewCrncy;
-	const rsltFnl = currentPrice * factorPric;
-	currentPriceDisplay.textContent = rsltFnl;
-	targetPriceInput.value = rsltFnl;
+	await gtPrc();
 });
-
+async function gtPrc() {
+	let priceCurrencyFtch = 1;
+	let smbls = [];
+	try {
+		const crncFtch = currencyFtch + "USD=X";
+		if (currencyFtch !== "USD") smbls.push(crncFtch); // 3omlt elsahm bnsba ldolar
+		let priceNewCrncy = 1;
+		const cnvrt = crncDsply.value;
+		const cnvrtFtch = cnvrt + "USD=X";
+		if (cnvrt !== "USD") smbls.push(cnvrtFtch); // l3omala libaghin n7wloha bnsba ldolar
+		const rslt = await ftchFnctn({ action: "gtPr", smbl: smbls });
+		const prc = {};
+		const proms = [];
+		rslt.forEach(el => {
+			if (el.error) return proms.push(gtPrc());
+			prc[el.symbol] = el;
+		});
+		if (proms.length) return Promise.all(proms);
+		console.log(rslt);
+		if (currencyFtch !== "USD") priceCurrencyFtch = prc[crncFtch].price || 1;
+		if (cnvrt !== "USD") priceNewCrncy = prc[cnvrtFtch].price || 1;
+		factorPric = priceCurrencyFtch / priceNewCrncy;
+		const rsltFnl = currentPrice * factorPric;
+		currentPriceDisplay.textContent = rsltFnl;
+		targetPriceInput.value = rsltFnl;
+	} catch (error) {
+		console.log(error);
+	}
+}
 /* instalation app */
 let deferredPrompt;
 

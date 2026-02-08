@@ -81,18 +81,19 @@ async function gtAlerts(data) {
 ///// the functions
 async function setAlerte(data) {
 	const rspns = {};
-	if (!data.id || !data.e || !data.s || !data.tPrc || !data.tId || !data.c) {
+	if (!data.id || !data.e || !data.s || !data.t || !data.tId || !data.c) {
 		console.log("الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.");
 	}
 	const alrtAdd = {
 		e: data.e, // e بدلاً من exchangeId
 		s: data.s, // s بدلاً من symbol
-		t: data.tPrc, // t بدلاً من targetPrice
+		t: data.t, // t بدلاً من targetPrice
 		c: data.c, // c بدلاً من alertCondition
 		f: data.f, //f: factorPric,
 		//  r: new Date().toLocaleString(), // requestTime
 	};
 	if (data.mt) alrtAdd.mt = data.mt;
+	if (data.e2) alrtAdd.e2 = data.e2;
 	try {
 		if (data.isAlrd) {
 			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${

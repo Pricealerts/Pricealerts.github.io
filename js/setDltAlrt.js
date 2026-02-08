@@ -1,4 +1,4 @@
-setAlertButton.addEventListener("click", async () => {
+gebi("setAlertButton").addEventListener("click", async () => {
 	const isTelegramAlert = alertTypeTelegramCheckbox.checked;
 	const isBrowserAlert = alertTypeBrowserCheckbox.checked;
 
@@ -32,19 +32,23 @@ setAlertButton.addEventListener("click", async () => {
 		return;
 	}
 	localStorage.setItem("exchangeChoz", currentExchangeId);
+
 	// إنشاء معرف فريد للتنبيه
-	const newAlrtPrs = {
+	const newAlrt = {
 		id: Date.now().toString(),
 		e: currentExchangeId,
 		s: selectedSymbol,
-		tPrc: targetPrice,
+		t: targetPrice,
 		c: alertCondition,
 		f: factorPric,
 		isAlrd: false,
 		prc: null,
 	};
-	if (isBrowserAlert) newAlrtPrs.alTp = "b"; //alertType
-
+	
+	if (isBrowserAlert) newAlrt.alTp = "b"; //alertType
+	if (othExch) newAlrt.e = othExch;
+	if (allPricesBnc.includes(newAlrt.s) && newAlrt.e !== "binance")
+		newAlrt.e2 = "binance";
 	// التعامل مع تنبيه تيليجرام عبر firebase
 	if (isTelegramAlert) {
 		if (!localStorage.idChat || localStorage.idChat !== telegramChatId) {
@@ -52,18 +56,18 @@ setAlertButton.addEventListener("click", async () => {
 			await loadUserAlertsDisplay();
 			gebi("telegramChatIdNote").style.display = "none";
 		}
-		newAlrtPrs.tId =  telegramChatId;
-		newAlrtPrs.alTp = "t"; //alertType
+		newAlrt.tId = telegramChatId;
+		newAlrt.alTp = "t"; //alertType
 		const prc = currentPriceDisplay.textContent;
 		if (
 			(alertCondition === "l" && prc <= targetPrice) ||
 			(alertCondition === "g" && prc >= targetPrice)
 		) {
-		//	newAlrtPrs.isAlrd = true;
-			newAlrtPrs.prc = prc;
+			//	newAlrt.isAlrd = true;
+			newAlrt.prc = prc;
 		}
 	}
-	const success = await manageAlertOnFirebase("setAlert", newAlrtPrs);
+	const success = await manageAlertOnFirebase("setAlert", newAlrt);
 	if (success) {
 		alertStatus.textContent +=
 			(isTelegramAlert ? " تيليجرام" : "") +
@@ -74,6 +78,8 @@ setAlertButton.addEventListener("click", async () => {
 });
 
 async function deleteAlert(alert) {
+	console.log(alert);
+	
 	await manageAlertOnFirebase("dltAlrt", {
 		id: alert.alertId,
 		tId: alert.telegramChatId,
@@ -89,12 +95,11 @@ async function manageAlertOnFirebase(action, alertData = null) {
 	} التنبيه...`;
 	alertStatus.style.color = "#007bff";
 	if (alertData.alTp === "t" || action === "dltAlrt") {
-		
 		try {
-			await ftchFnctn(FIREBASE_WEB_ALERT_URL, {
+			await ftchFnctn({
 				action: action,
 				...alertData,
-			}).then(dt => {
+			},FIREBASE_WEB_ALERT_URL).then(dt => {
 				data = dt;
 			});
 		} catch (error) {
@@ -105,29 +110,15 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		}
 	} else data.status = "success";
 	if (data.status === "success") {
-		console.log('log');
-		
 		alertStatus.textContent = `${
 			action === "setAlert" ? "تم تعيين" : "تم حذف"
 		} التنبيه بنجاح.`;
 		alertStatus.style.color = "green";
 		if (action === "dltAlrt") return dltNtf(id);
-		else /* if (action === "setAlert") */ {
-			const alrtAdd = {
-				id: id,
-				e: alertData.e, // e بدلاً من exchangeId
-				s: alertData.s, // s بدلاً من symbol
-				tId: alertData.tId || null, // tId بدلاً من telegramChatId
-				t: alertData.tPrc, // tPrc بدلاً من targetPrice
-				c: alertData.c, // c بدلاً من alertCondition
-				alTp: alertData.alTp, // tp بدلاً من alertType
-				f: alertData.f, // f بدلاً من factorPric
-				isAlrd: alertData.isAlrd,
-				prc: alertData.prc ,
-			};
-			const alrtAddAry = ["id" + id, alrtAdd];
+		else if (action === "setAlert")  {
+			const alrtAddAry = ["id" + id, alertData];
 			alrtsStorg.push(alrtAddAry);
-		} 
+		}
 		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
 		renderAlerts();
 

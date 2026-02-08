@@ -1,5 +1,5 @@
 import axios from "axios";
-import { EXCHANGES_CONFIG, gtapiUrl, ftcgAppScrpt, exchs } from "./cnstnts.js";
+import { EXCHANGES_CONFIG, gtapiUrl, ftcgAppScrpt } from "./cnstnts.js";
 import { cAllDatabase } from "./cAllDatabase.js";
 
 // *** بيانات اعتماد Telegram Bot API ***
@@ -76,19 +76,11 @@ async function checkAndSendAlerts() {
 		const alrts = Object.entries(user[1]);
 		alrts.forEach(alert => {
 			const isStock = stocksFn(alert, tlgId);
-			console.log("alert is : " + JSON.stringify(alert));
-			console.log("isStock is : " + JSON.stringify(isStock));
-
 			if (isStock) return false;
-			console.log('fat f ');
-			
+
 			const alrt = alert[1];
-			const { e: exchangeId, s: symbol } = alrt;
-			const existing = symbolsMap.get(symbol);
-			if (
-				!existing ||
-				(exchangeId === "binance" && existing.exchangeId !== "binance")
-			) {
+			const { e, e2: exchangeId = e, s: symbol } = alrt;
+			if (!symbolsMap.has(symbol)) {
 				symbolsMap.set(symbol, { exchangeId });
 			}
 			alrt.i = alert[0];
@@ -108,7 +100,7 @@ async function checkAndSendAlerts() {
 			if ((now < startTime || now > endTime) && exchangeToday == meta.oDy)
 				return true;
 		}
-		if (exchs.includes(exchangeId)) {
+		if (!EXCHANGES_CONFIG[exchangeId]) {
 			if (!stocksMap.has(symbol)) stocksMap.set(symbol, []);
 			stocksMap.get(symbol).push({ i: alert[0], tid: tlgId, ...alrt });
 			return true;
@@ -117,14 +109,9 @@ async function checkAndSendAlerts() {
 	}
 
 	usersAll = null;
-	console.log("stocksMap is : " + JSON.stringify(stocksMap));
-	console.log("stocksMap.size is : " + JSON.stringify(stocksMap.size));
-	console.log("symbolsMap is : " + JSON.stringify(symbolsMap));
 	if (stocksMap.size > 0) ftcgAppScrpt(stocksMap);
+	if (!symbolsMap.size === 0) return false;
 	const rsltcandles = await getCandles(symbolsMap);
-	console.log("rsltcandles is : " + JSON.stringify(rsltcandles));
-
-	if (!rsltcandles) return false;
 	// نتكرر على الصفوف من الأسفل للأعلى لسهولة الحذف
 	let promises = [];
 	for (let k = 0; k < allAlerts.length; k++) {
@@ -140,7 +127,6 @@ async function checkAndSendAlerts() {
 		} = allAlerts[k];
 
 		const candles = rsltcandles[symbol];
-		console.log("candles is : " + JSON.stringify(candles));
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null;
 		const rglrChatId = telegramChatId.slice(3);
@@ -161,10 +147,6 @@ async function checkAndSendAlerts() {
 			}
 		} /* else {console.warn(`لم يتم الحصول على بيانات شمعة  لـ ${symbol} على 
 		${EXCHANGES_CONFIG[exchangeId].name}. قد تكون حدود API أو عدم توفر البيانات.`)} */
-		console.log(
-			"triggeredByHistoricalPrice is : " +
-				JSON.stringify(triggeredByHistoricalPrice),
-		);
 
 		if (triggeredByHistoricalPrice) {
 			const message = `🔔 تنبيه سعر ${
@@ -179,14 +161,12 @@ async function checkAndSendAlerts() {
 				id: id,
 				//	alrtOk: true,
 			};
-			console.log("dlt is : " + JSON.stringify(dlt));
-
 			promises.push(cAllDatabase(dlt));
 			promises.push(sendTelegramMessage(rglrChatId, message));
 			continue;
 		}
 
-		const newMeta = candles[0]?.meta;
+		/* const newMeta = candles[0]?.meta;
 		if (!newMeta) continue;
 		const statusChanged = meta?.st !== newMeta?.st;
 		if (statusChanged) {
@@ -205,7 +185,7 @@ async function checkAndSendAlerts() {
 				f: factorPric,
 			};
 			promises.push(cAllDatabase(rsltDt));
-		}
+		} */
 	}
 	allAlerts = [];
 	await chngOfDb(promises);
@@ -305,7 +285,6 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		} else if (exchangeId === "kraken") {
 			let lmtSlc = mappedInterval * limit;
 			let dtSlc = datas.result[symbol].slice(0, lmtSlc);
-
 			candles = dtSlc.map(exchange.parseCandle);
 		} else if (exchangeId === "coinbase") {
 			if (datas) {
@@ -343,14 +322,11 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 }
 
 async function chngOfDb(promises) {
-	if (!promises || promises.length == 0) return "walo";
+	if (!promises || promises.length == 0) return;
 	try {
 		await Promise.all(promises);
-		promises = null;
-		return { success: true };
 	} catch (error) {
 		console.error("error respons", error);
-		return { success: false, error: error.message };
 	}
 }
 /**

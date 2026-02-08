@@ -167,7 +167,7 @@ export const EXCHANGES_CONFIG = {
 	},
 };
 
-export const exchs = [
+/* export const exchs = [
 	"nyse",
 	"xetra",
 	"LSE",
@@ -178,7 +178,7 @@ export const exchs = [
 	"XSES",
 	"other",
 	"nasdaq",
-];
+]; */
 /* exchs.forEach(ex => {
 	EXCHANGES_CONFIG[ex] = { ...EXCHANGES_CONFIG.nasdaqe };
 	EXCHANGES_CONFIG[ex].name = ex; //.toLowerCase()

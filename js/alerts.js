@@ -24,23 +24,14 @@ async function loadUserAlertsDisplay() {
 function renderAlerts() {
 	const alerts = alrtsStorg;
 	const brwAlrts = alerts.filter(alert => alert[1].alTp === "b");
-	const tlgAlrts = alerts.filter(alert => alert[1].alTp !== "b");
-
-	if (!alerts || alerts.length === 0) {
-		gebi("alertsListNtf").innerHTML =
-			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
-		gebi("alertsList").innerHTML =
-			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
-		return;
-	}
-
+	const tlgAlrts = alerts.filter(alert => alert[1].alTp !== "t");
 	gebi("alertsListNtf").innerHTML =
-		brwAlrts.length === 0
+		!brwAlrts.length 
 			? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
 			: "";
 
 	gebi("alertsList").innerHTML =
-		tlgAlrts.length === 0
+		!tlgAlrts.length 
 			? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
 			: "";
 	let alrtlst = gebi("alertsListNtf");
@@ -60,19 +51,17 @@ function renderAlerts() {
 				: "عندما يصبح السعر أصغر أو يساوي"; //condichionText
 
 		const listItem = document.createElement("li");
-		let dltAlrt = alert[0];
+		let dltAlrt = `dltNtf(${alert[0]})`;
 		let tpAlrt = "(النوع: تطبيق)";
-		let btnDlt = "notif";
 		if (alTp === "t") {
 			alrtlst = gebi("alertsList");
-			dltAlrt = JSON.stringify({
-				alertId: dltAlrt,
+			dltAlrt =`deleteAlert(${JSON.stringify({
+				alertId: alert[0],
 				telegramChatId: "cht" + telegramChatId,
-			});
+			})})` ;
 			tpAlrt = `(النوع: تيليجرام)
 				<br>   المعرف:   
 				 ${telegramChatId}  `;
-			btnDlt = "button";
 		}
 		listItem.id = alert[0];
 		listItem.innerHTML = `
@@ -81,25 +70,14 @@ function renderAlerts() {
 				${cndtnTxt} ${targetPrice} 
 				${tpAlrt}
 			</span>
-			<button class="delete-${btnDlt}" 
-			data-alert='${dltAlrt}'
+			<button class="delete-button" 
+			onclick = ${dltAlrt}
 			>حذف</button>
 		`;
 		alrtlst.appendChild(listItem);
 	});
-	document.querySelectorAll(".delete-button").forEach(button => {
-		button.addEventListener("click", event => {
-			const alertIdToDelete = JSON.parse(event.target.dataset.alert);
-			deleteAlert(alertIdToDelete);
-		});
-	});
-	document.querySelectorAll(".delete-notif").forEach(button => {
-		button.addEventListener("click", event => {
-			const idDlt = event.target.dataset.alert;
-			dltNtf(idDlt);
-		});
-	});
 }
+
 // --- وظائف التنبيهات (تم تبسيطها) ---
 function requestNotificationPermission() {
 	if (!("Notification" in window)) {
@@ -235,6 +213,7 @@ function dltNtf(idDlt) {
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 	}
 }
+
 
 
 

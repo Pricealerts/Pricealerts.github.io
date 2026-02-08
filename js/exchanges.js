@@ -1,18 +1,20 @@
 let orgnUrls = [
 	"https://script.google.com/macros/s/AKfycbzMgCAunXYJFMRFMQJX1UrQUnJdsjoHh31bZqumyi2-f6mgrJfbBwCwTNBR0YQUQD9ZSQ/exec",
-	"https://script.google.com/macros/s/AKfycbz_bPV0YD_u56AHej1sQstTnzk4LFAPrgDkRZYw-NzI0KzUCmPmL2uUn6P-TAC1jIel7Q/exec",
-	"https://script.google.com/macros/s/AKfycbxSDIjmCkCwVU3gyFfPABhHV5EayTrMmoFa4BAWhaRZwUsTB0c4LjD-i5D5JdN9oeyv/exec",
-	"https://script.google.com/macros/s/AKfycbwOXLglGbwUkBEfO1NFxhPcWwp5SeKv01XWZto5memVSoUnVMhlseZurVHOVP2V1ZIb/exec",
-	"https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec",
+	// "https://script.google.com/macros/s/AKfycbz_bPV0YD_u56AHej1sQstTnzk4LFAPrgDkRZYw-NzI0KzUCmPmL2uUn6P-TAC1jIel7Q/exec",
+	// "https://script.google.com/macros/s/AKfycbxSDIjmCkCwVU3gyFfPABhHV5EayTrMmoFa4BAWhaRZwUsTB0c4LjD-i5D5JdN9oeyv/exec",
+	// "https://script.google.com/macros/s/AKfycbwOXLglGbwUkBEfO1NFxhPcWwp5SeKv01XWZto5memVSoUnVMhlseZurVHOVP2V1ZIb/exec",
+	// "https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec",
 ];
 let frbsUrls = [
-	"https://rqststocks-wgqzo7cltq-ew.a.run.app",
-	"https://rqststocks-yg7soqqfkq-ew.a.run.app",
+	//"https://rqststocks-wgqzo7cltq-ew.a.run.app", // chatId
+	"https://rqststocks-yg7soqqfkq-ew.a.run.app", // gtPriceSearch
 ];
-const frbUrl = frbsUrls[1];
-const appScrptUrl = orgnUrls[0];
-const urlAlytwr = gtRndmUrl(orgnUrls);
-console.log(appScrptUrl);
+//frbsUrls =gtRndmUrl(frbsUrls)
+let frbUrl = frbsUrls[0];
+
+orgnUrls = gtRndmUrl(orgnUrls);
+let apScUrl = orgnUrls[0];
+console.log(frbUrl);
 
 function gtRndmUrl(urls) {
 	let rndmUrls = [];
@@ -127,8 +129,8 @@ const EXCHANGES = {
 	},
 	nasdaq: {
 		name: "NASDAQ",
-		exchangeInfoUrl: appScrptUrl,
-		tickerPriceUrl: appScrptUrl,
+		exchangeInfoUrl: apScUrl,
+		tickerPriceUrl: apScUrl,
 		usdtSuffix: "USD",
 		intervalData: 3600000,
 		crptChos: "none",
@@ -182,7 +184,14 @@ const otherPrpos = [
 	"PA=F",
 ];
 
-async function ftchFnctn(url, body) {
+async function ftchFnctn(body, url = null) {
+	if (!url) {
+		frbUrl = frbsUrls[frbsUrls.indexOf(frbUrl) + 1];
+		if (!frbUrl) frbUrl = frbsUrls[0];
+		url = frbUrl;
+	}
+	console.log(url);
+	// بقية الكود
 	try {
 		const response = await fetch(url, {
 			method: "POST",
@@ -196,9 +205,11 @@ async function ftchFnctn(url, body) {
 	}
 }
 
-async function ftchFnctnAPPs(url, body) {
+async function ftchFnctnAPPs(body) {
+	apScUrl = orgnUrls[orgnUrls.indexOf(apScUrl) + 1];
+	if (!apScUrl) apScUrl = orgnUrls[0];
 	try {
-		const response = await fetch(url, {
+		const response = await fetch(apScUrl, {
 			method: "POST",
 			"Content-Type": "application",
 			body: JSON.stringify(body),
@@ -210,6 +221,3 @@ async function ftchFnctnAPPs(url, body) {
 		throw error;
 	}
 }
-
-
-
