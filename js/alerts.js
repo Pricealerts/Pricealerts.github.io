@@ -193,12 +193,13 @@ async function hndlAlrt(curentPrice, slctdSmbl) {
 		) {
 			if (alert.alTp === "t")
 				proms.push(
-					await deleteAlert({
+					 deleteAlert({
 						id: id,
 						telegramChatId: "cht" + telegramChatId,
 					}),
 				);
 			else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
+			await Promise.all(proms)
 			dltNtf(id);
 		}
 	});
@@ -213,7 +214,5 @@ function dltNtf(idDlt) {
 			'<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>';
 	}
 }
-
-
 
 

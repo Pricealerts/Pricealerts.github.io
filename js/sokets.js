@@ -1,3 +1,49 @@
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+//// binance WebSocket
+let oldTmBnc=Date.now();
+function bncWebSocket(symbol) {
+        console.log('3awdo');
+		clearInterval(priceUpdateInterval);
+        priceUpdateInterval=null
+	if (priceUpdateInterval) {
+		clearInterval(priceUpdateInterval);
+	}
+	if (binanceSocket && binanceSocketSmbl != symbol) {
+		binanceSocket.close();
+		binanceSocket = null;
+	}
+	const symbolL = symbol.toLowerCase();
+	binanceSocket = new WebSocket(
+		`wss://stream.binance.com:9443/ws/${symbolL}@ticker`,
+	);
+	binanceSocketSmbl = symbol;
+	binanceSocket.onmessage = event => {
+		const data = JSON.parse(event.data);
+		currentPrice = parseFloat(data.c); // 'c' تعني السعر الحالي (Current/Last price)
+		currentPriceDisplay.textContent = `${currentPrice} `;
+        const nowDate = Date.now();
+        const dfrnc = nowDate- oldTmBnc;
+        if (dfrnc > 3000) {
+		hndlAlrt(currentPrice, symbol);
+        oldTmBnc = nowDate;
+        }
+	};
+	return allPricesBnc.find(obj => obj.symbol == symbol).price;
+}
+
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+/////////////////////////////////////////
+//// mexc WebSocket
+
+
+
 let gateSocket;
 
 function startGateTracking(symbols = ["BTC_USDT", "ETH_USDT"]) {
@@ -30,10 +76,10 @@ function startGateTracking(symbols = ["BTC_USDT", "ETH_USDT"]) {
 			console.log(`🚀 Gate.io [${symbol}]: ${price}`);
 		}
 	};
-	gateSocket.onclose = () => {
+	/* gateSocket.onclose = () => {
 		console.log("⚠️ انقطع اتصال Gate.io، سيعاد الاتصال بعد 5 ثوانٍ...");
 		setTimeout(() => startGateTracking(symbols), 5000);
-	};
+	}; */
 	gateSocket.onerror = err => {
 		console.error("❌ خطأ في اتصال Gate:", err);
 	};
