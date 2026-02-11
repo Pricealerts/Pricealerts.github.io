@@ -58,7 +58,6 @@ export const rqstStocks = onRequest(
 			"https://pricealerts.web.app",
 			"http://127.0.0.1:4808",
 		];
-
 		if (allowedOrigins.includes(origin)) {
 			res.set("Access-Control-Allow-Origin", origin);
 		} else if (origin === undefined && req.body.orgn === "appsScriptDadi") {
@@ -72,13 +71,10 @@ export const rqstStocks = onRequest(
 		if (req.method === "OPTIONS") {
 			return res.status(204).send("");
 		}
-
 		const data = req.method === "POST" ? req.body : req.query;
-		
 		try {
 			const response = await rtrnFn(data);
 			res.status(200).json(response);
-			
 		} catch (err) {
 			res.status(500).json({ error: "Server error" });
 		}

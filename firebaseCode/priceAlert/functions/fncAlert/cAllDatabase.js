@@ -42,9 +42,9 @@ async function cAllDatabase(data) {
 			rspns = await sndEmail(data, db);
 		} else if (action === "appscrpt") {
 			const promises = data.promises.map(prm => cAllDatabase(prm));
-			 await Promise.all(promises);
+			await Promise.all(promises);
 			rspns = false;
-		}/*  else if (action === "smbls") {
+		} /*  else if (action === "smbls") {
 			rspns = await price(data);
 		} */
 
@@ -66,10 +66,9 @@ async function gtAlerts(data) {
 			dtRspns = await postsRef.child(`cht${data.chid}`).get();
 		}
 		if (!dtRspns.exists()) {
-			return {stat:false};
+			return { stat: false };
 		}
-
-		return {stat:true,alerts:dtRspns.val()} ;
+		return { stat: true, alerts: dtRspns.val() };
 	} catch (error) {
 		// Provide an Error object
 		throw new Error(

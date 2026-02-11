@@ -43,8 +43,7 @@ export const proxyRequestV2 = onRequest(
 			//  const usedMemory = process.memoryUsage().heapUsed / 1024 / 1024;
 			// res.send(`ذاكرة مستخدمة: ~${Math.round(usedMemory)}MB`);
 		} catch (error) {
-			console.error("error f proxyRequestV2 is :");
-			console.log(error);
+			console.error("error f proxyRequestV2 is : " + JSON.stringify(error));
 			const err = JSON.stringify({
 				error: "Failed to fetch data",
 				status: "notSuccess",

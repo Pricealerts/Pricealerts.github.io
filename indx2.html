@@ -65,15 +65,14 @@
 				<select id="exchangeSelect">
 					<optgroup label=" منصات العملات الرقمية">
 						<option value="binance">Binance</option>
-						<option value="mexc">mexc</option>
 						<option value="kucoin">KuCoin</option>
 						<option value="coingecko">CoinGecko</option>
 						<option value="okx">OKX</option>
 						<option value="bybit">Bybit</option>
 						<option value="bitget">Bitget</option>
-						<option value="lbank">Lbank</option>
 						<option value="kraken">Kraken</option>
 						<option value="coinbase">Coinbase</option>
+						<option value="cryptocompare">باقي العملات الرقمية</option>
 					</optgroup>
 					<optgroup label=" بورصات الأسهم">
 						<option value="nasdaq">NASDAQ</option>
@@ -137,6 +136,13 @@
 					<option value="RUB">RUB</option>
 					<option value="CNY">CNY</option>
 					<option value="KRW">KRW</option>
+				</select>
+				<select
+					id="cptoDsply"
+					class=""
+					style="width: fit-content; cursor: pointer; "
+				>
+					<option value="USDT">USDT</option>
 				</select>
 				<p class="currentPrice" id="currentPrice">--.--</p>
 			</div>
@@ -261,7 +267,6 @@
 				</h3>
 			</div>
 		</div>
-	
 
 		<script type="module" src="./frbsJs/stocksFirebase.js"></script>
 		<script src="./js.min.js"></script>

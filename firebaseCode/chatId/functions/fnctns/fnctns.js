@@ -13,10 +13,10 @@ if (!chatIdAbdelhadi) {
 
 function getDb() {
 	if (!db) db = getDatabase();
-	return db;
+	//return db;
 }
 async function rtrnFn(data) {
-	db = getDb();
+	 getDb();
 
 	const { action, smbl } = data;
 	const actionMap = {
@@ -39,6 +39,7 @@ async function rtrnFn(data) {
 // جلب رموز بورصة واحدة من البورصات لخرين
 // ------------------------
 async function getExchangeSymbols() {
+	getDb();
 	const exchngsStk = [
 		"HKEX",
 		"LSE",
@@ -64,16 +65,17 @@ async function getExchangeSymbols() {
 		); // nasdaq
 		exchngsStk.push(...["nasdaq", "nyse", "gateIoSmbls"]);
 		const rsltsPr = await Promise.all(promises);
-		const prDatabes = [];
+		const apndStocks = {};
+		const errPr = [];
 		for (let i = 0; i < exchngsStk.length; i++) {
 			if (rsltsPr[i].length > 5) {
-				prDatabes.push(db.ref(`${exchngsStk[i]}`).set(rsltsPr[i]));
+				apndStocks[exchngsStk[i]] = rsltsPr[i];
 			} else {
-				prDatabes.push(sndErr(exchngsStk[i]));
+				errPr.push(sndErr(exchngsStk[i]));
 			}
 		}
-		await Promise.all(prDatabes);
-
+		await db.ref(`stockSymbols`).set(apndStocks);
+		if (errPr.length) await Promise.all(errPr);
 		async function sndErr(exchngStk) {
 			const messageText = `slam 3likm Abdelhadi ${exchngStk} rah khawi 3awd chofah `;
 			await sendTelegramMessage(chatIdAbdelhadi, messageText);

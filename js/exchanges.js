@@ -6,8 +6,8 @@ let orgnUrls = [
 	// "https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec",
 ];
 let frbsUrls = [
-	//"https://rqststocks-wgqzo7cltq-ew.a.run.app", // chatId
-	"https://rqststocks-yg7soqqfkq-ew.a.run.app", // gtPriceSearch
+	"https://rqststocks-wgqzo7cltq-ew.a.run.app", // chatId
+	//"https://rqststocks-yg7soqqfkq-ew.a.run.app", // gtPriceSearch
 ];
 //frbsUrls =gtRndmUrl(frbsUrls)
 let frbUrl = frbsUrls[0];
@@ -25,119 +25,92 @@ function gtRndmUrl(urls) {
 	}
 	return rndmUrls;
 }
+const apiKyCrptcmpr =
+	"c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f";
 const EXCHANGES = {
 	binance: {
 		name: "Binance",
 		exchangeInfoUrl: "https://api.binance.com/api/v3/exchangeInfo",
 		tickerPriceUrl: "https://api.binance.com/api/v3/ticker/price",
-		usdtSuffix: "USDT", // "https://api.binance.com/api/v3/klines"
 		intervalData: 10000000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	mexc: {
 		name: "MEXC",
 		exchangeInfoUrl: "https://api.mexc.com/api/v3/ticker/price",
 		tickerPriceUrl: "https://api.mexc.com/api/v3/ticker/price",
-		usdtSuffix: "USDT",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	kucoin: {
 		name: "KuCoin",
 		exchangeInfoUrl: "https://api.kucoin.com/api/v1/symbols",
 		tickerPriceUrl: "https://api.kucoin.com/api/v1/market/orderbook/level1",
-		usdtSuffix: "USDT",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	coingecko: {
 		name: "CoinGecko",
 		exchangeInfoUrl: "https://api.coingecko.com/api/v3/coins/list",
 		tickerPriceUrl: "https://api.coingecko.com/api/v3/simple/price",
-		usdtSuffix: "USD",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	okx: {
 		name: "OKX",
 		exchangeInfoUrl:
 			"https://www.okx.com/api/v5/public/instruments?instType=SPOT",
 		tickerPriceUrl: "https://www.okx.com/api/v5/market/tickers?instType=SPOT",
-		usdtSuffix: "-USDT",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	bybit: {
 		name: "Bybit",
 		exchangeInfoUrl: "https://api.bybit.com/v5/market/tickers?category=spot",
 		tickerPriceUrl: "https://api.bybit.com/v2/public/tickers",
-		usdtSuffix: "USDT",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	bitget: {
 		name: "Bitget",
 		exchangeInfoUrl: "https://api.bitget.com/api/spot/v1/public/products",
 		tickerPriceUrl: "https://api.bitget.com/api/spot/v1/market/tickers",
-		usdtSuffix: "USDT_SPBL",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	lbank: {
 		name: "LBank",
 		exchangeInfoUrl: "https://api.lbkex.com/v2/ticker.do?symbol=all", // ترجع جميع الرموز والأسعار
 		tickerPriceUrl: "https://api.lbkex.com/v2/ticker.do?symbol=", // يتبعها رمز العملة
-		usdtSuffix: "usdt", // الأحرف كلها صغيرة
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	coincap: {
 		name: "CoinCap",
 		exchangeInfoUrl:
 			"https://cors-anywhere.herokuapp.com/https://api.coincap.io/v2/assets",
 		tickerPriceUrl: "https://api.coincap.io/v2/assets?symbol=bitcoin", // يحتاج فلترة حسب الرمز
-		usdtSuffix: "USDT",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	kraken: {
 		name: "Kraken",
 		exchangeInfoUrl: "https://api.kraken.com/0/public/AssetPairs",
 		tickerPriceUrl: "https://api.kraken.com/0/public/Ticker",
-		usdtSuffix: "USDT", // في Kraken يتم تسعير USDT مقابل الدولار فعليًا
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
 	},
 	coinbase: {
 		name: "Coinbase",
 		exchangeInfoUrl: "https://api.exchange.coinbase.com/products",
 		tickerPriceUrl: "https://api.exchange.coinbase.com/products", // + /<symbol>/ticker
-		usdtSuffix: "-USDT",
 		intervalData: 10000,
-		crptChos: "block",
-		crncDsply: "none",
+	},
+	cryptocompare: {
+		name: "Cryptocompare",
+		exchangeInfoUrl: "https://min-api.cryptocompare.com/data/all/coinlist",
+		tickerPriceUrl: `https://min-api.cryptocompare.com/data/price?fsym=`, // ${coin}&tsyms=${currency}&api_key=${apiKey}
+		intervalData: 10000,
+		gturl: smbl =>
+			`https://min-api.cryptocompare.com/data/price?fsym=${smbl}&tsyms=USDT&api_key=c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f`,
 	},
 	nasdaq: {
 		name: "NASDAQ",
 		exchangeInfoUrl: apScUrl,
 		tickerPriceUrl: apScUrl,
-		usdtSuffix: "USD",
 		intervalData: 3600000,
-		crptChos: "none",
-		crncDsply: "inline-block",
 	},
 };
-
 const exchs = [
 	"HKEX", //
 	"LSE",
@@ -157,15 +130,7 @@ exchs.forEach(ex => {
 	EXCHANGES[ex] = { ...EXCHANGES.nasdaq };
 	EXCHANGES[ex].name = ex; //.toLowerCase()
 });
-//console.log(EXCHANGES);
 
-/* 
-	function clone(obj) {
-		return { ...obj };
-	}
-
-	EXCHANGES.nyse  = clone(EXCHANGES.nasdaq); 
-*/
 
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////

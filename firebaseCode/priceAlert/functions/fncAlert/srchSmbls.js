@@ -58,7 +58,8 @@ async function getCandles(symbolsMap) {
 		candles[symbol] =
 			data && Array.isArray(data) && data.length > 0 ? data : null;
 	});
-
+	//console.log('cndlis is : ' + JSON.stringify(candles));
+	
 	return candles;
 }
 
@@ -165,27 +166,6 @@ async function checkAndSendAlerts() {
 			promises.push(sendTelegramMessage(rglrChatId, message));
 			continue;
 		}
-
-		/* const newMeta = candles[0]?.meta;
-		if (!newMeta) continue;
-		const statusChanged = meta?.st !== newMeta?.st;
-		if (statusChanged) {
-			const rglrId = id.slice(2);
-			const exchangeDate = new Date(Date.now() + newMeta.gm * 1000);
-			newMeta.oDy = exchangeDate.getUTCDate();
-			const rsltDt = {
-				action: "setAlert",
-				id: rglrId,
-				tId: rglrChatId,
-				e: exchangeId,
-				s: symbol,
-				tPrc: targetPrice,
-				c: alertCondition,
-				mt: newMeta,
-				f: factorPric,
-			};
-			promises.push(cAllDatabase(rsltDt));
-		} */
 	}
 	allAlerts = [];
 	await chngOfDb(promises);
@@ -204,19 +184,19 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 	if (
 		!exchange ||
 		!exchange.candlestickUrl ||
-		!exchange.parseCandle ||
-		!exchange.intervalMap[interval]
+		!exchange.parseCandle //||
+		//!exchange.intervalMap[interval]
 	) {
 		return null;
 	}
 	symbol = symbol.replace(/\$\g/, "");
-	const now = new Date();
-	const endTimeMs = now.getTime();
+	//const now = new Date();
+	//const endTimeMs = now.getTime();
 
 	// لحساب وقت البدء لطلب الشمعة الأخيرة
-	const intervalMs = parseIntervalToMilliseconds(interval);
+	//const intervalMs = parseIntervalToMilliseconds(interval);
 	// نحدد وقت البدء لضمان الحصول على الشموع المطلوبة بالضبط
-	const startTimeMs = endTimeMs - intervalMs * limit;
+	//const startTimeMs = endTimeMs - intervalMs * limit;
 
 	try {
 		let datas;
@@ -299,6 +279,8 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				let dtSlc = [datas[indData]];
 				candles = dtSlc.map(exchange.parseCandle);
 			}
+		} else if (exchangeId === "cryptocompare") {
+			 candles = datas.Data.Data;
 		} else {
 			if (Array.isArray(datas) && datas.length) {
 				candles = datas.map(exchange.parseCandle);

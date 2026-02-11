@@ -4,6 +4,7 @@ const targetPriceInput = gebi("targetPrice");
 const searchPrice = gebi("searchPrice");
 const dropdownList = gebi("dropdownList");
 const crncDsply = gebi("crncDsply");
+const cptoDsply = gebi("cptoDsply");
 const alertTypeBrowserCheckbox = gebi("alertTypeBrowser"); // تم تغيير الاسم
 const alertTypeTelegramCheckbox = gebi("alertTypeTelegram"); // تم تغيير الاسم
 const telegramChatIdContainer = gebi("telegramChatIdContainer");
@@ -16,15 +17,11 @@ let selectedSymbol = "";
 let currentPrice = null;
 let priceUpdateInterval;
 let factorPric = 1;
-let binanceSocket = null;
-let binanceSocketSmbl = null;
-let mexcSocket = null;
-let mexcSocketSmbl = null;
 let allCrpto = [];
-let allPricesBnc = [];
-let allPricesMexc = [];
-let alrtsStorg = JSON.parse(localStorage.getItem("alrtsStorg")) || []; // لتخزين التنبيهات المحملة من التخزين المحلي
-let othExch = false
+let allCrptCmpr = [];
+let symbolsMap = new Map();
+let alrtsStorg = JSON.parse(localStorage.getItem("alrtsStorg")) || [];
+let othExch = false;
 // --- معالجات الأحداث ---
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -64,18 +61,19 @@ async function startPage() {
 		gebi("alertsList").innerHTML =
 			'<li class="no-alerts-message">جار التحميل...</li>';
 		tlgChtIdInpt.style.display = "none";
-		await loadUserAlertsDisplay();
 	} else if (telegramChatId.length) {
 		tlgChtIdInpt.value = telegramChatId;
 		gebi("alertsList").innerHTML =
 			'<li class="no-alerts-message">جار التحميل...</li>';
-		await loadUserAlertsDisplay();
+		setTimeout(() => {
+			loadUserAlertsDisplay();
+		}, 120000);
 		//
 	} else {
 		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
-		if (alrtsStorg.length) renderAlerts();
 		gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 	}
+	if (alrtsStorg.length) renderAlerts();
 	// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
 	if (alertTypeTelegramCheckbox.checked)
 		telegramChatIdContainer.style.display = "block";
@@ -127,15 +125,19 @@ function populateList(items) {
 		dropdownList.appendChild(div);
 	});
 }
-
+String.prototype.tlc = function () {
+	return this.toLowerCase();
+};
 async function filterList() {
-	const query = searchPrice.value.toLowerCase();
+	const qr = searchPrice.value.tlc(); // qr = query
 	if (exchangeSelect.value !== "other") {
-		const filtered = allCrpto.filter(c => c.toLowerCase().includes(query));
+		let filtered = allCrpto
+			.filter(c => c.tlc().includes(qr))
+			.sort((a, b) => a.tlc().indexOf(qr) - b.tlc().indexOf(qr));
 		populateList(filtered);
 		return false;
 	}
-	let qs = query.trim(); //querySmbl
+	let qs = qr.trim(); //querySmbl
 	if (qs.length < 2) {
 		dropdownList.innerHTML = "";
 		return;
@@ -143,22 +145,12 @@ async function filterList() {
 	qs = encodeURIComponent(qs);
 	try {
 		const result = await ftchFnctnAPPs({ action: "smbls", smbl: qs });
-		console.log(result);
-
 		dropdownList.innerHTML = result
 			.map(
-				item => `
-                <div class="suggestion-item" onclick = "gtPrcOfOther('${
-									item.symbol
-								}')">
-                    <strong>${item.symbol}</strong> — ${
-											item.shortname || item.longname || "No Name"
-										}  
-                    <span style="color:gray">(
-					${item.quoteType}
-					)</span> <span style="color:gray">(${item.exchDisp})</span>
-                </div>
-            `,
+				item => `<div class="suggestion-item" onclick = "gtPrcOfOther('${item.symbol}','${item.exchDisp}')"
+						><strong>${item.symbol} </strong> — ${item.shortname || item.longname || "No Name"}<span
+						style="color:gray">(${item.quoteType})</span><span style="color:gray">(${item.exchDisp})</span>
+                	</div>`,
 			)
 			.join("");
 	} catch (err) {
@@ -172,8 +164,8 @@ function createDiv(symbol) {
 	div.onclick = () => gtPrcOfOther(symbol);
 	return div;
 }
-function gtPrcOfOther(symbol,exch=false) {
-	othExch = exch
+function gtPrcOfOther(symbol, exch = false) {
+	othExch = exch;
 	searchPrice.value = symbol;
 	currentPriceDisplay.textContent = "--.--"; // إعادة تعيين السعر الحالي
 	dropdownList.style.display = "none";
@@ -198,11 +190,18 @@ function updateTargetPrice() {
 			.forEach(el => (el.innerHTML = "0.00"));
 	}
 }
-
-crncDsply.addEventListener("change", async () => {
-	await gtPrc();
+cptoDsply.addEventListener("change", () => {
+	const symbol = cptoDsply.value;
+	factorPric = allCrptCmpr.find(obj => obj.symbol == symbol).factor;
+	let rsltFnl = currentPrice * factorPric;
+	if (symbol == searchPrice.value) rsltFnl = 1;
+	currentPriceDisplay.textContent = rsltFnl;
+	targetPriceInput.value = rsltFnl;
 });
-async function gtPrc() {
+crncDsply.addEventListener("change", async () => {
+	await gtPrcCrncDsply();
+});
+async function gtPrcCrncDsply() {
 	let priceCurrencyFtch = 1;
 	let smbls = [];
 	try {
@@ -216,7 +215,7 @@ async function gtPrc() {
 		const prc = {};
 		const proms = [];
 		rslt.forEach(el => {
-			if (el.error) return proms.push(gtPrc());
+			if (el.error) return proms.push(gtPrcCrncDsply());
 			prc[el.symbol] = el;
 		});
 		if (proms.length) return Promise.all(proms);

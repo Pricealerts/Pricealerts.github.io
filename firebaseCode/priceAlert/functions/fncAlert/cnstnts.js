@@ -140,8 +140,25 @@ export const EXCHANGES_CONFIG = {
 		}),
 		intervalMap: { "1m": "60", "5m": "300", "15m": "900", "1h": "3600" },
 	},
+	cryptocompare: {
+		name: "CryptoCompare",
+		tickerPriceUrl: "https://min-api.cryptocompare.com/data/v2/histominute",
+		candlestickUrl: "https://min-api.cryptocompare.com/data/v2/histominute",
+		usdtSuffix: "USDT",
+		// دالة المعالجة لتحويل البيانات لشكل موحد
+		parseCandle: c => ({
+			//time: c.time * 1000, // تحويل للـ Milliseconds
+			open: parseFloat(c.open),
+			high: parseFloat(c.high),
+			low: parseFloat(c.low),
+			close: parseFloat(c.close),
+			volume: parseFloat(c.volumefrom),
+		}),
+		intervalMap: { "1m": "60", "5m": "300", "15m": "900", "1h": "3600" },
+	},
 	nasdaqe: {
 		name: "NASDAQ",
+		tickerPriceUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
 		candlestickUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
 		usdtSuffix: "-USD",
 		parseCandle: data => {
@@ -224,6 +241,20 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 				"Z";
 			const endDate = new Date().toISOString().split(".")[0] + "Z";
 			apiUrl = `${exchange.tickerPriceUrl}${symbol}/candles?start=${startDate}&end=${endDate}&granularity=300`;
+			break;
+		case "cryptocompare":
+			const allKy = ["c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f"];
+			const rndm = Math.floor(Math.random() * allKy.length);
+			const apiKey = allKy[rndm];
+			const  baseUrl =  exchange.tickerPriceUrl;
+			const params = new URLSearchParams({
+				fsym: symbol,
+				tsym: exchange.usdtSuffix,
+				limit: limit,
+				aggregate: 5,
+				api_key: apiKey,
+			});
+			apiUrl = `${baseUrl}?${params.toString()}`;
 			break;
 		/* case "nasdaq":
 		case "nyse":

@@ -15,109 +15,98 @@ async function smblsLclStrg(exchngId, nmDy, fnctn, bdy = exchngId) {
 		const locaTim = localExSmbls.time;
 		nmbrDays = (today - locaTim) / (1000 * 60 * 60 * 24);
 	}
-
 	if (nmbrDays < nmDy) {
 		return localExSmbls.symbols;
 	} else {
 		const data = await fnctn(bdy);
-		//if (!data.length) return false;
-		// storage data
 		const tolclStrg = { symbols: data, time: today };
 		localStorage[exchngId] = JSON.stringify(tolclStrg);
 		return data; //symbols
 	}
 }
-
+let allSmblBnc=[];
+let allPricesBnc = [];
+let allPricesMexc = [];
+let allPricesKucoin = [];
+let allPricesOkx = [];
+let allPrices;
 const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
 // --- وظائف جلب البيانات وتحديث الأسعار ---
 async function fetchTradingPairs(exchangeId) {
 	const exchange = EXCHANGES[exchangeId];
-
-	gebi("crncDsply").style.display = "none";
 	if (!exchange) {
 		currentPriceDisplay.textContent = "منصة غير متاحة.";
 		searchPrice.placeholder = "الرجاء اختيار منصة صحيحة";
 		return;
 	}
+	let dspl = "none";
+	let crptChos = "none";
+	let crptCmprLt = "none";
+	if (exchangeId == "cryptocompare") {
+		crptCmprLt = "inline-block";
+		if (!allCrptCmpr.length) {
+			allCrptCmpr.push({ symbol: "USDT", factor: 1 });
+			allPricesBnc.forEach(el => {
+				if (el.symbol.includes("USDT")) {
+					const symbol = el.symbol.replace("USDT", "");
+					const factor = 1 / el.price;
+					allCrptCmpr.push({ symbol, factor });
+				}
+			});
+			allCrptCmpr.sort((a, b) => a.symbol.localeCompare(b.symbol));
+			cptoDsply.innerHTML = allCrptCmpr
+				.map(o => `<option value="${o.symbol}">${o.symbol}</option>`)
+				.join("");
+			cptoDsply.value = "USDT";
+		}
+	}
 
+	if (exchs.includes(exchangeId)) dspl = "inline-block";
+	else crptChos = "block";
+	gebi("crptChos").style.display = crptChos;
+	gebi("noteYahoo").style.display = dspl;
+	crncDsply.style.display = dspl;
+	cptoDsply.style.display = crptCmprLt;
+	factorPric = 1;
 	try {
-		let symbols = [];
-		let urlCrpts =
-			getPriceUrl +
-			"?action=getCryptoSymbols&urlSmbls=" +
-			exchange.exchangeInfoUrl;
-		gebi("crptChos").style.display = exchange.crptChos;
-		gebi("crncDsply").style.display = exchange.crncDsply;
-		gebi("noteYahoo").style.display = exchange.crncDsply;
-
-		let response, data, bdy;
+		let response,
+			data,
+			symbols = [],
+			bdy;
 		switch (exchangeId) {
 			case "binance": //tickerPriceUrl
-				response = await fetch(exchange.tickerPriceUrl);
-				allPricesBnc = await response.json();
-				symbols = allPricesBnc.map(s => s.symbol);
-
-				break;
-			case "mexc":
-				bdy = {
-					action: "cryptoSymbols",
-					url: exchange.exchangeInfoUrl,
-				};
-				allPricesMexc = await smblsLclStrg("mexc", 1, ftchFnctnAPPs, bdy);
-
-				if (allPricesMexc.length) {
-					symbols = allPricesMexc
-						//.filter(s => s.symbol.endsWith(exchange.usdtSuffix))
-						.map(s => s.symbol);
-				} else {
-					allPricesMexc = allPricesBnc;
-					symbols = allPricesBnc.map(s => s.symbol);
+				if (localStorage.binance)
+					allPricesBnc = JSON.parse(localStorage.binance);
+				else {
+					response = await fetch(exchange.tickerPriceUrl);
+					allPricesBnc = await response.json();
+					localStorage.binance = JSON.stringify(allPricesBnc);
 				}
-				//gtDifrns();
+				symbols = allPricesBnc.map(s => s.symbol);
+				allSmblBnc = symbols;
 				break;
 			case "kucoin":
 				bdy = {
 					action: "cryptoSymbols",
 					url: exchange.exchangeInfoUrl,
 				};
-				response = await smblsLclStrg("kucoin", 1, ftchFnctnAPPs, bdy);
-				if (!Array.isArray(response)) {
-					if (response.code == "200000" && response.data) {
-						symbols = response.data
-							/* .filter(
-							s => s.symbol.endsWith(exchange.usdtSuffix) && s.enableTrading,
-						) */
-							.map(s => s.symbol);
-						const today = Date.now();
-						const tolclStrg = { symbols: symbols, time: today };
-						localStorage["kucoin"] = JSON.stringify(tolclStrg);
-					
-					} else {
-						console.error("حدث خطأ في البيانات:", data);
-					}
-				}else{
-					symbols = response
-				}
+				response = await smblsLclStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
+				symbols = response;
+				allPricesKucoin = symbols;
 
 				break;
 			case "coingecko":
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
-
 				symbols = data.map(s => s.id); // مثل: ['bitcoin', 'ethereum']
 				break;
 			case "okx":
 				response = await fetch(exchange.tickerPriceUrl);
-				allPrices = await response.json();
-				allPrices = allPrices.data;
-				symbols = allPrices
-					/* .filter(
-						s => s.instType === "SPOT" && s.instId.endsWith(exchange.usdtSuffix)
-					) */
-					.map(s => s.instId /* .replace("-", "") */);
-				console.log(symbols);
-
+				allPricesOkx = await response.json();
+				allPricesOkx = allPricesOkx.data;
+				console.log(allPricesOkx);
+				symbols = allPricesOkx.map(s => s.instId);
 				break;
 			case "bybit":
 				response = await fetch(exchange.exchangeInfoUrl);
@@ -132,18 +121,10 @@ async function fetchTradingPairs(exchangeId) {
 				allPrices = data.data;
 				symbols = allPrices.map(s => s.symbol);
 				break;
-			case "lbank":
-				response = await fetch(urlCrpts);
-				data = await response.json();
-				allPrices = data.data;
-				symbols = allPrices.map(s => s.symbol);
-
-				break;
 			case "coincap":
 				response = await fetch(exchange.tickerPriceUrl);
-
 				data = await response.json();
-				symbols = data.data.filter(s => s.symbol && s.symbol.length <= 10); // تصفية تقريبية
+				symbols = data.data.filter(s => s.symbol); // تصفية تقريبية
 				break;
 			case "coinmarketcap":
 				response = await fetch(getPriceUrl, {
@@ -151,9 +132,7 @@ async function fetchTradingPairs(exchangeId) {
 					body: JSON.stringify({ action: "symbols" }),
 				});
 				data = await response.json();
-
 				symbols = data.smbls.map(s => s.symbol);
-
 				break;
 			case "kraken":
 				response = await fetch(exchange.exchangeInfoUrl);
@@ -166,6 +145,11 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.exchangeInfoUrl);
 				data = await response.json();
 				symbols = data.filter(s => !s.trading_disabled).map(s => s.id);
+				break;
+			case "cryptocompare":
+				response = await fetch(exchange.exchangeInfoUrl);
+				data = await response.json();
+				symbols = Object.keys(data.Data);
 				break;
 			case "nasdaq":
 			case "nyse":
@@ -193,13 +177,19 @@ async function fetchTradingPairs(exchangeId) {
 		if (symbols.length > 0) {
 			symbols.sort();
 			allCrpto = symbols; // حفظ جميع العملات في متغير عام
-			symbols.forEach(symbol => {
-				const div = createDiv(symbol);
+			const slcCrpt = symbols.splice(0, 100);
+			slcCrpt.forEach(s => {
+				const div = createDiv(s);
 				dropdownList.appendChild(div);
 			});
-			searchPrice.value = symbols[0];
+			searchPrice.value = slcCrpt[0];
+			if (exchangeId == "cryptocompare") searchPrice.value = "BTC";
 			setTimeout(() => {
 				startPriceUpdates();
+				symbols.forEach(s => {
+					const div = createDiv(s);
+					dropdownList.appendChild(div);
+				});
 				//refreshWidget()
 			}, 10);
 		} else {
@@ -230,8 +220,6 @@ async function fetchCurrentPrice(
 	if (!exchange) return null;
 	rfrsh++;
 	try {
-		let urlCrpts =
-			getPriceUrl + "?action=getPrice&urlSmbl=" + exchange.tickerPriceUrl;
 		let apiUrl = "";
 		let price = null;
 		let response, data, rslt;
@@ -250,55 +238,16 @@ async function fetchCurrentPrice(
 					return null;
 				}
 				break;
-			case "mexc":
-				console.log("prmrFtch is : " + prmrFtch);
-				console.log("brwsrAlrt is : " + brwsrAlrt);
-				const exst = allPricesBnc.some(e => e.symbol === symbol);
-				if (prmrFtch) {
-					if (exst) {
-						price = bncWebSocket(symbol);
-					} else price = allPricesMexc.find(obj => obj.symbol == symbol).price;
-				} else if (brwsrAlrt) {
-					if (exst) {
-						const response = await fetch(
-							`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`,
-						);
-						const data = await response.json();
-						price = data.price;
-					} else {
-						price = await ftchFnctnAPPs({
-							action: "gtMexcPrice",
-							smb: symbol,
-						});
-					}
-
-					//return price;
-				} else {
-					//await checkForBrowserAlerts();
-					if (priceUpdateInterval) {
-						clearInterval(priceUpdateInterval);
-					}
-					return null;
-				}
-				break;
 			case "kucoin":
-				apiUrl = `${urlCrpts}&symbole=${symbol}`;
-				response = await fetch(apiUrl);
-				data = await response.json();
-				// إذا كانت البيانات تحتوي على رمز السعر
-				if (data.code === "200000" && data.data && data.data.price) {
-					price = parseFloat(data.data.price);
-					rfrsh = 0;
-				} else {
-					console.error(
-						`خطأ من KuCoin API (ticker):`,
-						data.msg || JSON.stringify(data),
-					);
-					rfrsh++;
-
-					if (rfrsh < 5) {
-						//fetchTradingPairs(exchangeId);
-					}
+				if (prmrFtch) connectKuCoinWS(symbol);
+				else if (brwsrAlrt) {
+					bdy = {
+						action: "gtPrice",
+						url: exchange.exchangeInfoUrl,
+						symbol,
+					};
+					data = await smblsLclStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
+					if (data.data.price) price = parseFloat(data.data.price);
 				}
 				break;
 			case "coingecko":
@@ -307,19 +256,15 @@ async function fetchCurrentPrice(
 				price = response[symbol].usd;
 				break;
 			case "okx":
-				if (prmrFtch) {
-				}
-				connectOKX(symbol);
+				if (prmrFtch) connectOKX(symbol);
 				price = allPrices.find(obj => obj.instId == symbol).last;
 				break;
 			case "bybit":
 				price = allPrices.find(obj => obj.symbol == symbol).lastPrice;
+				connectBybit(symbol);
 				break;
 			case "bitget":
 				price = allPrices.find(obj => obj.symbol == symbol).close;
-				break;
-			case "lbank":
-				price = await allPrices.find(obj => obj.symbol == symbol).ticker.latest;
 				break;
 			case "kraken":
 				//apiUrl = ;
@@ -337,6 +282,13 @@ async function fetchCurrentPrice(
 				response = await fetch(urll);
 				data = await response.json();
 				price = data.price;
+				break;
+			case "cryptocompare":
+				const urlcompar = exchange.gturl(symbol);
+				response = await fetch(urlcompar);
+				if (!response.ok) throw new Error("فشل في جلب البيانات");
+				data = await response.json();
+				price = data["USDT"] * factorPric;
 				break;
 			case "nasdaq":
 			case "nyse":
@@ -366,7 +318,6 @@ async function fetchCurrentPrice(
 					crncDsply.innerHTML += `<option value="${currencyFtch}">${currencyFtch}</option>`;
 					crncDsply.value = currencyFtch;
 				}
-
 				const timeInMs2 = Date.now();
 				const dfrns = timeInMs2 - timeInMs;
 				console.log(dfrns);
@@ -411,11 +362,10 @@ function startPriceUpdates() {
 		//if (binanceSocket && binanceSocketSmbl === selectedSymbol) return;
 
 		fetchCurrentPrice(currentExchangeId, selectedSymbol, true); // جلب السعر الحالي عند بدء التحديثات
-		console.log("priceUpdateInterval is : " + priceUpdateInterval);
 		priceUpdateInterval = setInterval(() => {
 			console.log("priceUpdateInterval is : " + priceUpdateInterval);
 			fetchCurrentPrice(currentExchangeId, selectedSymbol);
-		}, EXCHANGES[currentExchangeId].intervalData);
+		}, 300000 /* EXCHANGES[currentExchangeId].intervalData */); //5 minut
 	} else {
 		currentPriceDisplay.textContent = "--.--";
 		currentPrice = null;
