@@ -1,14 +1,14 @@
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
 let getPriceUrl =
 	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
-const FIREBASE_WEB_ALERT_URL =
+const FIREBASE_URL =
 	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
 let currencyFtch = "USD";
 let rfrsh = 0;
-async function smblsLclStrg(exchngId, nmDy, fnctn, bdy = exchngId) {
+async function fnAndStrg(nmStrg, nmDy, fnctn, bdy = nmStrg, url = null) {
 	let nmbrDays = 100;
-	let localExSmbls = localStorage.getItem(exchngId);
+	let localExSmbls = localStorage.getItem(nmStrg);
 	const today = Date.now();
 	if (localExSmbls) {
 		localExSmbls = JSON.parse(localExSmbls);
@@ -16,19 +16,22 @@ async function smblsLclStrg(exchngId, nmDy, fnctn, bdy = exchngId) {
 		nmbrDays = (today - locaTim) / (1000 * 60 * 60 * 24);
 	}
 	if (nmbrDays < nmDy) {
-		return localExSmbls.symbols;
+		return localExSmbls.data;
 	} else {
-		const data = await fnctn(bdy);
-		const tolclStrg = { symbols: data, time: today };
-		localStorage[exchngId] = JSON.stringify(tolclStrg);
+		let pr = url === null ? [bdy] : [bdy, url];
+		let data = await fnctn(...pr);
+		if (data.Data) data = Object.keys(data.Data);
+		const tolclStrg = { data, time: today };
+		localStorage[nmStrg] = JSON.stringify(tolclStrg);
 		return data; //symbols
 	}
 }
-let allSmblBnc=[];
+let allSmblBnc = [];
 let allPricesBnc = [];
 let allPricesMexc = [];
 let allPricesKucoin = [];
 let allPricesOkx = [];
+let allPricesCrptCmp = [];
 let allPrices;
 const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
@@ -91,7 +94,7 @@ async function fetchTradingPairs(exchangeId) {
 					action: "cryptoSymbols",
 					url: exchange.exchangeInfoUrl,
 				};
-				response = await smblsLclStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
+				response = await fnAndStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
 				symbols = response;
 				allPricesKucoin = symbols;
 
@@ -147,9 +150,13 @@ async function fetchTradingPairs(exchangeId) {
 				symbols = data.filter(s => !s.trading_disabled).map(s => s.id);
 				break;
 			case "cryptocompare":
-				response = await fetch(exchange.exchangeInfoUrl);
-				data = await response.json();
-				symbols = Object.keys(data.Data);
+				symbols = await fnAndStrg(
+					"cryptocompare",
+					1,
+					ftchFnctn,
+					null,
+					exchange.exchangeInfoUrl,
+				);
 				break;
 			case "nasdaq":
 			case "nyse":
@@ -164,7 +171,7 @@ async function fetchTradingPairs(exchangeId) {
 			case "XPAR":
 			case "XSHE":
 			case "gateIoSmbls":
-				symbols = await smblsLclStrg(exchangeId, 30, gtDataStocks);
+				symbols = await fnAndStrg(exchangeId, 30, gtDataStocks);
 				break;
 			case "other":
 				symbols = otherPrpos;
@@ -246,7 +253,7 @@ async function fetchCurrentPrice(
 						url: exchange.exchangeInfoUrl,
 						symbol,
 					};
-					data = await smblsLclStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
+					data = await fnAndStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
 					if (data.data.price) price = parseFloat(data.data.price);
 				}
 				break;
@@ -284,6 +291,14 @@ async function fetchCurrentPrice(
 				price = data.price;
 				break;
 			case "cryptocompare":
+				if (!apKCrpt)
+					apKCrpt = await fnAndStrg(
+						"apKCrpt",
+						15,
+						ftchFnctn,
+						{ action: "gtApiKy" },
+						FIREBASE_URL,
+					);
 				const urlcompar = exchange.gturl(symbol);
 				response = await fetch(urlcompar);
 				if (!response.ok) throw new Error("فشل في جلب البيانات");

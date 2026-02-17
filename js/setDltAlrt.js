@@ -22,7 +22,7 @@ gebi("setAlertButton").addEventListener("click", async () => {
 		alertStatus.style.color = "red";
 		return;
 	}
-	if (!smbl || !currentExchangeId || prc == 'NaN') {
+	if (!smbl || !currentExchangeId || prc == "NaN") {
 		alertStatus.textContent = "الرجاء اختيار منصة وعملة.";
 		alertStatus.style.color = "red";
 		return;
@@ -52,7 +52,7 @@ gebi("setAlertButton").addEventListener("click", async () => {
 	smbl = smbl.replace(/(_|-)/g, "");
 	if (allSmblBnc.includes(smbl) && newAlrt.e !== "binance") {
 		newAlrt.e2 = "binance";
-		newAlrt.s = smbl;
+		if (newAlrt.s !== smbl) newAlrt.s2 = smbl;
 	}
 	// التعامل مع تنبيه تيليجرام عبر firebase
 	if (isTelegramAlert) {
@@ -76,7 +76,7 @@ gebi("setAlertButton").addEventListener("click", async () => {
 		alertStatus.textContent +=
 			(isTelegramAlert ? " تيليجرام" : "") +
 			(isBrowserAlert ? " تطبيق " : "") +
-			`تم تعيين تنبيه لـ ${smbl}.`;
+			`تم تعيين تنبيه لـ ${newAlrt.s}.`;
 		alertStatus.style.color = "green";
 	}
 });
@@ -105,7 +105,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 					action: action,
 					...alertData,
 				},
-				FIREBASE_WEB_ALERT_URL,
+				FIREBASE_URL,
 			).then(dt => {
 				data = dt;
 			});

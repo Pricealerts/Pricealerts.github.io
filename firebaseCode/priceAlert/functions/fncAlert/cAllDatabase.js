@@ -44,6 +44,9 @@ async function cAllDatabase(data) {
 			const promises = data.promises.map(prm => cAllDatabase(prm));
 			await Promise.all(promises);
 			rspns = false;
+		} else if (action === "gtApiKy") {
+			const rndm = Math.floor(Math.random() * 6);
+			rspns = process.env[`API_KEY${rndm}`];
 		} /*  else if (action === "smbls") {
 			rspns = await price(data);
 		} */

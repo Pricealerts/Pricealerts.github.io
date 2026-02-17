@@ -243,40 +243,33 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 			apiUrl = `${exchange.tickerPriceUrl}${symbol}/candles?start=${startDate}&end=${endDate}&granularity=300`;
 			break;
 		case "cryptocompare":
-			const allKy = ["c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f"];
-			const rndm = Math.floor(Math.random() * allKy.length);
-			const apiKey = allKy[rndm];
-			const  baseUrl =  exchange.tickerPriceUrl;
-			const params = new URLSearchParams({
-				fsym: symbol,
-				tsym: exchange.usdtSuffix,
-				limit: limit,
-				aggregate: 5,
-				api_key: apiKey,
-			});
-			apiUrl = `${baseUrl}?${params.toString()}`;
-			break;
-		/* case "nasdaq":
-		case "nyse":
-		case "xetra":
-		case "lse":
-		case "TSE":
-		case "HKSE":
-		case "NSE":
-		case "other":
-			apiUrl = `${exchange.candlestickUrl}${symbol}?interval=${mappedInterval}&range=${limit}d`;
-			break; */
+			const rndm = Math.floor(Math.random() * 6);
+			const apiKey = process.env[`API_KEY${rndm}`];
+			const baseUrl = exchange.tickerPriceUrl;
+			return [
+				baseUrl,
+				{
+					params: {
+						fsym: symbol,
+						tsym: config.usdtSuffix,
+						limit: 10,
+						aggregate: settings.aggregate, // هنا نمرر قيمة التجميع ديناميكياً
+						api_key: apiKey,
+					},
+				},
+			];
 		default:
 			`https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=5m&range=1d`;
 	}
 
-	return apiUrl;
+	return [apiUrl];
 };
 
 export const ftcgAppScrpt = stocksMap => {
 	const quota = 60;
 	const orgnUrls = [
 		"https://script.google.com/macros/s/AKfycbwZXFG47b2ccGkifQENtoRDWSBBsBno22dGehmRH1kns-AbuvMPOzLNOJzj1upiaIqK/exec",
+
 		// "https://script.google.com/macros/s/AKfycbwn_lZzsTUXIXQlq33rYjs0rpOOiQeMQm5neghfdvJgKPQpjDM7mNKpexZqhqilOajjJA/exec"
 		// "https://script.google.com/macros/s/AKfycbyUSD_7o1-ed8OlPABqQh2Qt8e0ENsCimPWgSmgm3SQAF-6x4WzQHbfbzk1Pql92iXF-w/exec",
 	];

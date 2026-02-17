@@ -25,8 +25,8 @@ function gtRndmUrl(urls) {
 	}
 	return rndmUrls;
 }
-const apiKyCrptcmpr =
-	"c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f";
+let apKCrpt = null;
+
 const EXCHANGES = {
 	binance: {
 		name: "Binance",
@@ -102,7 +102,7 @@ const EXCHANGES = {
 		tickerPriceUrl: `https://min-api.cryptocompare.com/data/price?fsym=`, // ${coin}&tsyms=${currency}&api_key=${apiKey}
 		intervalData: 10000,
 		gturl: smbl =>
-			`https://min-api.cryptocompare.com/data/price?fsym=${smbl}&tsyms=USDT&api_key=c60217b3b7ffab489c03f232284f717034db471ecdcbc25876c75bdef9756e0f`,
+			`https://min-api.cryptocompare.com/data/price?fsym=${smbl}&tsyms=USDT&api_key=${apKCrpt}`,
 	},
 	nasdaq: {
 		name: "NASDAQ",
@@ -131,7 +131,6 @@ exchs.forEach(ex => {
 	EXCHANGES[ex].name = ex; //.toLowerCase()
 });
 
-
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////
@@ -155,14 +154,20 @@ async function ftchFnctn(body, url = null) {
 		if (!frbUrl) frbUrl = frbsUrls[0];
 		url = frbUrl;
 	}
-	console.log(url);
 	// بقية الكود
+	const ftch =
+		body === null
+			? [url]
+			: [
+					url,
+					{
+						method: "POST",
+						headers: { "Content-Type": "application/json" },
+						body: JSON.stringify(body),
+					},
+			  ];
 	try {
-		const response = await fetch(url, {
-			method: "POST",
-			headers: { "Content-Type": "application/json" },
-			body: JSON.stringify(body),
-		});
+		const response = await fetch(...ftch);
 		return await response.json();
 	} catch (error) {
 		console.error("Fetch error:", error);

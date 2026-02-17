@@ -70,6 +70,7 @@ function bncWebSocketMult() {
 		bncSckt.send(JSON.stringify(msg));
 	};
 	let oldTmBnc = Date.now();
+
 	bncSckt.onmessage = event => {
 		const data = JSON.parse(event.data);
 		if (data.e === "24hrTicker") {

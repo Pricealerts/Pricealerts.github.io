@@ -59,7 +59,7 @@ async function getCandles(symbolsMap) {
 			data && Array.isArray(data) && data.length > 0 ? data : null;
 	});
 	//console.log('cndlis is : ' + JSON.stringify(candles));
-	
+
 	return candles;
 }
 
@@ -80,7 +80,7 @@ async function checkAndSendAlerts() {
 			if (isStock) return false;
 
 			const alrt = alert[1];
-			const { e, e2: exchangeId = e, s: symbol } = alrt;
+			const { e, s, e2: exchangeId = e, s2: symbol = s } = alrt;
 			if (!symbolsMap.has(symbol)) {
 				symbolsMap.set(symbol, { exchangeId });
 			}
@@ -91,7 +91,7 @@ async function checkAndSendAlerts() {
 	});
 	function stocksFn(alert, tlgId) {
 		const alrt = alert[1];
-		const { e: exchangeId, s: symbol, mt: meta } = alrt;
+		const { e, e2: exchangeId = e, s: symbol, mt: meta } = alrt;
 		if (meta) {
 			const now = Date.now();
 			const startTime = meta.st * 1000;
@@ -119,20 +119,21 @@ async function checkAndSendAlerts() {
 		const {
 			e: exchangeId,
 			s: symbol,
+			s2,
 			t: targetPrice,
 			c: alertCondition,
 			tid: telegramChatId,
 			i: id,
-			mt: meta,
+			//mt: meta,
 			f: factorPric,
 		} = allAlerts[k];
 
-		const candles = rsltcandles[symbol];
+		const candles = rsltcandles[s2];
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null;
 		const rglrChatId = telegramChatId.slice(3);
 		if (candles && candles.length > 0) {
-			const trgtFctor = targetPrice * factorPric;
+			const trgtFctor = targetPrice / factorPric;
 			for (const candle of candles) {
 				if (alertCondition === "l" && candle.low <= trgtFctor) {
 					// less
@@ -203,7 +204,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 		let mappedInterval = exchange.intervalMap[interval];
 
 		const apiUrl = gtapiUrl(exchangeId, symbol, mappedInterval, limit);
-		const axs = await axios.get(apiUrl);
+		const axs = await axios.get(...apiUrl);
 		datas = axs.data;
 
 		let candles = [];
@@ -280,7 +281,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 				candles = dtSlc.map(exchange.parseCandle);
 			}
 		} else if (exchangeId === "cryptocompare") {
-			 candles = datas.Data.Data;
+			candles = datas.Data.Data;
 		} else {
 			if (Array.isArray(datas) && datas.length) {
 				candles = datas.map(exchange.parseCandle);

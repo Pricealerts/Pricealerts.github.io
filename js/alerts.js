@@ -14,14 +14,6 @@ async function loadUserAlertsDisplay() {
 	}
 }
 function renderAlerts() {
-	alrtsStorg.forEach(([, alert]) => {
-		const { e, e2: exch = e, s: smbl } = alert;
-		if (!symbolsMap.has(smbl)) {
-			symbolsMap.set(smbl, exch);
-			if (!exch == "binance") chkBrwsrY = true;
-			if (exch == "binance") chkBrwsrBnc = true;
-		}
-	});
 	const brwAlrts = alrtsStorg.filter(alert => alert[1].alTp === "b");
 	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp !== "t");
 	let alrtlst = gebi("alertsListNtf");
@@ -35,18 +27,24 @@ function renderAlerts() {
 	alrtsStorg.forEach(alert => {
 		const {
 			e: exchangeId,
+			e2: exchngeId2 = exchangeId,
 			s: symbol,
+			s2: smbl = symbol,
 			t: targetPrice,
 			c: alrtCndchn, //alertCondition
 			alTp = "t",
 		} = alert[1];
+		if (!symbolsMap.has(smbl)) {
+			symbolsMap.set(smbl, exchngeId2);
+			if (exchngeId2 !== "binance") chkBrwsrY = true;
+		}
 		let cndtnTxt =
 			alrtCndchn === "g"
 				? "عندما يصبح السعر أكبر أو يساوي"
 				: "عندما يصبح السعر أصغر أو يساوي"; //condichionText
 
 		const listItem = document.createElement("li");
-		let dltAlrt = `dltNtf(${alert[0]})`;
+		let dltAlrt = `dltNtf('${alert[0]}')`;
 		let tpAlrt = "(النوع: تطبيق)";
 		if (alTp === "t") {
 			alrtlst = gebi("alertsList");
@@ -72,9 +70,10 @@ function renderAlerts() {
 		alrtlst.appendChild(listItem);
 	});
 	brwsrAlrtIntrvl();
-	if (chkBrwsrBnc) bncWebSocketMult();
+	bncWebSocketMult();
 }
-let chkBrwsrIntrvl, chkBrwsrY, chkBrwsrBnc;
+let chkBrwsrIntrvl,
+	chkBrwsrY = false;
 function brwsrAlrtIntrvl() {
 	if (chkBrwsrIntrvl || !chkBrwsrY) return;
 	if (chkBrwsrIntrvl && !chkBrwsrY) {
@@ -91,15 +90,15 @@ async function checkForBrowserAlerts() {
 	if (alrtsStorg.length === 0) return;
 	const symbolsOrder = Array.from(symbolsMap);
 	const promises = symbolsOrder
-		.map(async ([s, e]) => {
+		.map(async ([s2, e]) => {
 			if (e == "binanace") return false; // تخطي هذه المنصات
 			return fetchCurrentPrice(
 				e, // المنصة
-				s, // الرمز
+				s2, // الرمز
 				false,
 				true,
 			).catch(err => {
-				console.error(`❌ Error fetching ${e} from ${s} err is  :`);
+				console.error(`❌ Error fetching ${e} from ${s2} err is  :`);
 				console.error(err);
 				return null;
 			});
@@ -116,12 +115,15 @@ async function checkForBrowserAlerts() {
 
 // دالة المعالجة الداخلية
 async function hndlAlrt(curentPrice, slctdSmbl) {
-	const alertsForThisSymbol = alrtsStorg.filter(([, a]) => a.s === slctdSmbl);
+	const alertsForThisSymbol = alrtsStorg.filter(
+		([, a]) => a.s === slctdSmbl || a.s2 === slctdSmbl,
+	);
 	const proms = [];
 	alertsForThisSymbol.forEach(async alerte => {
 		const alert = alerte[1];
 		const id = alerte[0];
 		curentPrice *= alert.f;
+
 		if (
 			(alert.c === "l" && curentPrice <= alert.t) ||
 			(alert.c === "g" && curentPrice >= alert.t)
@@ -134,10 +136,10 @@ async function hndlAlrt(curentPrice, slctdSmbl) {
 					}),
 				);
 			else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
-			await Promise.all(proms);
 			dltNtf(id);
 		}
 	});
+	await Promise.all(proms);
 }
 
 function dltNtf(idDlt) {
