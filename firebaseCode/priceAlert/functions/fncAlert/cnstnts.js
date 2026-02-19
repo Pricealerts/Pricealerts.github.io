@@ -203,6 +203,10 @@ export const EXCHANGES_CONFIG = {
 /**
  * دالة جلب رابط الـ API
  */
+export const rndmKey = () => {
+	const rndm = Math.floor(Math.random() * 10); // mor 6 hadak nta3 lemail lakhor
+	return process.env[`API_KEY${rndm}`];
+};
 export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 	// التحقق من وجود الإعدادات للمنصة المطلوبة
 	const exchange = EXCHANGES_CONFIG[exchangeId];
@@ -243,8 +247,7 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 			apiUrl = `${exchange.tickerPriceUrl}${symbol}/candles?start=${startDate}&end=${endDate}&granularity=300`;
 			break;
 		case "cryptocompare":
-			const rndm = Math.floor(Math.random() * 6);
-			const apiKey = process.env[`API_KEY${rndm}`];
+			const apiKey = rndmKey();
 			const baseUrl = exchange.tickerPriceUrl;
 			return [
 				baseUrl,
@@ -268,10 +271,13 @@ export const gtapiUrl = (exchangeId, symbol, mappedInterval, limit) => {
 export const ftcgAppScrpt = stocksMap => {
 	const quota = 60;
 	const orgnUrls = [
-		"https://script.google.com/macros/s/AKfycbwZXFG47b2ccGkifQENtoRDWSBBsBno22dGehmRH1kns-AbuvMPOzLNOJzj1upiaIqK/exec",
-
-		// "https://script.google.com/macros/s/AKfycbwn_lZzsTUXIXQlq33rYjs0rpOOiQeMQm5neghfdvJgKPQpjDM7mNKpexZqhqilOajjJA/exec"
-		// "https://script.google.com/macros/s/AKfycbyUSD_7o1-ed8OlPABqQh2Qt8e0ENsCimPWgSmgm3SQAF-6x4WzQHbfbzk1Pql92iXF-w/exec",
+		"https://script.google.com/macros/s/AKfycbzQbHPJ9yGzrH6W6nDESHciFvT-fOX6GORTvGBj4056N-ZBqtwYcLtVdOyOwku8zNOiRw/exec",
+		"https://script.google.com/macros/s/AKfycbzLZpLTeA8HUEW76X-Rm_A8ldcv4rK586GqyVlAQLNS0ekMd5Z4j86cmzIPiiirrMBx/exec",
+		"https://script.google.com/macros/s/AKfycbw94K_bG9mQJmUggEFHkJPaiiIcZKN05BqQtzPSjbWbeFHyVC5n0KR4jVTo8mb0HYeo/exec",
+		"https://script.google.com/macros/s/AKfycbwjusxGXq8EFItqeJwHSdIYF31IN0QhIPm3Czzl6KVYCz5M_nt5Pw15-nh6k3Z5pMFyDg/exec",
+		"https://script.google.com/macros/s/AKfycbymlMryby8lJt8WevTphMqZgjVxDIFG35AagfSshvmDqbAu7eKKSYbzWORSAnxbeuFioA/exec",
+		"https://script.google.com/macros/s/AKfycbyCQnrV5sfcRxRaxTLBTWHITKrYFOYtKJlGeTbaL23KGAidUX1mi0MSfy3PVT_ahQMP7g/exec",
+		"https://script.google.com/macros/s/AKfycbyVf0_HzUtKfuq5EuE8dTmPlUi1xr7v_QrUrWls7GH773CrCZYWOgHRLi2BLlFDofxmnA/exec"
 	];
 
 	const acsptAlrts = orgnUrls.length * quota;

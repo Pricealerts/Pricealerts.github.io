@@ -1,9 +1,11 @@
 let orgnUrls = [
-	"https://script.google.com/macros/s/AKfycbzMgCAunXYJFMRFMQJX1UrQUnJdsjoHh31bZqumyi2-f6mgrJfbBwCwTNBR0YQUQD9ZSQ/exec",
-	// "https://script.google.com/macros/s/AKfycbz_bPV0YD_u56AHej1sQstTnzk4LFAPrgDkRZYw-NzI0KzUCmPmL2uUn6P-TAC1jIel7Q/exec",
-	// "https://script.google.com/macros/s/AKfycbxSDIjmCkCwVU3gyFfPABhHV5EayTrMmoFa4BAWhaRZwUsTB0c4LjD-i5D5JdN9oeyv/exec",
-	// "https://script.google.com/macros/s/AKfycbwOXLglGbwUkBEfO1NFxhPcWwp5SeKv01XWZto5memVSoUnVMhlseZurVHOVP2V1ZIb/exec",
-	// "https://script.google.com/macros/s/AKfycbxjD-PZ6LrbRhVXxiLf9M2BCS0Zf18UT1GjZKgCN-oTdqg0bd_x8BSZ9VmqZaxHKh3E/exec",
+	"https://script.google.com/macros/s/AKfycbzfgbjh4pMa6vtgtvkGulxe3mMJfxRuS1lk-OtL8Cza7LcSYYshxSpPTx7nXbKO4G3aSQ/exec",
+	"https://script.google.com/macros/s/AKfycbyIGH7SLi-lqK_ZdwNDgebCgzeV1pjqSaM8sgtgqBOvzFyHHMGAqm71l0MslLzwXwyG/exec",
+	"https://script.google.com/macros/s/AKfycbxOuh1YRl6ObJOKWXz1kMMeohQDeaVNXxnIuUfKUgkJvwmpVUU6IeWKIGwVekXRhXq8Jw/exec",
+	"https://script.google.com/macros/s/AKfycbzZvsX-TrjPLhjxn_unHOqNY83lzp-nkYqdEwSIqBymgUp9Gy8kxLm17j9c3uTJLAR4/exec",
+	"https://script.google.com/macros/s/AKfycbz9Tg0CDt8veAVGAEE8sJiKU0Y9t15KFurlvuEi0sVR2EseFH4iWBJIRpyVsvVU8HEh/exec",
+	"https://script.google.com/macros/s/AKfycbxBEhgPiJCXqp-Y8oRA70o80jpMPnoa1fYmYX-EiubqL1ek_gl4gvx13UdOWvr0XCry/exec",
+	"https://script.google.com/macros/s/AKfycbxzZmeqF3beh2csmPaNwMKbBjPt-x50Rek3yk6_X4-FDfxbz9YIcwMjicPTuZI9x7j2/exec"
 ];
 let frbsUrls = [
 	"https://rqststocks-wgqzo7cltq-ew.a.run.app", // chatId
@@ -191,3 +193,6 @@ async function ftchFnctnAPPs(body) {
 		throw error;
 	}
 }
+
+
+

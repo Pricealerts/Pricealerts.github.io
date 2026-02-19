@@ -8,22 +8,28 @@ let currencyFtch = "USD";
 let rfrsh = 0;
 async function fnAndStrg(nmStrg, nmDy, fnctn, bdy = nmStrg, url = null) {
 	let nmbrDays = 100;
-	let localExSmbls = localStorage.getItem(nmStrg);
+	let localStrg = localStorage.getItem(nmStrg);
 	const today = Date.now();
-	if (localExSmbls) {
-		localExSmbls = JSON.parse(localExSmbls);
-		const locaTim = localExSmbls.time;
+	if (localStrg) {
+		localStrg = JSON.parse(localStrg);
+		const locaTim = localStrg.time;
 		nmbrDays = (today - locaTim) / (1000 * 60 * 60 * 24);
 	}
+	console.log(localStrg);
+
 	if (nmbrDays < nmDy) {
-		return localExSmbls.data;
+		return localStrg.data;
 	} else {
-		let pr = url === null ? [bdy] : [bdy, url];
-		let data = await fnctn(...pr);
-		if (data.Data) data = Object.keys(data.Data);
-		const tolclStrg = { data, time: today };
-		localStorage[nmStrg] = JSON.stringify(tolclStrg);
-		return data; //symbols
+		try {
+			let pr = url === null ? [bdy] : [bdy, url];
+			let data = await fnctn(...pr);
+			if (data.Data) data = Object.keys(data.Data);
+			const tolclStrg = { data, time: today };
+			localStorage[nmStrg] = JSON.stringify(tolclStrg);
+			return data; //symbols
+		} catch (error) {
+			console.log(`Error in fnAndStrg for ${nmStrg}:`, error);
+		}
 	}
 }
 let allSmblBnc = [];
@@ -294,16 +300,16 @@ async function fetchCurrentPrice(
 				if (!apKCrpt)
 					apKCrpt = await fnAndStrg(
 						"apKCrpt",
-						15,
+						10,
 						ftchFnctn,
 						{ action: "gtApiKy" },
 						FIREBASE_URL,
 					);
 				const urlcompar = exchange.gturl(symbol);
 				response = await fetch(urlcompar);
-				if (!response.ok) throw new Error("فشل في جلب البيانات");
 				data = await response.json();
-				price = data["USDT"] * factorPric;
+				price = data["USDT"] ;
+				if (!brwsrAlrt)price *= factorPric;
 				break;
 			case "nasdaq":
 			case "nyse":
@@ -319,7 +325,13 @@ async function fetchCurrentPrice(
 			case "XSHE":
 			case "other":
 				const timeInMs = Date.now();
-				rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
+				if (prmrFtch) {
+					rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
+				} else if (brwsrAlrt) {
+					rslt = await ftchFnctnAPPs({ action: "price", smbl: symbol });
+					return rslt.price;
+				}
+
 				console.log(rslt);
 				if (rslt.error && rfrsh < 3) {
 					//await fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
@@ -344,7 +356,7 @@ async function fetchCurrentPrice(
 
 		if (price !== null) {
 			currentPrice = parseFloat(price);
-			if (brwsrAlrt) return currentPrice;
+			if (brwsrAlrt) return [currentPrice,symbol];
 			currentPriceDisplay.textContent = `${currentPrice} `;
 			if (prmrFtch) {
 				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف

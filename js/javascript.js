@@ -145,6 +145,8 @@ async function filterList() {
 	qs = encodeURIComponent(qs);
 	try {
 		const result = await ftchFnctnAPPs({ action: "smbls", smbl: qs });
+		console.log(result);
+		
 		dropdownList.innerHTML = result
 			.map(
 				item => `<div class="suggestion-item" onclick = "gtPrcOfOther('${item.symbol}','${item.exchDisp}')"

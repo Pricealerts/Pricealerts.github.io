@@ -81,12 +81,11 @@ gebi("setAlertButton").addEventListener("click", async () => {
 	}
 });
 
-async function deleteAlert(alert) {
-	console.log(alert);
-
+async function deleteAlert({ alertId, telegramChatId, alrt = false }) {
 	await manageAlertOnFirebase("dltAlrt", {
-		id: alert.alertId,
-		tId: alert.telegramChatId,
+		id: alertId,
+		tId: telegramChatId,
+		alrt,
 	});
 }
 

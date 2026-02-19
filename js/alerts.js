@@ -88,10 +88,29 @@ function brwsrAlrtIntrvl() {
 
 async function checkForBrowserAlerts() {
 	if (alrtsStorg.length === 0) return;
+	const crptoExch = [
+		"binance",
+		"mexc",
+		"kucoin",
+		"coingecko",
+		"okx",
+		"bybit",
+		"bitget",
+		"lbank",
+		"coincap",
+		"kraken",
+		"coinbase",
+		"cryptocompare",
+	];
 	const symbolsOrder = Array.from(symbolsMap);
+	const stocks = [];
 	const promises = symbolsOrder
 		.map(async ([s2, e]) => {
 			if (e == "binanace") return false; // تخطي هذه المنصات
+			if (!crptoExch.includes(e)) {
+				stocks.push(s2);
+				return false;
+			}
 			return fetchCurrentPrice(
 				e, // المنصة
 				s2, // الرمز
@@ -100,15 +119,22 @@ async function checkForBrowserAlerts() {
 			).catch(err => {
 				console.error(`❌ Error fetching ${e} from ${s2} err is  :`);
 				console.error(err);
-				return null;
+				return false;
 			});
 		})
 		.filter(Boolean);
 	const results = await Promise.all(promises);
+	if (stocks.length) {
+		const gtStocks = await ftchFnctnAPPs({
+			action: "arryPrice",
+			smbls: stocks,
+		});
+		results.push(...gtStocks);
+	}
 	const hndlPr = [];
-	results.forEach((data, index) => {
-		const symbol = symbolsOrder[index][0];
-		hndlPr.push(hndlAlrt(data, symbol));
+	results.forEach(data => {
+		//const symbol = symbolsOrder[index][0];
+		hndlPr.push(hndlAlrt(...data));
 	});
 	await Promise.all(hndlPr);
 }
@@ -123,16 +149,19 @@ async function hndlAlrt(curentPrice, slctdSmbl) {
 		const alert = alerte[1];
 		const id = alerte[0];
 		curentPrice *= alert.f;
-
+		
 		if (
 			(alert.c === "l" && curentPrice <= alert.t) ||
 			(alert.c === "g" && curentPrice >= alert.t)
 		) {
+			alerte.prc = curentPrice
 			if (alert.alTp === "t")
 				proms.push(
 					deleteAlert({
-						id: id,
+						alertId: id,
 						telegramChatId: "cht" + telegramChatId,
+						alrt: alerte,
+
 					}),
 				);
 			else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);

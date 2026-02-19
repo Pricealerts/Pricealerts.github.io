@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar">
 	<head>
 		<meta charset="UTF-8" />
@@ -27,11 +27,7 @@
 		<h3>تصغير صورة موجودة وتحويلها إلى Base64</h3>
 
 		<!-- الصورة الأصلية -->
-		<img
-			id="sourceImg"
-			alt="Google Drive Image"
-			src=""
-		/>
+		<img id="sourceImg" alt="Google Drive Image" src="" />
 		<!-- 		https://drive.google.com/thumbnail?id=1Swxr6FwLG3xFqOyyYs_xjxCkMzQUnFgz&sz=w800 -->
 		<br /><br />
 		<button id="convertBtn">تحويل إلى Base64</button>
@@ -92,64 +88,47 @@
 			}
 		</script>
 
-		<img id="myImage" src="https://firebasestorage.googleapis.com/v0/b/pricealert-31787.firebasestorage.app/o/avatars%2FyJb1Wu8v15SiWJ6AFLcbfMAspaD3?alt=media&token=24091ffd-0619-4347-b16b-1343a203e4f6" alt="avatar">
-<script>
-function imageToBase64(imgElement) {
-  return new Promise((resolve, reject) => {
-    const img = imgElement;
+		<img
+			id="myImage"
+			src="https://firebasestorage.googleapis.com/v0/b/pricealert-31787.firebasestorage.app/o/avatars%2FyJb1Wu8v15SiWJ6AFLcbfMAspaD3?alt=media&token=24091ffd-0619-4347-b16b-1343a203e4f6"
+			alt="avatar"
+		/>
+		<script>
+			function imageToBase64(imgElement) {
+				return new Promise((resolve, reject) => {
+					const img = imgElement;
 
-    // إنشاء canvas بنفس حجم الصورة
-    const canvas = document.createElement("canvas");
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext("2d");
+					// إنشاء canvas بنفس حجم الصورة
+					const canvas = document.createElement("canvas");
+					canvas.width = img.width;
+					canvas.height = img.height;
+					const ctx = canvas.getContext("2d");
 
-    // رسم الصورة على canvas
-    ctx.drawImage(img, 0, 0);
+					// رسم الصورة على canvas
+					ctx.drawImage(img, 0, 0);
 
-    // تحويل canvas إلى Base64
-    canvas.toDataURL("image/png", 1.0, (dataUrl) => {
-      resolve(dataUrl);
-    });
+					// تحويل canvas إلى Base64
+					canvas.toDataURL("image/png", 1.0, dataUrl => {
+						resolve(dataUrl);
+					});
 
-    // طريقة أبسط بدون callback
-    const dataUrl = canvas.toDataURL("image/png");
-    resolve(dataUrl);
-  });
-}
+					// طريقة أبسط بدون callback
+					const dataUrl = canvas.toDataURL("image/png");
+					resolve(dataUrl);
+				});
+			}
 
-const imgElement = document.getElementById("myImage");
-imageToBase64(imgElement).then(base64 => {
-  console.log("Base64:", base64);
-  // حفظ في localStorage إذا أحببت
-  localStorage.setItem("avatarBase64", base64);
-});
-</script>
-<script>
-			const alrtddd = {
-	e: "gdhff",
-	s: "dfhsdf",
-	ft: 57600022232300,
-	ms: true,
-};
-const candles = { aeezr: "areayter" };
-const {
-	e: exchangeId,
-	s: symbol,
-	t: targetPrice,
-	c: alertCondition,
-	tid: telegramChatIdZ,
-	i: id,
-	mt: meta,
-} = alrtddd;
-const statusChanged = meta?.st !== candles?.meta?.st;
-const isMarketClosed = candles?.marketState === "CLOSED";
-if (statusChanged || isMarketClosed) {
-	console.log("rah ldakhl");
-} else {
-	console.log("rah khrj");
-}
-
+			const imgElement = document.getElementById("myImage");
+			imageToBase64(imgElement).then(base64 => {
+				console.log("Base64:", base64);
+				// حفظ في localStorage إذا أحببت
+				localStorage.setItem("avatarBase64", base64);
+			});
+		</script>
+		<script>
+			const myAry = [1, 2, 3, 4, 5];
+			console.log(...myAry);
+			
 		</script>
 	</body>
 </html>

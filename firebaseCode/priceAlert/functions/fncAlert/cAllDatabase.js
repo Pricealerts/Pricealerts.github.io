@@ -1,6 +1,6 @@
 // استيراد مكتبة Firebase Admin SDK
 import { getDatabase } from "firebase-admin/database";
-import { EXCHANGES_CONFIG } from "./cnstnts.js";
+import { EXCHANGES_CONFIG ,rndmKey} from "./cnstnts.js";
 import { sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
 //import { price, srchSmbls } from "./yhoCode.js";
@@ -45,11 +45,12 @@ async function cAllDatabase(data) {
 			await Promise.all(promises);
 			rspns = false;
 		} else if (action === "gtApiKy") {
-			const rndm = Math.floor(Math.random() * 6);
-			rspns = process.env[`API_KEY${rndm}`];
-		} /*  else if (action === "smbls") {
-			rspns = await price(data);
-		} */
+			rspns = rndmKey();
+			//rspns = process.env[`API_KEY${Math.floor(Math.random() * 6)}`];
+			//rspns = process.env.API_KEY0;
+		} else {
+			rspns = { stat: false, message: "Action not recognized" };
+		}
 
 		return rspns;
 	} catch (error) {
@@ -132,7 +133,15 @@ async function dltAlrt(data) {
 	if (alrtId.length == 0) {
 		return { status: "error", message: "الرجاء توفير معرف التنبيه للحذف." };
 	}
-
+	if(data.alrt){
+		const alrtAdd = data.alrt;
+		const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
+				alrtAdd.s
+			}</b> بلغت <b>${alrtAdd.prc}</b> (الشرط: السعر ${
+				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
+			} ${alrtAdd.t})`;
+			await sendTelegramMessage(data.tId, message);
+	}
 	// Use same key structure used in setAlert: "cht<chatId>/id<alrtId>"
 	const ref = postsRef.child(`${chatId}/${alrtId}`);
 	try {
