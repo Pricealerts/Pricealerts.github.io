@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase-admin/app";
+/* import { initializeApp } from "firebase-admin/app";
 import { onValueWritten } from "firebase-functions/v2/database";
 
 initializeApp();
@@ -57,3 +57,4 @@ export const onUserCreated = onValueCreated(
 		return null;
 	}
 );
+ */

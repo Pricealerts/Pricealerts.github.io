@@ -129,7 +129,6 @@ async function setAlerte(data) {
 async function dltAlrt(data) {
 	let chatId = data.tId;
 	let alrtId = data.id;
-
 	if (alrtId.length == 0) {
 		return { status: "error", message: "الرجاء توفير معرف التنبيه للحذف." };
 	}
@@ -147,7 +146,6 @@ async function dltAlrt(data) {
 	try {
 		// حذف المرجع الأساسي
 		await ref.remove();
-
 		//const dtCall = db.ref(`allChatId/${chatId}`);
 		// تعديل العداد بطريقة آمنة باستخدام transaction
 		/* if (data.alrtOk) {
