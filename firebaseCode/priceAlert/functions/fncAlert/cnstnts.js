@@ -156,7 +156,7 @@ export const EXCHANGES_CONFIG = {
 		}),
 		intervalMap: { "1m": "60", "5m": "300", "15m": "900", "1h": "3600" },
 	},
-	nasdaqe: {
+	nasdaqez: {
 		name: "NASDAQ",
 		tickerPriceUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
 		candlestickUrl: "https://query1.finance.yahoo.com/v8/finance/chart/",
@@ -201,7 +201,7 @@ export const EXCHANGES_CONFIG = {
 	EXCHANGES_CONFIG[ex].name = ex; //.toLowerCase()
 }); */
 /**
- * دالة جلب رابط الـ API
+ **** دالة جلب رابط الـ API
  */
 export const rndmKey = () => {
 	const rndm = Math.floor(Math.random() * 10); // mor 6 hadak nta3 lemail lakhor
@@ -277,9 +277,8 @@ export const ftcgAppScrpt = stocksMap => {
 		"https://script.google.com/macros/s/AKfycbwjusxGXq8EFItqeJwHSdIYF31IN0QhIPm3Czzl6KVYCz5M_nt5Pw15-nh6k3Z5pMFyDg/exec",
 		"https://script.google.com/macros/s/AKfycbymlMryby8lJt8WevTphMqZgjVxDIFG35AagfSshvmDqbAu7eKKSYbzWORSAnxbeuFioA/exec",
 		"https://script.google.com/macros/s/AKfycbyCQnrV5sfcRxRaxTLBTWHITKrYFOYtKJlGeTbaL23KGAidUX1mi0MSfy3PVT_ahQMP7g/exec",
-		"https://script.google.com/macros/s/AKfycbyVf0_HzUtKfuq5EuE8dTmPlUi1xr7v_QrUrWls7GH773CrCZYWOgHRLi2BLlFDofxmnA/exec"
+		"https://script.google.com/macros/s/AKfycbyVf0_HzUtKfuq5EuE8dTmPlUi1xr7v_QrUrWls7GH773CrCZYWOgHRLi2BLlFDofxmnA/exec",
 	];
-
 	const acsptAlrts = orgnUrls.length * quota;
 	let rndmUrls = [];
 	for (let i = orgnUrls.length; i > 0; i--) {

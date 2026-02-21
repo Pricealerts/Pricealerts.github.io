@@ -1,6 +1,6 @@
 // استيراد مكتبة Firebase Admin SDK
 import { getDatabase } from "firebase-admin/database";
-import { EXCHANGES_CONFIG ,rndmKey} from "./cnstnts.js";
+import { EXCHANGES_CONFIG, rndmKey } from "./cnstnts.js";
 import { sendTelegramMessage } from "./srchSmbls.js";
 import { sndEmail } from "./sndEmail.js";
 //import { price, srchSmbls } from "./yhoCode.js";
@@ -132,19 +132,19 @@ async function dltAlrt(data) {
 	if (alrtId.length == 0) {
 		return { status: "error", message: "الرجاء توفير معرف التنبيه للحذف." };
 	}
-	if(data.alrt){
-		const alrtAdd = data.alrt;
-		const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
+	try {
+		if (data.alrt) {
+			const alrtAdd = data.alrt;
+			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
 				alrtAdd.s
 			}</b> بلغت <b>${alrtAdd.prc}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 			} ${alrtAdd.t})`;
-			await sendTelegramMessage(data.tId, message);
-	}
-	// Use same key structure used in setAlert: "cht<chatId>/id<alrtId>"
-	const ref = postsRef.child(`${chatId}/${alrtId}`);
-	try {
-		// حذف المرجع الأساسي
+			const ref = postsRef.child(`${chatId}/${alrtId}`);
+			const getChId = await ref.get();
+			if (getChId.exists()) await sendTelegramMessage(data.tId, message);
+		}
+
 		await ref.remove();
 		//const dtCall = db.ref(`allChatId/${chatId}`);
 		// تعديل العداد بطريقة آمنة باستخدام transaction

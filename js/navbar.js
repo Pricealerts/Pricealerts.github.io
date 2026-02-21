@@ -48,16 +48,18 @@ sidebar.innerHTML = `<!-- Sidebar (LEFT) -->
         	<a href="#">المنتجات</a>
 			<a href="#">الخدمات</a> 
              -->
+			
 			<a href="https://pricealerts.web.app/otherPage/privacy.html">
            		سياسة الخصوصية
 				<img src="/imgs/web/privacy-svgrepo-com.svg" alt=""></a>
 			<a href="https://pricealerts.web.app/otherPage/contact.html">
             اتصل بنا
 				<img src="/imgs/web/mail-svgrepo-com.svg" alt="home"></a>
-		
-        		${enteEsc}
+				 <a href="https://pricealerts.web.app/ai">
+			التحليل باستخدام AI
+			<img src="/imgs/web/ai-svgrepo-com.svg" alt=""></a>
+        		${enteEsc}${accont}
 			
-			${accont}
 `;
 
 document.body.prepend(sidebar);

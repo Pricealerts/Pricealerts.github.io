@@ -10,11 +10,12 @@ if (!chatIdAbdelhadi) {
 }
 
 async function rtrnFn(data) {
-	const { action, smbl } = data;
+	const { action, smbl='BTC' } = data;
 	const actionMap = {
 		srchSmbls: srchSmbls,
 		sendMessage: sendMesageFn,
 		gtPr: price,
+		gtApiKy:rndmKey
 	};
 	const executeAction = actionMap[action];
 	if (executeAction) {
@@ -29,7 +30,10 @@ async function rtrnFn(data) {
 // ------------------------
 // جلب رموز بورصة واحدة من البورصات لخرين
 // ------------------------
-
+export const rndmKey = () => {
+	const rndm = Math.floor(Math.random() * 4); // mor 6 hadak nta3 lemail lakhor
+	return process.env[`API_KEY_G${rndm}`];
+};
 /////// nta3 message
 async function sendMesageFn(messageText) {
 	try {

@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>مساعد الأسعار الذكي | Gemini Price Alert</title>
+		<link
+			rel="stylesheet"
+			href="https://pricealerts.github.io/style/navbar.css"
+		/>
+		<link rel="stylesheet" href="./style.css" />
+
+		<script type="importmap">
+			{
+				"imports": {
+					"@google/generative-ai": "https://esm.run/@google/generative-ai"
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div class="chat-container">
+			<div id="pirantCntynr" class="pirantCntynr" style="padding: 0 20px"></div>
+			<div
+				style="
+					padding: 10px;
+					background: #007bff;
+					color: white;
+					text-align: center;
+					font-weight: bold;
+				"
+			>
+				محلل الأسواق الذكي 🤖
+			</div>
+
+			<div class="messages-area" id="chat-history">
+				<div class="message bot-msg">
+					أهلاً بك! أنا مساعدك المالي. اسألني عن أي شيء عن التداول وسأجيبك في
+					الحال.
+				</div>
+			</div>
+
+			<div class="suggestions-area">
+				<div
+					class="chip"
+					onclick="sendPrompt('كم سعر البيتكوين (BTC) وحلل اتجاهه؟')"
+				>
+					💰 سعر البيتكوين
+				</div>
+				<div
+					class="chip"
+					onclick="sendPrompt('ما هو وضع سهم أبل (AAPL) اليوم؟')"
+				>
+					🍎 سهم Apple
+				</div>
+				<!-- <div class="chip" onclick="sendPrompt('قارن بين سعر ETH و SOL')">
+					⚖️ مقارنة عملات
+				</div> -->
+				<div class="chip" onclick="sendPrompt('تحليل لسهم أرامكو (2222.SR)')">
+					🛢️ سهم أرامكو
+				</div>
+				<div class="chip" onclick="sendPrompt('أعطني نصيحة للتداول بشكل جيد')">
+					نصيحة إستثمارية 📈
+				</div>
+			</div>
+
+			<div class="input-area">
+				<input
+					type="text"
+					id="user-input"
+					placeholder="اكتب سؤالك هنا..."
+					onkeypress="if(event.key === 'Enter') window.sendMessage()"
+				/>
+				<button id="send-btn" onclick="window.sendMessage()">إرسال</button>
+			</div>
+		</div>
+
+		<script type="module" src="./js.js"></script>
+
+		<script src="https://pricealerts.github.io/js/navbar.js"></script>
+	</body>
+</html>

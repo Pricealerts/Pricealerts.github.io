@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -63,15 +63,14 @@
 				<select id="exchangeSelect">
 					<optgroup label=" منصات العملات الرقمية">
 						<option value="binance">Binance</option>
-						<option value="mexc">mexc</option>
 						<option value="kucoin">KuCoin</option>
 						<option value="coingecko">CoinGecko</option>
 						<option value="okx">OKX</option>
 						<option value="bybit">Bybit</option>
 						<option value="bitget">Bitget</option>
-						<option value="lbank">Lbank</option>
 						<option value="kraken">Kraken</option>
 						<option value="coinbase">Coinbase</option>
+						<option value="cryptocompare">باقي العملات الرقمية</option>
 					</optgroup>
 					<optgroup label=" بورصات الأسهم">
 						<option value="nasdaq">NASDAQ</option>
@@ -136,17 +135,18 @@
 					<option value="CNY">CNY</option>
 					<option value="KRW">KRW</option>
 				</select>
+				<select
+					id="cptoDsply"
+					class=""
+					style="width: fit-content; cursor: pointer"
+				>
+					<option value="USDT">USDT</option>
+				</select>
 				<p class="currentPrice" id="currentPrice">--.--</p>
 			</div>
 
 			<div class="alert-section">
 				<h2>إعداد التنبيه</h2>
-				<!-- <p class="note">
-                <strong>ملاحظة:</strong> التنبيهات المستمرة والفعالة هي عبر 
-				<strong>تيليجرام</strong> 
-				فقط (وتُحذف تلقائيًا بعد التفعيل)
-				. تنبيهات المتصفح هي لمرة واحدة عند فتح الصفحة.
-            </p> -->
 				<label for="targetPrice">السعر المستهدف :</label>
 				<input
 					type="number"
@@ -237,7 +237,7 @@
 					<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>
 				</ul>
 			</div>
-			
+
 			<div class="active-alerts-section">
 				<h2>تنبيهاتي النشطة ( تطبيق )</h2>
 				<ul id="alertsListNtf">
@@ -264,18 +264,6 @@
 					</div>
 				</h3>
 			</div>
-
-			<!--  <iframe id="ifrmTRdVw"
-  src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&style=1"
-  width="100%" style="margin-top: 20px;"
-  height="400"
-  frameborder="0"
-  allowtransparency="true"
-  scrolling="no">
-</iframe> 
-
-
--->
 		</div>
 		<script>
 			const installBtn = document.getElementById("installBtn");

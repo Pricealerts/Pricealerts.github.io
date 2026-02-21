@@ -297,19 +297,11 @@ async function fetchCurrentPrice(
 				price = data.price;
 				break;
 			case "cryptocompare":
-				if (!apKCrpt)
-					apKCrpt = await fnAndStrg(
-						"apKCrpt",
-						10,
-						ftchFnctn,
-						{ action: "gtApiKy" },
-						FIREBASE_URL,
-					);
-				const urlcompar = exchange.gturl(symbol);
+				const urlcompar = await exchange.gturl(symbol);
 				response = await fetch(urlcompar);
 				data = await response.json();
-				price = data["USDT"] ;
-				if (!brwsrAlrt)price *= factorPric;
+				price = data["USDT"];
+				if (!brwsrAlrt) price *= factorPric;
 				break;
 			case "nasdaq":
 			case "nyse":
@@ -356,7 +348,7 @@ async function fetchCurrentPrice(
 
 		if (price !== null) {
 			currentPrice = parseFloat(price);
-			if (brwsrAlrt) return [currentPrice,symbol];
+			if (brwsrAlrt) return [symbol, currentPrice];
 			currentPriceDisplay.textContent = `${currentPrice} `;
 			if (prmrFtch) {
 				targetPriceInput.value = currentPrice; // تعيين السعر الحالي كقيمة افتراضية لحقل السعر المستهدف

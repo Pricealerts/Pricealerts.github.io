@@ -19,4 +19,4 @@ function checkLocalStorageSpace() {
     console.log("المساحة المتبقية تقريباً: " + (limitMB - usedMB).toFixed(2) + " MB");
 }
 
-//checkLocalStorageSpace();
+checkLocalStorageSpace();

@@ -25,7 +25,7 @@ const db = getDatabase(app);
 window.gtDataStocks = async exchangeId => {
 	try {
 		const rslt = (await get(ref(db, `stockSymbols/${exchangeId}`))).val();
-		console.log(rslt);  
+		console.log(rslt);
 		return rslt;
 	} catch (error) {
 		console.log(error);
@@ -39,5 +39,16 @@ window.dataAlrts = async chId => {
 	} catch (error) {
 		console.log(error);
 		return [];
+	}
+};
+let apKCrpt = null;
+window.gtApiKey = async () => {
+	try {
+		if (!apKCrpt)
+			apKCrpt = await ftchFnctn({ action: "gtApiKy" }, FIREBASE_URL);
+		return apKCrpt;
+	} catch (error) {
+		console.log(error);
+		return "";
 	}
 };

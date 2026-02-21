@@ -77,7 +77,7 @@ function bncWebSocketMult() {
 			const nowDate = Date.now();
 			const dfrnc = nowDate - oldTmBnc;
 			if (dfrnc > 3000) {
-				hndlAlrt(data.c, data.s);
+				hndlAlrt(data.s, data.c);
 				oldTmBnc = nowDate;
 			}
 		}
@@ -119,7 +119,7 @@ async function connectKuCoinWS(symbol = "0G-USDT") {
 				const nowDate = Date.now();
 				const dfrnc = nowDate - connectId;
 				if (dfrnc > 3000) {
-					hndlAlrt(msg.data.size, symbol);
+					hndlAlrt(symbol, msg.data.size);
 					connectId = nowDate;
 				}
 			}
@@ -161,7 +161,7 @@ function connectOKX(symbol) {
 			const nowDate = Date.now();
 			const dfrnc = nowDate - connectId;
 			if (dfrnc > 3000) {
-				hndlAlrt(price, symbol);
+				hndlAlrt(symbol, price);
 				connectId = nowDate;
 			}
 		}
@@ -200,7 +200,7 @@ function connectBybit(symbol = "BTCUSDT") {
 				const nowDate = Date.now();
 				const dfrnc = nowDate - connectId;
 				if (dfrnc > 3000) {
-					hndlAlrt(price, symbol);
+					hndlAlrt(symbol, price);
 					connectId = nowDate;
 				}
 			}

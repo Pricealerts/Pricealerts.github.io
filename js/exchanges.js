@@ -5,7 +5,7 @@ let orgnUrls = [
 	"https://script.google.com/macros/s/AKfycbzZvsX-TrjPLhjxn_unHOqNY83lzp-nkYqdEwSIqBymgUp9Gy8kxLm17j9c3uTJLAR4/exec",
 	"https://script.google.com/macros/s/AKfycbz9Tg0CDt8veAVGAEE8sJiKU0Y9t15KFurlvuEi0sVR2EseFH4iWBJIRpyVsvVU8HEh/exec",
 	"https://script.google.com/macros/s/AKfycbxBEhgPiJCXqp-Y8oRA70o80jpMPnoa1fYmYX-EiubqL1ek_gl4gvx13UdOWvr0XCry/exec",
-	"https://script.google.com/macros/s/AKfycbxzZmeqF3beh2csmPaNwMKbBjPt-x50Rek3yk6_X4-FDfxbz9YIcwMjicPTuZI9x7j2/exec"
+	"https://script.google.com/macros/s/AKfycbxzZmeqF3beh2csmPaNwMKbBjPt-x50Rek3yk6_X4-FDfxbz9YIcwMjicPTuZI9x7j2/exec",
 ];
 let frbsUrls = [
 	"https://rqststocks-wgqzo7cltq-ew.a.run.app", // chatId
@@ -27,7 +27,6 @@ function gtRndmUrl(urls) {
 	}
 	return rndmUrls;
 }
-let apKCrpt = null;
 
 const EXCHANGES = {
 	binance: {
@@ -103,8 +102,10 @@ const EXCHANGES = {
 		exchangeInfoUrl: "https://min-api.cryptocompare.com/data/all/coinlist",
 		tickerPriceUrl: `https://min-api.cryptocompare.com/data/price?fsym=`, // ${coin}&tsyms=${currency}&api_key=${apiKey}
 		intervalData: 10000,
-		gturl: smbl =>
-			`https://min-api.cryptocompare.com/data/price?fsym=${smbl}&tsyms=USDT&api_key=${apKCrpt}`,
+		gturl:async smbl => {
+			const ky = await gtApiKey();
+			`https://min-api.cryptocompare.com/data/price?fsym=${smbl}&tsyms=USDT&api_key=${ky}`;
+		},
 	},
 	nasdaq: {
 		name: "NASDAQ",
@@ -193,6 +194,3 @@ async function ftchFnctnAPPs(body) {
 		throw error;
 	}
 }
-
-
-
