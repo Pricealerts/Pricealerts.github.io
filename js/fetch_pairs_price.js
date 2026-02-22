@@ -1,11 +1,10 @@
 // *** استبدل هذا برابط Web app URL الخاص بـ Google Apps Script الذي ستنشئه ***
-let getPriceUrl =
-	"https://script.google.com/macros/s/AKfycbyg0QZ6udY-A2E8r_Q5rwr46HKUgFxV2h1MvKW1xJtYBBx2OJAmQo5zBM_fYsGhjvU6/exec";
 const FIREBASE_URL =
 	"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
 
-let currencyFtch = "USD";
-let rfrsh = 0;
+let currencyFtch = "USD",
+	alphvntgVal = true,
+	rfrsh = 0;
 async function fnAndStrg(nmStrg, nmDy, fnctn, bdy = nmStrg, url = null) {
 	let nmbrDays = 100;
 	let localStrg = localStorage.getItem(nmStrg);
@@ -32,13 +31,13 @@ async function fnAndStrg(nmStrg, nmDy, fnctn, bdy = nmStrg, url = null) {
 		}
 	}
 }
-let allSmblBnc = [];
-let allPricesBnc = [];
-let allPricesMexc = [];
-let allPricesKucoin = [];
-let allPricesOkx = [];
-let allPricesCrptCmp = [];
-let allPrices;
+let allSmblBnc = [],
+	allPricesBnc = [],
+	allPricesMexc = [],
+	allPricesKucoin = [],
+	allPricesOkx = [],
+	allPricesCrptCmp = [],
+	allPrices;
 const MAX_ALERTS = 50; // يمكن تغيير هذا الحد الأقصى للتنبيهات
 // تعريف جميع المنصات المدعومة وواجهات برمجة التطبيقات الخاصة بها
 // --- وظائف جلب البيانات وتحديث الأسعار ---
@@ -134,14 +133,6 @@ async function fetchTradingPairs(exchangeId) {
 				response = await fetch(exchange.tickerPriceUrl);
 				data = await response.json();
 				symbols = data.data.filter(s => s.symbol); // تصفية تقريبية
-				break;
-			case "coinmarketcap":
-				response = await fetch(getPriceUrl, {
-					method: "POST",
-					body: JSON.stringify({ action: "symbols" }),
-				});
-				data = await response.json();
-				symbols = data.smbls.map(s => s.symbol);
 				break;
 			case "kraken":
 				response = await fetch(exchange.exchangeInfoUrl);
@@ -318,7 +309,25 @@ async function fetchCurrentPrice(
 			case "other":
 				const timeInMs = Date.now();
 				if (prmrFtch) {
-					rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
+					if (alphvntgVal) {
+						const url2 = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=JAVASCRIPT_DEMO`;
+						const response = await fetch(url2, {
+							method: "GET",
+						});
+						data = await response.json();
+						const quote = data["Global Quote"] || false;
+						const latestPrice = parseFloat(quote["05. price"]) || false;
+						console.log(latestPrice);
+						if (
+							!quote ||
+							Object.keys(quote).length === 0 ||
+							!response.ok ||
+							isNaN(latestPrice)
+						) {
+							rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
+							alphvntgVal = false;
+						} else rslt = latestPrice;
+					} else rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 				} else if (brwsrAlrt) {
 					rslt = await ftchFnctnAPPs({ action: "price", smbl: symbol });
 					return rslt.price;

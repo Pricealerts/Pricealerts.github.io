@@ -2,80 +2,126 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>Binance Live Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جلب سعر سهم AAPL - حل مشكلة CORS</title>
+    <!-- تضمين Tailwind CSS لتصميم سريع وجميل -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0b0e11; color: white; display: flex; justify-content: center; padding-top: 50px; }
-        table { border-collapse: collapse; width: 80%; max-width: 800px; background-color: #1e2329; border-radius: 10px; overflow: hidden; }
-        th, td { padding: 15px; text-align: center; border-bottom: 1px solid #2b2f36; }
-        th { background-color: #2b2f36; color: #848e9c; }
-        .price { font-weight: bold; font-family: monospace; font-size: 1.2em; transition: color 0.3s; }
-        .up { color: #02c076; } /* أخضر */
-        .down { color: #f84960; } /* أحمر */
-        .symbol { font-weight: bold; color: #f0b90b; }
+        body {
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f9;
+        }
     </style>
 </head>
 <body>
 
-    <table>
-        <thead>
-            <tr>
-                <th>الزوج</th>
-                <th>السعر الحالي (USDT)</th>
-                <th>التغير (24ساعة)</th>
-            </tr>
-        </thead>
-        <tbody id="crypto-table">
-            </tbody>
-    </table>
+<div class="bg-white p-8 rounded-xl shadow-2xl max-w-lg w-full text-center">
+    <h1 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-3">جلب بيانات أسهم Apple (AAPL)</h1>
+    
+    <div id="result" class="text-xl font-medium text-blue-600 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        جارٍ جلب البيانات...
+    </div>
 
-    <script>
-        const pairs = ['btcusdt', 'ethusdt', 'solusdt', 'bnbusdt'];
-        const prices = {}; // لتخزين الأسعار السابقة للمقارنة
-        const tableBody = document.getElementById('crypto-table');
+    <p class="mt-6 text-sm text-gray-500">
+        تم التبديل إلى Alpha Vantage API. يرجى الملاحظة أن مفاتيح الـ API التجريبية لها حدود قصوى صارمة للطلبات.
+    </p>
+</div>
 
-        // إنشاء الصفوف في الجدول لكل عملة
-        pairs.forEach(pair => {
-            const row = document.createElement('tr');
-            row.id = `row-${pair}`;
-            row.innerHTML = `
-                <td class="symbol">${pair.toUpperCase()}</td>
-                <td id="price-${pair}" class="price">جاري التحميل...</td>
-                <td id="change-${pair}">--</td>
-            `;
-            tableBody.appendChild(row);
-        });
+<script>
+    // ******************************************************
+    // الكود الذي يستخدم Alpha Vantage
+    // ******************************************************
+    
+    // مفتاح API تجريبي آخر متاح للجميع من Alpha Vantage (JavaScript Demo Key)
+    // نستخدمه كمحاولة أخيرة لتجاوز حدود المفتاح "demo" السابق
+    const ALPHA_VANTAGE_API_KEY = 'JAVASCRIPT_DEMO'; 
 
-        // الاتصال بـ WebSocket
-        const streams = pairs.map(p => `${p}@ticker`).join('/');
-        const ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
+    // الرابط لطلب سعر السهم اليومي (Global Quote) من Alpha Vantage لـ AAPL
+    const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=${ALPHA_VANTAGE_API_KEY}`;
+    //const url2 = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=JAVASCRIPT_DEMO`;
+    
+    // لم نعد نحتاج إلى الخادم الوكيل (proxyUrl) لأن Alpha Vantage يسمح بطلبات CORS المباشرة.
+    const apiKey = ""; 
 
-        ws.onmessage = (event) => {
-            const msg = JSON.parse(event.data);
-            const data = msg.data;
-            const pair = data.s.toLowerCase();
-            const currentPrice = parseFloat(data.c).toFixed(2);
-            const change = data.P; // نسبة التغير
-            const priceElement = document.getElementById(`price-${pair}`);
-            const changeElement = document.getElementById(`change-${pair}`);
+    async function fetchStockData() {
+        // عرض حالة التحميل
+        const resultElement = document.getElementById('result');
+        resultElement.classList.remove('text-red-600', 'bg-red-50', 'border-red-200', 'text-green-600', 'bg-green-50', 'border-green-200');
+        resultElement.classList.add('text-blue-600', 'bg-blue-50', 'border-blue-200');
+        resultElement.innerText = 'جارٍ جلب البيانات...';
+        
+        try {
+            // الطلب المباشر (بدون خادم وكيل)
+            const response = await fetch(url, {
+                method: 'GET'
+            });
 
-            // تحديد اللون بناءً على السعر السابق
-            if (prices[pair]) {
-                if (currentPrice > prices[pair]) {
-                    priceElement.className = 'price up';
-                } else if (currentPrice < prices[pair]) {
-                    priceElement.className = 'price down';
-                }
+            if (!response.ok) {
+                // خطأ HTTP
+                throw new Error(`خطأ HTTP! حالة الرد: ${response.status}.`);
             }
-            // تحديث القيم في الجدول
-            priceElement.innerText = `$${currentPrice}`;
-            changeElement.innerText = `${change}%`;
-            changeElement.className = parseFloat(change) >= 0 ? 'up' : 'down';
 
-            // تخزين السعر الحالي للمرة القادمة
-            prices[pair] = currentPrice;
-        };
+            const data = await response.json();
+            console.log(data);
+			
+            // =======================================================
+            // معالجة الأخطاء والقيود
+            // =======================================================
+            if (data.Note) {
+                // Alpha Vantage يرسل "Note" عند تجاوز الحد الأقصى للطلبات
+                throw new Error(`تم تجاوز الحد الأقصى للطلبات التجريبية. يرجى الحصول على مفتاح API خاص بك.`);
+            }
 
-        ws.onclose = () => console.log("🔌 انقطع الاتصال");
-    </script>
+            // التحقق من وجود رسالة خطأ صريحة من الـ API
+            if (data['Error Message']) {
+                throw new Error(data['Error Message']);
+            }
+            
+            // التحقق من وجود بيانات الأسعار (Global Quote)
+            const quote = data['Global Quote'];
+            if (!quote || Object.keys(quote).length === 0) {
+                // في هذه الحالة، الرد لم يحتوِ على بيانات الأسعار بدون رسالة خطأ واضحة
+                throw new Error("لم يتم العثور على بيانات الأسعار في الرد. (يُرجى الانتظار دقيقة ومحاولة تشغيل الكود مرة أخرى أو الحصول على مفتاح API خاص بك)");
+            }
+            // =======================================================
+
+            // استخراج سعر الإغلاق (05. price) وتاريخ التحديث (07. latest trading day)
+            const latestPrice = parseFloat(quote['05. price']);
+            const latestTradingDay = quote['07. latest trading day'];
+            
+            // تحويل التاريخ إلى تنسيق عربي
+            const date = new Date(latestTradingDay).toLocaleDateString('ar-EG', { dateStyle: 'medium' });
+
+            if (isNaN(latestPrice)) {
+                 throw new Error("القيمة المسترجعة للسعر غير صالحة.");
+            }
+            
+            // عرض النتيجة بنجاح
+            resultElement.classList.remove('text-red-600', 'bg-red-50', 'border-red-200', 'text-blue-600', 'bg-blue-50', 'border-blue-200');
+            resultElement.classList.add('text-green-600', 'bg-green-50', 'border-green-200');
+            resultElement.innerHTML = `
+                <p><strong>آخر سعر:</strong> $${latestPrice.toFixed(2)}</p>
+                <p class="text-sm text-gray-500 mt-2">آخر تحديث: ${date}</p>
+            `;
+
+        } catch (error) {
+            // عرض رسالة الخطأ
+            console.error("Fetch error:", error);
+            resultElement.classList.remove('text-blue-600', 'bg-blue-50', 'border-blue-200', 'text-green-600', 'bg-green-50', 'border-green-200');
+            resultElement.classList.add('text-red-600', 'bg-red-50', 'border-red-200');
+            resultElement.innerHTML = `
+                <p>❌ خطأ في جلب البيانات:</p>
+                <p class="text-sm mt-2">${error.message}</p>
+            `;
+        }
+    }
+
+    window.onload = fetchStockData;
+</script>
+
 </body>
 </html>
