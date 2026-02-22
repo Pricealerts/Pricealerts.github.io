@@ -222,7 +222,6 @@ async function fetchCurrentPrice(
 ) {
 	const exchange = EXCHANGES[exchangeId];
 	if (!exchange) return null;
-	rfrsh++;
 	try {
 		let apiUrl = "";
 		let price = null;
@@ -310,8 +309,8 @@ async function fetchCurrentPrice(
 				const timeInMs = Date.now();
 				if (prmrFtch) {
 					if (alphvntgVal) {
-						const url2 = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=JAVASCRIPT_DEMO`;
-						const response = await fetch(url2, {
+						const urlAlp = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=JAVASCRIPT_DEMO`;
+						const response = await fetch(urlAlp, {
 							method: "GET",
 						});
 						data = await response.json();
@@ -373,6 +372,7 @@ async function fetchCurrentPrice(
 		console.error(`حدث خطأ في جلب سعر ${symbol} من ${exchange.name}:`, error);
 		currentPriceDisplay.textContent = "خطأ في جلب السعر.";
 		currentPrice = null;
+		rfrsh++;
 		if (rfrsh < 3) {
 			console.log("3awd wla rfrsh : " + rfrsh);
 			//fetchCurrentPrice(exchangeId, symbol, prmrFtch);

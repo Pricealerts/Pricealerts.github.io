@@ -217,10 +217,6 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 		requestNotificationPermission();
 	}
 }
-const ggghhh = {trdtsd : 'fdqdqsd'}
-const quoteZ = ggghhh["Global Quote"]|| false
-console.log(quoteZ);
-
 /* 
 const fsqd = [
 	{
