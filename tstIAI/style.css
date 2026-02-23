@@ -1,0 +1,459 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Cairo', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    display: flex;
+    min-height: 100vh;
+    background: rgba(255, 255, 255, 0.95);
+}
+
+/* الشريط الجانبي */
+.sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #2c3e50 0%, #1a2634 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logo i {
+    font-size: 2em;
+    color: #f1c40f;
+}
+
+.logo h2 {
+    font-size: 1.3em;
+    font-weight: 700;
+}
+
+.api-key-section {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.api-key-section label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: #ecf0f1;
+}
+
+.api-key-section input {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    font-size: 0.9em;
+}
+
+.api-key-section input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.api-key-section small {
+    display: block;
+    margin-top: 5px;
+    font-size: 0.8em;
+    color: #bdc3c7;
+}
+
+.quick-actions h3 {
+    font-size: 1em;
+    margin-bottom: 10px;
+    color: #ecf0f1;
+}
+
+.quick-actions button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255,255,255,0.1);
+    border: none;
+    border-radius: 5px;
+    color: white;
+    text-align: right;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quick-actions button:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateX(-5px);
+}
+
+.quick-actions button i {
+    width: 20px;
+}
+
+.price-ticker {
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.price-ticker h3 {
+    margin-bottom: 10px;
+    font-size: 1em;
+}
+
+.price-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.price-item:last-child {
+    border-bottom: none;
+}
+
+.price {
+    font-weight: 700;
+    color: #2ecc71;
+}
+
+.market-status {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot.green {
+    background: #2ecc71;
+    box-shadow: 0 0 10px #2ecc71;
+}
+
+.update-time {
+    font-size: 0.9em;
+    color: #bdc3c7;
+}
+
+/* المحتوى الرئيسي */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+header h1 {
+    color: #2c3e50;
+    font-size: 1.8em;
+    margin-bottom: 10px;
+}
+
+header p {
+    color: #7f8c8d;
+}
+
+/* منطقة المحادثة */
+.chat-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    max-height: calc(100vh - 300px);
+}
+
+.welcome-message {
+    text-align: center;
+    padding: 40px 20px;
+    color: #7f8c8d;
+}
+
+.welcome-message i {
+    font-size: 4em;
+    color: #3498db;
+    margin-bottom: 20px;
+}
+
+.welcome-message h3 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.welcome-message ul {
+    list-style: none;
+    margin-top: 15px;
+}
+
+.welcome-message li {
+    padding: 5px 0;
+}
+
+.message {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.user-message {
+    align-items: flex-end;
+}
+
+.assistant-message {
+    align-items: flex-start;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 12px 18px;
+    border-radius: 15px;
+    position: relative;
+    animation: fadeIn 0.3s ease;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-left-radius: 5px;
+}
+
+.assistant-message .message-content {
+    background: #f1f2f6;
+    color: #2c3e50;
+    border-bottom-right-radius: 5px;
+}
+
+.message-time {
+    font-size: 0.7em;
+    margin-top: 5px;
+    color: #95a5a6;
+}
+
+/* منطقة الإدخال */
+.input-area {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+}
+
+.input-wrapper {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+textarea {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 10px;
+    font-size: 1em;
+    resize: none;
+    outline: none;
+    font-family: 'Cairo', sans-serif;
+}
+
+.input-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 10px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.action-buttons button {
+    background: none;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: all 0.3s;
+}
+
+.action-buttons button:hover {
+    background: #e0e0e0;
+    color: #e74c3c;
+}
+
+.send-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.send-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.disclaimer {
+    margin-top: 10px;
+    font-size: 0.8em;
+    color: #95a5a6;
+    text-align: center;
+}
+
+/* الإشعارات */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2c3e50;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    animation: slideDown 0.3s ease;
+}
+
+.notification.hidden {
+    display: none;
+}
+
+/* مؤشر الكتابة */
+.typing-indicator {
+    display: flex;
+    gap: 5px;
+    padding: 10px;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #95a5a6;
+    border-radius: 50%;
+    animation: typing 1s infinite ease-in-out;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+/* بادجات الأسعار */
+.price-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    background: rgba(46, 204, 113, 0.2);
+    color: #27ae60;
+    border-radius: 3px;
+    font-size: 0.8em;
+    margin: 0 5px;
+}
+
+/* أنيميشن */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -20px);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+    }
+    30% {
+        transform: translateY(-10px);
+    }
+}
+/* sk-13fa7431f03640229288055a9d13f5f1 */
+/* التجاوب مع الشاشات الصغيرة */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+    
+    .sidebar {
+        width: 100%;
+        max-height: 300px;
+        overflow-y: auto;
+    }
+    
+    .main-content {
+        padding: 10px;
+    }
+    
+    .message-content {
+        max-width: 90%;
+    }
+}

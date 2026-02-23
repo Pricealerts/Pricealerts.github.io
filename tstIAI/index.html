@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساعد التداول الذكي - DeepSeek</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- الشريط الجانبي -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h2>مساعد التداول</h2>
+            </div>
+            
+            <div class="api-key-section">
+                <label for="api-key">
+                    <i class="fas fa-key"></i>
+                    مفتاح DeepSeek API
+                </label>
+                <input type="password" id="api-key" placeholder="أدخل مفتاح API الخاص بك">
+                <small>مثال: sk-1234567890abcdef</small>
+            </div>
+            
+            <div class="quick-actions">
+                <h3><i class="fas fa-bolt"></i> إجراءات سريعة</h3>
+                <button onclick="quickQuery('ما سعر BTC و ETH؟')">
+                    <i class="fab fa-bitcoin"></i> أسعار العملات
+                </button>
+                <button onclick="quickQuery('ما سعر AAPL و MSFT؟')">
+                    <i class="fas fa-chart-simple"></i> أسعار الأسهم
+                </button>
+                <button onclick="quickQuery('تحليل فني لـ BTC')">
+                    <i class="fas fa-chart-line"></i> تحليل فني
+                </button>
+            </div>
+            
+            <div class="price-ticker">
+                <h3><i class="fas fa-newspaper"></i> آخر الأسعار</h3>
+                <div id="live-prices">
+                    <div class="price-item">
+                        <span>BTC</span>
+                        <span class="price" id="btc-price">جاري التحميل...</span>
+                    </div>
+                    <div class="price-item">
+                        <span>ETH</span>
+                        <span class="price" id="eth-price">جاري التحميل...</span>
+                    </div>
+                    <div class="price-item">
+                        <span>AAPL</span>
+                        <span class="price" id="aapl-price">جاري التحميل...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="market-status">
+                <h3><i class="fas fa-circle"></i> حالة السوق</h3>
+                <div class="status-indicator">
+                    <span class="dot green"></span>
+                    <span>السوق مفتوح</span>
+                </div>
+                <div class="update-time">
+                    آخر تحديث: <span id="update-time">-</span>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- المحتوى الرئيسي -->
+        <main class="main-content">
+            <!-- رأس الصفحة -->
+            <header>
+                <h1><i class="fas fa-robot"></i> مساعد التداول بالذكاء الاصطناعي</h1>
+                <p>اسأل عن أي شيء في عالم التداول والأسواق المالية</p>
+            </header>
+            
+            <!-- منطقة المحادثة -->
+            <div class="chat-container" id="chat-container">
+                <div class="welcome-message" id="welcome-message">
+                    <i class="fas fa-chart-pie"></i>
+                    <h3>مرحباً بك في مساعد التداول الذكي!</h3>
+                    <p>يمكنك سؤالي عن:</p>
+                    <ul>
+                        <li>أسعار العملات الرقمية (مثل: BTC, ETH, BNB)</li>
+                        <li>أسعار الأسهم (مثل: AAPL, GOOGL, MSFT)</li>
+                        <li>تحليلات السوق والتوصيات</li>
+                        <li>مقارنات بين الأصول المختلفة</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- منطقة الإدخال -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="user-input" 
+                        placeholder="اكتب سؤالك هنا... مثال: ما سعر البيتكوين والإيثيريوم اليوم؟"
+                        rows="2"
+                    ></textarea>
+                    
+                    <div class="input-actions">
+                        <div class="action-buttons">
+                            <button onclick="clearChat()" class="clear-btn" title="مسح المحادثة">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                            <button onclick="attachFile()" class="attach-btn" title="إرفاق ملف">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                        </div>
+                        <button onclick="sendMessage()" class="send-btn" id="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>إرسال</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="disclaimer">
+                    <i class="fas fa-info-circle"></i>
+                    هذه المعلومات لأغراض تعليمية فقط وليست نصيحة مالية
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- نافذة منبثقة للإشعارات -->
+    <div id="notification" class="notification hidden">
+        <span id="notification-message"></span>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
