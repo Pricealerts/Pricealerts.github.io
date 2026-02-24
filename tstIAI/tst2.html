@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>إرسال رسالة إلى ChatGPT</title>
+<style>
+body{
+    font-family: Arial;
+    text-align: center;
+    margin-top: 100px;
+}
+input{
+    width: 300px;
+    padding: 10px;
+    font-size: 16px;
+}
+button{
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<h2>اكتب رسالتك</h2>
+
+<input type="text" id="message" placeholder="اكتب هنا...">
+<button onclick="sendMessage()">إرسال</button>
+
+<script>
+function sendMessage(){
+    let msg = document.getElementById("message").value;
+    if(msg.trim() !== ""){
+        let url = "https://chatgpt.com/?q=" + encodeURIComponent(msg);
+        window.location.href = url;
+    } else {
+        alert("يرجى كتابة رسالة أولاً");
+    }
+}
+</script>
+
+</body>
+</html>
