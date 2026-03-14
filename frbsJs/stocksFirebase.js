@@ -1,7 +1,9 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {initializeApp, db as dbPrc } from "./firebaseCode.js";
 //import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";// nta3 tokn
 
 import {
+	
 	getDatabase,
 	ref,
 	get,
