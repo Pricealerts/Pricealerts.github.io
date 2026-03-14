@@ -56,7 +56,7 @@ export const proxyRequestV2 = onRequest(
 
 export const scheduledTask = onSchedule(
 	{
-		schedule: "0 9 * * *" ,//evriday //schedule: "*/5 * * * *","0 9 * * *"
+		schedule: "*/5 * * * *" ,//evriday //schedule: "*/5 * * * *","0 9 * * *"
 		region: "europe-west1",
 		memory: "256MiB",
 		maxInstances: 1,

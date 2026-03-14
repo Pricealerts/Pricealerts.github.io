@@ -1,4 +1,17 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import {
+	auth,
+	onAuthStateChanged,
+} from "https://pricealerts.github.io/frbsJs/firebaseCode.js";
+
+onAuthStateChanged(auth, async user => {
+	if (!user) {
+		window.location.href = "/signin";
+	}
+});
+
+window.scrollTo(0, document.body.scrollHeight);
+
 const urlPrcAlrt = "https://rqststocks-wgqzo7cltq-ew.a.run.app";
 const urlGtPrice = "https://rqststocks-yg7soqqfkq-ew.a.run.app";
 let nmberPrmpt = localStorage.nmberPrmpt || 0;
@@ -10,7 +23,8 @@ console.log(nmberPrmpt);
 // ---------------------------------------------------------
 // 1. الإعدادات (ضع مفتاحك هنا)
 // ---------------------------------------------------------
-const API_KEY_G = await gtApiKey(false, urlGtPrice);
+const API_KEY_G =
+	"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"; // await gtApiKey(false, urlGtPrice);
 const genAI = new GoogleGenerativeAI(API_KEY_G);
 // ---------------------------------------------------------
 // 2. تعريف الأداة (Function Definition)
@@ -45,8 +59,8 @@ const toolsDefinition = [
 ];
 
 // أسماء النماذج (نبدأ بالأحدث وننتقل للمستقر عند الخطأ)
-let currentModelName = "gemini-2.5-flash";
-//let currentModelName = "gemini-3-flash-preview";
+// let currentModelName = "gemini-2.5-flash";
+let currentModelName = "gemini-3-flash-preview";
 // إعداد النموذج مع الأدوات
 const model = genAI.getGenerativeModel({
 	model: currentModelName, // جرب هذا الاسم بدلاً من flash-8b
@@ -100,13 +114,15 @@ const functions = {
 };
 
 window["sendMessage"] = async () => {
-	const inputField = document.getElementById("user-input");
+	if (writing || !userInpt.value.length) return;
+	const inputField = userInpt;
 	const userText = inputField.value.trim();
+
 	if (!userText) return;
 	if (nmberPrmpt > 5) {
 		const urlRverce = `https://chatgpt.com/?q=${userText}`;
 		addMessage(
-			`لقد إستخدمت المحادثات المجانية كاملتا يمكنك إكمال المحادثة بهذا الرابط 
+			`آسف, لقد إستخدمت المحادثات المجانية كاملتا يمكنك إكمال المحادثة بهذا الرابط 
 			<a href ='${urlRverce}' target="_blank"> ${urlRverce} </a>`,
 			"bot-msg",
 		);
@@ -172,11 +188,11 @@ window["sendMessage"] = async () => {
 		console.error("حدث خطأ:", error);
 
 		// --- ميزة التبديل التلقائي (Fallback) ---
-		if (currentModelName !== "gemini-1.5-flash") {
+		if (currentModelName !== "gemini-2.5-flash") {
 			console.warn(
 				"⚠️ النموذج الحالي غير متوفر، يتم التحويل إلى النسخة المستقرة...",
 			);
-			currentModelName = "gemini-1.5-flash";
+			currentModelName = "gemini-2.5-flash";
 			model = genAI.getGenerativeModel({
 				model: currentModelName,
 				tools: toolsDefinition,
@@ -193,23 +209,49 @@ window["sendMessage"] = async () => {
 		}
 	}
 };
-
+const btnBlu = " send-btn-blue";
+const userInpt = gebi("user-input");
+const sndBtn = gebi("send-btn");
 // دوال مساعدة للواجهة
 window.sendPrompt = text => {
-	document.getElementById("user-input").value = text;
+	userInpt.value = text;
+	if (!writing) sndBtn.className = btnBlu;
 	// window.sendMessage();
 };
+userInpt.addEventListener("input", () => {
+	if (userInpt.value.length && !writing) sndBtn.className = btnBlu;
+	else sndBtn.className = "";
+});
+let writing = false;
+function typeWriter(text, element, speed) {
+	let i = 0;
+	let txt = "";
+	writing = true;
+	sndBtn.className = "";
+	let interval = setInterval(() => {
+		txt += text.charAt(i);
+		element.innerHTML = txt;
+		i++;
+		if (i === text.length) {
+			writing = false;
+			if (userInpt.value.length) sndBtn.className = btnBlu;
+			clearInterval(interval);
+		}
+	}, speed);
+}
 
+// استدعاء الدالة لكتابة الفقرة
 function addMessage(text, className) {
 	const div = document.createElement("div");
 	div.className = `message ${className}`;
 	// تحويل الماركداون البسيط (Bolding)
-	div.innerHTML = text
-		.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-		.replace(/\n/g, "<br>");
-	document.getElementById("chat-history").appendChild(div);
-	document.getElementById("chat-history").scrollTop =
-		document.getElementById("chat-history").scrollHeight;
+	const text2 = text
+		.replaceAll(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+		.replaceAll(/\n/g, "<br>");
+	gebi("chat-history").appendChild(div);
+	if (className == "bot-msg") typeWriter(text2, div, 20);
+	else div.innerHTML = text2;
+
 	return div;
 }
 let apKyCrypto;
@@ -239,6 +281,9 @@ async function cryptocompare(coin = "BTC", currency = "USDT") {
 	} catch (error) {
 		console.error("❌ خطأ:", error);
 	}
+}
+function gebi(el) {
+	return document.getElementById(el);
 }
 const rspnsMnfstation = `التداول في الأسواق المالية (سواء كانت أسهم، عملات رقمية، أو فوركس) هو مهارة تتطلب وقتاً وانضباطاً. 
 إليك مجموعة من النصائح الذهبية لتبدأ وتستمر بشكل جيد:

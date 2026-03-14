@@ -1,44 +1,45 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8">
-<title>إرسال رسالة إلى ChatGPT</title>
-<style>
-body{
-    font-family: Arial;
-    text-align: center;
-    margin-top: 100px;
-}
-input{
-    width: 300px;
-    padding: 10px;
-    font-size: 16px;
-}
-button{
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>كتابة بوت شات</title>
+    <style>
+        .chat-box {
+            font-family: 'Arial', sans-serif;
+            font-size: 20px;
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+            padding: 20px;
+            background-color: #f9f9f9;
+            min-height: 100px;
+            line-height: 1.5;
+        }
+    </style>
 </head>
 <body>
 
-<h2>اكتب رسالتك</h2>
+    <div class="chat-box" id="chat-box"></div>
 
-<input type="text" id="message" placeholder="اكتب هنا...">
-<button onclick="sendMessage()">إرسال</button>
+    <script>
+        const message = "مرحباً! كيف يمكنني مساعدتك اليوم؟";
 
-<script>
-function sendMessage(){
-    let msg = document.getElementById("message").value;
-    if(msg.trim() !== ""){
-        let url = "https://chatgpt.com/?q=" + encodeURIComponent(msg);
-        window.location.href = url;
-    } else {
-        alert("يرجى كتابة رسالة أولاً");
-    }
-}
-</script>
+        function typeWriter(text, elementId, speed) {
+            let i = 0;
+            let element = document.getElementById(elementId);
+            let interval = setInterval(()=> {
+                element.innerHTML += text.charAt(i);
+                i++;
+                if (i === text.length) {
+                    clearInterval(interval);
+                }
+            }, speed);
+        }
 
+        // استدعاء الدالة لكتابة الفقرة
+        typeWriter(message, 'chat-box', 50);
+    </script>
 </body>
 </html>

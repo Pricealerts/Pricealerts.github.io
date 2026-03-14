@@ -135,6 +135,7 @@ async function updateUserData(user, isExist = true) {
 				await gogleImg(newImgUrl);
 			}
 		}
+		localStorage.nmberPrmpt = 0
 		window.location.href = drction;
 	} catch (error) {
 		console.log("error updateUserData is : " + error);

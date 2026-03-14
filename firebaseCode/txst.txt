@@ -1,9 +1,13 @@
+انسشاء مشروع في firebas 
+firebase init
+
 باش نمحي npm ونعاود نأنستاليه
 cd functions
 del package-lock.json  
 rmdir /s /q node_modules   
 npm install
 firebase deploy --only functions
+
 
 
 
@@ -82,9 +86,9 @@ const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ||
 /* nta3 telegram */
 
 https://telegramwebhook-3wzofmiqgq-ew.a.run.app
-https://api.telegram.org/bot8146635194:AAFGD_bkO7OSXHWdEf5ofe35Jm4DjslIhOE/setWebhook?url=https://telegramwebhook-3wzofmiqgq-ew.a.run.app
+https://api.telegram.org/bot8672494930:AAGolJM8lGHFNW2-07j75Fb643ecyJBbw3Q/setWebhook?url=https://telegramwebhook-wgqzo7cltq-ew.a.run.app
 
-
+https://telegramwebhook-wgqzo7cltq-ew.a.run.app
 
 
 

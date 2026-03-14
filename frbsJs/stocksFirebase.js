@@ -1,12 +1,11 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { db as dbPrc } from "./firebaseCode.js";
-//import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-messaging.js";// nta3 tokn
+import {initializeApp, db as dbPrc } from "./firebaseCode.js";
+//import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";// nta3 tokn
 
 import {
 	getDatabase,
 	ref,
 	get,
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-database.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyBHBJPf-oqcI5smvfs77qpsAQVi-gdPUzA",

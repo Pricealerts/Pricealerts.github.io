@@ -107,6 +107,7 @@ function setUpdtData(storUp, rfrnce, user) {
  */
 
 export {
+	initializeApp,
 	getAuth,
 	signInWithPopup,
 	signOut,
