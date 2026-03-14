@@ -181,12 +181,13 @@ async function fetchTradingPairs(exchangeId) {
 		if (symbols.length > 0) {
 			symbols.sort();
 			allCrpto = symbols; // حفظ جميع العملات في متغير عام
-			const slcCrpt = symbols.splice(0, 100);
+			const slcCrpt = symbols;
 			symbols.forEach(s => {
 				const div = createDiv(s);
 				dropdownList.appendChild(div);
 			});
 			searchPrice.value = slcCrpt[0];
+			startPriceUpdates();
 			if (exchangeId == "cryptocompare") searchPrice.value = "BTC";
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
@@ -307,26 +308,27 @@ async function fetchCurrentPrice(
 						});
 						data = await response.json();
 						const quote = data["Global Quote"] || false;
-						console.log("quote is : " + JSON.stringify(quote));
+						//console.log("quote is : " + JSON.stringify(quote));
 
 						const latestPrice = parseFloat(quote["05. price"]) || false;
-						console.log(isNaN(latestPrice));
-						if (isNaN(latestPrice) && quote) {
+						//console.log('is nn is '+ isNaN(latestPrice));
+						if (isNaN(latestPrice) || !quote) {
 							rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 							alphvntgVal = false;
-						} else
+						} else{
 							rslt = {
 								symbol: quote["01. symbol"] || symbol,
 								price: latestPrice,
 								currency: "USD",
-							};
+							};}
 					} else rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 				} else if (brwsrAlrt) {
 					rslt = await ftchFnctnAPPs({ action: "price", smbl: symbol });
 					return rslt.price;
 				}
 
-				console.log("rslt is " + rslt);
+				//console.log("rslt is " +JSON.stringify(rslt));
+				if ( rslt);
 				if (rslt.error && rfrsh < 3) {
 					//await fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
 					return false;
