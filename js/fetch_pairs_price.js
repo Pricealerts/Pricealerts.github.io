@@ -9,7 +9,7 @@ async function fnAndStrg(nmStrg, nmDy, fnctn, bdy = nmStrg, url = null) {
 	let nmbrDays = 100;
 	let localStrg = localStorage.getItem(nmStrg);
 	const today = Date.now();
-	if (localStrg) {
+	if (localStrg && JSON.parse(localStrg).data.length) {
 		localStrg = JSON.parse(localStrg);
 		const locaTim = localStrg.time;
 		nmbrDays = (today - locaTim) / (1000 * 60 * 60 * 24);
@@ -315,24 +315,26 @@ async function fetchCurrentPrice(
 						});
 						data = await response.json();
 						const quote = data["Global Quote"] || false;
+						console.log("quote is : " + JSON.stringify(quote));
+
 						const latestPrice = parseFloat(quote["05. price"]) || false;
-						console.log(latestPrice);
-						if (
-							!quote ||
-							Object.keys(quote).length === 0 ||
-							!response.ok ||
-							isNaN(latestPrice)
-						) {
+						console.log(isNaN(latestPrice));
+						if (isNaN(latestPrice)) {
 							rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 							alphvntgVal = false;
-						} else rslt = latestPrice;
+						} else
+							rslt = {
+								symbol: quote["01. symbol"] || symbol,
+								price: latestPrice,
+								currency: "USD",
+							};
 					} else rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 				} else if (brwsrAlrt) {
 					rslt = await ftchFnctnAPPs({ action: "price", smbl: symbol });
 					return rslt.price;
 				}
 
-				console.log(rslt);
+				console.log("rslt is " + rslt);
 				if (rslt.error && rfrsh < 3) {
 					//await fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
 					return false;

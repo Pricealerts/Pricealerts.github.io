@@ -1,5 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-//import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";// nta3 tokn
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+//import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-messaging.js";// nta3 tokn
 import {
 	getAuth,
 	signInWithPopup,
@@ -9,21 +9,21 @@ import {
 	signInWithCredential,
 	signInWithEmailAndPassword,
 	updateProfile,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
 import {
 	getDatabase,
 	ref,
 	update,
 	set,
 	get,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js"; 
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"; 
 
 import {
 	getStorage,
 	uploadBytes,
 	getDownloadURL,
 	ref as storageRef,
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+} from "https://www.gstatic.com/firebasejs/12.10.0/firebase-storage.js";
 
 // إعداد Firebase
 // إعدادات Firebase الخاصة بك
@@ -107,7 +107,6 @@ function setUpdtData(storUp, rfrnce, user) {
  */
 
 export {
-	initializeApp,
 	getAuth,
 	signInWithPopup,
 	signOut,
