@@ -182,20 +182,12 @@ async function fetchTradingPairs(exchangeId) {
 			symbols.sort();
 			allCrpto = symbols; // حفظ جميع العملات في متغير عام
 			const slcCrpt = symbols.splice(0, 100);
-			slcCrpt.forEach(s => {
+			symbols.forEach(s => {
 				const div = createDiv(s);
 				dropdownList.appendChild(div);
 			});
 			searchPrice.value = slcCrpt[0];
 			if (exchangeId == "cryptocompare") searchPrice.value = "BTC";
-			setTimeout(() => {
-				startPriceUpdates();
-				symbols.forEach(s => {
-					const div = createDiv(s);
-					dropdownList.appendChild(div);
-				});
-				//refreshWidget()
-			}, 10);
 		} else {
 			searchPrice.placeholder = "لا توجد أزواج  متاحة، الرجاء اختيار منصة أخرى";
 			if (priceUpdateInterval) clearInterval(priceUpdateInterval);
@@ -319,7 +311,7 @@ async function fetchCurrentPrice(
 
 						const latestPrice = parseFloat(quote["05. price"]) || false;
 						console.log(isNaN(latestPrice));
-						if (isNaN(latestPrice)) {
+						if (isNaN(latestPrice) && quote) {
 							rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 							alphvntgVal = false;
 						} else
