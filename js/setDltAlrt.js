@@ -121,7 +121,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		} التنبيه بنجاح.`;
 		alertStatus.style.color = "green";
 		if (action === "dltAlrt") return dltNtf(id);
-		else if (action === "setAlert") {
+		else if (action === "setAlert" && alertData.isAlrd) {
 			const alrtAddAry = ["id" + id, alertData];
 			alrtsStorg.push(alrtAddAry);
 		}

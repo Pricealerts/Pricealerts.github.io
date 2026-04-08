@@ -3,15 +3,12 @@ import { onRequest } from "firebase-functions/v2/https";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { rtrnFn, getExchangeSymbols } from "./fnctns/fnctns.js";
 
-
 if (!getApps().length) {
 	initializeApp();
 }
 
 let BOT_TOKENEV;
-if (!BOT_TOKENEV) {
-	BOT_TOKENEV = process.env.BOT_TOKEN;
-}
+
 export const telegramWebhook = onRequest(
 	{ region: "europe-west1" },
 	async (req, res) => {
@@ -21,6 +18,9 @@ export const telegramWebhook = onRequest(
 		const message = req.body.message;
 		if (!message) {
 			return res.status(200).send("No message");
+		}
+		if (!BOT_TOKENEV) {
+			BOT_TOKENEV = process.env.BOT_TOKEN;
 		}
 		const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKENEV}/sendMessage`;
 		const chatId = message.chat.id;
@@ -98,6 +98,3 @@ export const updtSmblsMnthly = onSchedule(
 		}
 	},
 );
-
-
-
