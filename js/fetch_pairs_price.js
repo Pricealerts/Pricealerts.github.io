@@ -84,13 +84,13 @@ async function fetchTradingPairs(exchangeId) {
 			bdy;
 		switch (exchangeId) {
 			case "binance": //tickerPriceUrl
-				if (localStorage.binance)
-					allPricesBnc = JSON.parse(localStorage.binance);
-				else {
+			/* 	if (//)
+					allPricesBnc = JSON.parse(//);
+				else { */
 					response = await fetch(exchange.tickerPriceUrl);
 					allPricesBnc = await response.json();
-					localStorage.binance = JSON.stringify(allPricesBnc);
-				}
+					//localStorage.binance = JSON.stringify(allPricesBnc);
+				//}
 				symbols = allPricesBnc.map(s => s.symbol);
 				allSmblBnc = symbols;
 				break;

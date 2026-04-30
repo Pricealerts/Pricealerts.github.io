@@ -65,9 +65,8 @@ async function startPage() {
 		tlgChtIdInpt.value = telegramChatId;
 		gebi("alertsList").innerHTML =
 			'<li class="no-alerts-message">جار التحميل...</li>';
-		setTimeout(() => {
-			loadUserAlertsDisplay();
-		}, 120000);
+		loadUserAlertsDisplay();
+
 		//
 	} else {
 		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
@@ -146,12 +145,18 @@ async function filterList() {
 	try {
 		const result = await ftchFnctnAPPs({ action: "smbls", smbl: qs });
 		console.log(result);
-		
+
 		dropdownList.innerHTML = result
 			.map(
-				item => `<div class="suggestion-item" onclick = "gtPrcOfOther('${item.symbol}','${item.exchDisp}')"
-						><strong>${item.symbol} </strong> — ${item.shortname || item.longname || "No Name"}<span
-						style="color:gray">(${item.quoteType})</span><span style="color:gray">(${item.exchDisp})</span>
+				item => `<div class="suggestion-item" onclick = "gtPrcOfOther('${
+					item.symbol
+				}','${item.exchDisp}')"
+						><strong>${item.symbol} </strong> — ${
+							item.shortname || item.longname || "No Name"
+						}<span
+						style="color:gray">(${item.quoteType})</span><span style="color:gray">(${
+							item.exchDisp
+						})</span>
                 	</div>`,
 			)
 			.join("");
