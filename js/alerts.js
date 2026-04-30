@@ -15,7 +15,7 @@ async function loadUserAlertsDisplay() {
 }
 function renderAlerts() {
 	const brwAlrts = alrtsStorg.filter(alert => alert[1].alTp === "b");
-	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp !== "t");
+	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp === "t");
 	let alrtlst = gebi("alertsListNtf");
 	alrtlst.innerHTML = !brwAlrts.length
 		? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
