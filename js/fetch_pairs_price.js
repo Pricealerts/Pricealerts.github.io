@@ -302,7 +302,7 @@ async function fetchCurrentPrice(
 				const timeInMs = Date.now();
 				if (prmrFtch) {
 					if (alphvntgVal) {
-						const urlAlp = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=JAVASCRIPT_DEMO`;
+						const urlAlp = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=JAVASCRIPT_DEMO`;
 						const response = await fetch(urlAlp, {
 							method: "GET",
 						});
