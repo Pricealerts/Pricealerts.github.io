@@ -1,9 +1,13 @@
 async function loadUserAlertsDisplay() {
 	try {
 		//const rsltd = await dataAlrts(telegramChatId);
-		const frbsUrl = 'https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2'
-		const rslt =await ftchFnctn({ action: "gtAlerts", chid: telegramChatId }, frbsUrl);
-		
+		const frbsUrl =
+			"https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2";
+		const rslt = await ftchFnctn(
+			{ action: "gtAlerts", chid: telegramChatId },
+			frbsUrl,
+		);
+
 		//rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 		let aryRslt = [];
 		if (rslt.stat) aryRslt = Object.entries(rslt.alerts) || [];
@@ -23,7 +27,7 @@ function renderAlerts() {
 	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp !== "b");
 	let alrtlst = gebi("alertsListNtf");
 	console.log(brwAlrts);
-	
+
 	alrtlst.innerHTML = !brwAlrts.length
 		? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
 		: "";
