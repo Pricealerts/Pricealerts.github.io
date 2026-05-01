@@ -172,7 +172,7 @@ async function cntctUser(data) {
 			let message = `لقد قمت بتعين تنبيه على  ${EXCHANGES_CONFIG[data.e].name}! 
 				ل<b> ${data.s} </b>  
 				(الشرط: السعر   ${data.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"} ${
-					data.tPrc
+					data.t
 				} )
 				سيتم تبليغك فور تحقيق الشرط
 				شكرا`;
