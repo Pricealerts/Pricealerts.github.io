@@ -1,10 +1,15 @@
 async function loadUserAlertsDisplay() {
 	try {
-		const rslt = await dataAlrts(telegramChatId);
+		//const rsltd = await dataAlrts(telegramChatId);
+		const frbsUrl = 'https://europe-west1-pricealert-31787.cloudfunctions.net/proxyRequestV2'
+		const rslt =await ftchFnctn({ action: "gtAlerts", chid: telegramChatId }, frbsUrl);
+		
+		//rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 		let aryRslt = [];
-		if (rslt) aryRslt = Object.entries(rslt) || [];
+		if (rslt.stat) aryRslt = Object.entries(rslt.alerts) || [];
 		const browserAlerts = alrtsStorg.filter(alert => alert[1].alTp === "b");
 		alrtsStorg = [...browserAlerts, ...aryRslt];
+		console.log(alrtsStorg);
 		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
 		renderAlerts();
 	} catch (err) {
@@ -15,8 +20,10 @@ async function loadUserAlertsDisplay() {
 }
 function renderAlerts() {
 	const brwAlrts = alrtsStorg.filter(alert => alert[1].alTp === "b");
-	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp === "t");
+	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp !== "b");
 	let alrtlst = gebi("alertsListNtf");
+	console.log(brwAlrts);
+	
 	alrtlst.innerHTML = !brwAlrts.length
 		? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
 		: "";

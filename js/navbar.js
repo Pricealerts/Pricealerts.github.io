@@ -1,8 +1,7 @@
-
-let UserImage =localStorage.base64Pctr || "/imgs/web/apple-touch-icon.png";
+let UserImage = localStorage.base64Pctr || "/imgs/web/apple-touch-icon.png";
 let accont = "";
 
-let enteEsc =	`<a  id="signOutLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
+let enteEsc = `<a  id="signOutLink" style="cursor:pointer" href="https://pricealerts.web.app/signin" >
         			تسجبل الدخول
  					<img src="/imgs/web/signin-svgrepo-com.svg" alt="">
 				</a> `;
@@ -14,8 +13,6 @@ if (localStorage.base64Pctr) {
 				<img src="${UserImage}" alt="img" style="width: auto">
 			 </a>`;
 }
-
-
 
 /* 
 
@@ -102,5 +99,4 @@ overlay.onclick = () => {
 	sidebar.classList.remove("open");
 	overlay.classList.remove("show");
 };
-
 

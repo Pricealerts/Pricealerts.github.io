@@ -72,7 +72,7 @@ async function startPage() {
 		tlgChtIdInpt.value = ""; // إذا لم يكن موجودًا، تأكد من مسح الحقل
 		gebi("telegramChatIdNote").style.display = "block"; // إظهار الملاحظة
 	}
-	if (alrtsStorg.length) renderAlerts();
+	//if (alrtsStorg.length) renderAlerts();
 	// إظهار/إخفاء حقل Chat ID عند التحميل الأولي
 	if (alertTypeTelegramCheckbox.checked)
 		telegramChatIdContainer.style.display = "block";

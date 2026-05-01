@@ -87,23 +87,26 @@ async function setAlerte(data) {
 	if (!data.id || !data.e || !data.s || !data.t || !data.tId || !data.c) {
 		console.log("الرجاء توفير جميع البيانات المطلوبة لتعيين تنبيه تيليجرام.");
 	}
-	const alrtAdd = {
+	/* const alrtAdd = {
 		e: data.e, // e بدلاً من exchangeId
 		s: data.s, // s بدلاً من symbol
 		t: data.t, // t بدلاً من targetPrice
 		c: data.c, // c بدلاً من alertCondition
 		f: data.f, //f: factorPric,
 		//  r: new Date().toLocaleString(), // requestTime
-	};
+	}; */
+	const { e, s, t, c, f } = data;
+	const alrtAdd = { e, s, t, c, f };
 	if (data.mt) alrtAdd.mt = data.mt;
 	if (data.e2) alrtAdd.e2 = data.e2;
 	try {
 		if (data.isAlrd) {
-			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
+			const message = msgPrc(alrtAdd);
+			/* `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
 				alrtAdd.s
 			}</b> بلغت <b>${data.prc}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-			} ${alrtAdd.t})`;
+			} ${alrtAdd.t})` */;
 			await sendTelegramMessage(data.tId, message);
 			return { status: "success" };
 		}
@@ -125,35 +128,29 @@ async function setAlerte(data) {
 	}
 }
 
+function msgPrc(alrtAdd) {
+	return `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
+		alrtAdd.s
+	}</b> بلغت <b>${data.prc}</b> (الشرط: السعر ${
+		alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
+	} ${alrtAdd.t})`;
+}
 ///////// delet alert
 async function dltAlrt(data) {
-	let chatId = data.tId;
-	let alrtId = data.id;
+	const chatId = data.tId;
+	const alrtId = data.id;
 	if (alrtId.length == 0) {
 		return { status: "error", message: "الرجاء توفير معرف التنبيه للحذف." };
 	}
 	try {
+		const ref = postsRef.child(`${chatId}/${alrtId}`);
 		if (data.alrt) {
-			const alrtAdd = data.alrt;
-			const message = `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
-				alrtAdd.s
-			}</b> بلغت <b>${alrtAdd.prc}</b> (الشرط: السعر ${
-				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-			} ${alrtAdd.t})`;
-			const ref = postsRef.child(`${chatId}/${alrtId}`);
+			const message =msgPrc(data.alrt);
 			const getChId = await ref.get();
-			if (getChId.exists()) await sendTelegramMessage(data.tId, message);
+			if (getChId.exists()) await sendTelegramMessage(chatId, message);
 		}
 
 		await ref.remove();
-		//const dtCall = db.ref(`allChatId/${chatId}`);
-		// تعديل العداد بطريقة آمنة باستخدام transaction
-		/* if (data.alrtOk) {
-			await dtCall.update({
-				c: admin.database.ServerValue.increment(1),
-			});
-		} */
-
 		return { status: "success" };
 	} catch (error) {
 		console.error("❌ خطأ أثناء الحذف:", error);
