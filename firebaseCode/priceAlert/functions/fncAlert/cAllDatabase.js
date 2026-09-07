@@ -95,8 +95,8 @@ async function setAlerte(data) {
 		f: data.f, //f: factorPric,
 		//  r: new Date().toLocaleString(), // requestTime
 	}; */
-	const { e, s, t, c, f } = data;
-	const alrtAdd = { e, s, t, c, f };
+	const { e, s, t, c, f, prc } = data;
+	const alrtAdd = { e, s, t, c, f, prc };
 	if (data.mt) alrtAdd.mt = data.mt;
 	if (data.e2) alrtAdd.e2 = data.e2;
 	try {
@@ -131,7 +131,7 @@ async function setAlerte(data) {
 function msgPrc(alrtAdd) {
 	return `🔔 تنبيه سعر ${EXCHANGES_CONFIG[alrtAdd.e].name}!<b>${
 		alrtAdd.s
-	}</b> بلغت <b>${data.prc}</b> (الشرط: السعر ${
+	}</b> بلغت <b>${alrtAdd.prc}</b> (الشرط: السعر ${
 		alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
 	} ${alrtAdd.t})`;
 }
