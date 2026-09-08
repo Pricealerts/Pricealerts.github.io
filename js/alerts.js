@@ -7,11 +7,12 @@ async function loadUserAlertsDisplay() {
 			{ action: "gtAlerts", chid: telegramChatId },
 			frbsUrl,
 		);
-
-		//rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
+		
 		let aryRslt = [];
 		if (rslt.stat) aryRslt = Object.entries(rslt.alerts) || [];
 		const browserAlerts = alrtsStorg.filter(alert => alert[1].alTp === "b");
+		console.log(aryRslt);
+
 		alrtsStorg = [...browserAlerts, ...aryRslt];
 		console.log(alrtsStorg);
 		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
@@ -228,111 +229,3 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 		requestNotificationPermission();
 	}
 }
-/* 
-const fsqd = [
-	{
-		meta: {
-			currency: "SGD",
-			symbol: "1A0.SI",
-			exchangeName: "SES",
-			fullExchangeName: "SES",
-			instrumentType: "EQUITY",
-			firstTradeDate: 1478134800,
-			regularMarketTime: 1771488629,
-			hasPrePostMarketData: false,
-			gmtoffset: 28800,
-			timezone: "SGT",
-			exchangeTimezoneName: "Asia/Singapore",
-			regularMarketPrice: 0.037,
-			fiftyTwoWeekHigh: 0.052,
-			fiftyTwoWeekLow: 0.032,
-			regularMarketDayHigh: 0.04,
-			regularMarketDayLow: 0.037,
-			regularMarketVolume: 207200,
-			longName: "Katrina Group Ltd.",
-			shortName: "$ Katrina",
-			chartPreviousClose: 0.038,
-			previousClose: 0.038,
-			scale: 3,
-			priceHint: 4,
-			currentTradingPeriod: {
-				pre: {
-					timezone: "SGT",
-					start: 1771547400,
-					end: 1771549200,
-					gmtoffset: 28800,
-				},
-				regular: {
-					timezone: "SGT",
-					start: 1771549200,
-					end: 1771578000,
-					gmtoffset: 28800,
-				},
-				post: {
-					timezone: "SGT",
-					start: 1771578000,
-					end: 1771578000,
-					gmtoffset: 28800,
-				},
-			},
-			tradingPeriods: [
-				[
-					{
-						timezone: "SGT",
-						start: 1771462800,
-						end: 1771491600,
-						gmtoffset: 28800,
-					},
-				],
-			],
-			dataGranularity: "1h",
-			range: "1d",
-			validRanges: [
-				"1d",
-				"5d",
-				"1mo",
-				"3mo",
-				"6mo",
-				"1y",
-				"2y",
-				"5y",
-				"10y",
-				"ytd",
-				"max",
-			],
-		},
-		timestamp: [1771477200, 1771480800, 1771484400, 1771488000],
-		indicators: {
-			quote: [
-				{
-					low: [
-						0.03700000047683716,
-						null,
-						0.03700000047683716,
-						0.03700000047683716,
-					],
-					open: [
-						0.03700000047683716,
-						null,
-						0.03700000047683716,
-						0.03700000047683716,
-					],
-					volume: [118200, null, 4000, 23000],
-					close: [
-						0.03700000047683716,
-						null,
-						0.03700000047683716,
-						0.03700000047683716,
-					],
-					high: [
-						0.03999999910593033,
-						null,
-						0.03700000047683716,
-						0.03700000047683716,
-					],
-				},
-			],
-		},
-	},
-];
- */
