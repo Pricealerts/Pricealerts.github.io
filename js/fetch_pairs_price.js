@@ -9,32 +9,29 @@ async function fnAndStrg(nmStrg, nmDy, fnctn, bdy = nmStrg, url = null) {
 	let nmbrDays = 100;
 	let localStrg = localStorage.getItem(nmStrg);
 	const today = Date.now();
-	if (localStrg && JSON.parse(localStrg).data.length) {
-		localStrg = JSON.parse(localStrg);
-		const locaTim = localStrg.time;
-		nmbrDays = (today - locaTim) / (1000 * 60 * 60 * 24);
-	}
-	console.log(localStrg);
-
-	if (nmbrDays < nmDy) {
-		return localStrg.data;
-	} else {
+	if (localStrg) {
 		try {
-			let pr = url === null ? [bdy] : [bdy, url];
-			let data = await fnctn(...pr);
-			if (data.Data) data = Object.keys(data.Data);
-			const tolclStrg = { data, time: today };
-			localStorage[nmStrg] = JSON.stringify(tolclStrg);
-			return data; //symbols
+			localStrg = JSON.parse(localStrg);
+			const locaTim = localStrg.time;
+			nmbrDays = (today - locaTim) / (1000 * 60 * 60 * 24);
+			if (nmbrDays < nmDy) {
+				return localStrg.data;
+			} else {
+				let pr = url === null ? [bdy] : [bdy, url];
+				let data = await fnctn(...pr);
+				if (data.Data) data = Object.keys(data.Data);
+				const tolclStrg = { data, time: today };
+				localStorage[nmStrg] = JSON.stringify(tolclStrg);
+				return data; //symbols
+			}
 		} catch (error) {
-			console.log(`Error in fnAndStrg for ${nmStrg}:`, error);
+			localStrg = null;
 		}
 	}
 }
 let allSmblBnc = [],
 	allPricesBnc = [],
 	allPricesMexc = [],
-	allPricesKucoin = [],
 	allPricesOkx = [],
 	allPricesCrptCmp = [],
 	allPrices;
@@ -83,14 +80,9 @@ async function fetchTradingPairs(exchangeId) {
 			symbols = [],
 			bdy;
 		switch (exchangeId) {
-			case "binance": //tickerPriceUrl
-			/* 	if (//)
-					allPricesBnc = JSON.parse(//);
-				else { */
-					response = await fetch(exchange.tickerPriceUrl);
-					allPricesBnc = await response.json();
-					//localStorage.binance = JSON.stringify(allPricesBnc);
-				//}
+			case "binance":
+				response = await fetch(exchange.tickerPriceUrl);
+				allPricesBnc = await response.json();
 				symbols = allPricesBnc.map(s => s.symbol);
 				allSmblBnc = symbols;
 				break;
@@ -99,10 +91,7 @@ async function fetchTradingPairs(exchangeId) {
 					action: "cryptoSymbols",
 					url: exchange.exchangeInfoUrl,
 				};
-				response = await fnAndStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
-				symbols = response;
-				allPricesKucoin = symbols;
-
+				symbols = await fnAndStrg(exchangeId, 1, ftchFnctnAPPs, bdy);
 				break;
 			case "coingecko":
 				response = await fetch(exchange.exchangeInfoUrl);
@@ -315,12 +304,13 @@ async function fetchCurrentPrice(
 						if (isNaN(latestPrice) || !quote) {
 							rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 							alphvntgVal = false;
-						} else{
+						} else {
 							rslt = {
 								symbol: quote["01. symbol"] || symbol,
 								price: latestPrice,
 								currency: "USD",
-							};}
+							};
+						}
 					} else rslt = await ftchFnctn({ action: "gtPr", smbl: symbol });
 				} else if (brwsrAlrt) {
 					rslt = await ftchFnctnAPPs({ action: "price", smbl: symbol });
@@ -328,7 +318,7 @@ async function fetchCurrentPrice(
 				}
 
 				//console.log("rslt is " +JSON.stringify(rslt));
-				if ( rslt);
+				if (rslt);
 				if (rslt.error && rfrsh < 3) {
 					//await fetchCurrentPrice(exchangeId, symbol, prmrFtch, brwsrAlrt);
 					return false;

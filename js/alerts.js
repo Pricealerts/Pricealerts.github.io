@@ -7,14 +7,11 @@ async function loadUserAlertsDisplay() {
 			{ action: "gtAlerts", chid: telegramChatId },
 			frbsUrl,
 		);
-		
+
 		let aryRslt = [];
 		if (rslt.stat) aryRslt = Object.entries(rslt.alerts) || [];
 		const browserAlerts = alrtsStorg.filter(alert => alert[1].alTp === "b");
-		console.log(aryRslt);
-
 		alrtsStorg = [...browserAlerts, ...aryRslt];
-		console.log(alrtsStorg);
 		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
 		renderAlerts();
 	} catch (err) {
@@ -27,8 +24,8 @@ function renderAlerts() {
 	const brwAlrts = alrtsStorg.filter(alert => alert[1].alTp === "b");
 	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp !== "b");
 	let alrtlst = gebi("alertsListNtf");
-	console.log(brwAlrts);
-
+	console.log("alert strg is : ");
+	console.log(alrtsStorg);
 	alrtlst.innerHTML = !brwAlrts.length
 		? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
 		: "";
@@ -161,21 +158,22 @@ async function hndlAlrt(slctdSmbl, curentPrice) {
 		const alert = alerte[1];
 		const id = alerte[0];
 		curentPrice *= alert.f;
-
+		
 		if (
 			(alert.c === "l" && curentPrice <= alert.t) ||
 			(alert.c === "g" && curentPrice >= alert.t)
 		) {
-			alerte.prc = curentPrice;
-			if (alert.alTp === "t")
+			
+			alert.prc = curentPrice;
+			if (alert.alTp !== "b"){
 				proms.push(
 					deleteAlert({
 						alertId: id,
 						telegramChatId: "cht" + telegramChatId,
-						alrt: alerte,
+						alrt: alert,
 					}),
 				);
-			else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
+			}else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
 			dltNtf(id);
 		}
 	});
@@ -184,7 +182,9 @@ async function hndlAlrt(slctdSmbl, curentPrice) {
 
 function dltNtf(idDlt) {
 	gebi(idDlt).remove();
+	console.log(alrtsStorg);
 	alrtsStorg = alrtsStorg.filter(([id]) => id !== idDlt);
+	console.log(alrtsStorg);
 	localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
 	if (!alrtsStorg || alrtsStorg.length === 0) {
 		alertsListNtf.innerHTML =

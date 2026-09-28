@@ -1,4 +1,4 @@
-const cacheName = 'pwa-cache-v1.0.44';
+const cacheName = 'pwa-cache-v1.0.45';
 const filesToCache = [
   '/',
   '/index.html',

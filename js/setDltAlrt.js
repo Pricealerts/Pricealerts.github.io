@@ -80,20 +80,25 @@ gebi("setAlertButton").addEventListener("click", async () => {
 		alertStatus.style.color = "green";
 	}
 });
+const sdtsd = 'cht1234'
+const chSnd = sdtsd.slice(3,sdtsd.length);
+console.log(chSnd);
 
 async function deleteAlert({ alertId, telegramChatId, alrt = false }) {
+	
 	await manageAlertOnFirebase("dltAlrt", {
 		id: alertId,
 		tId: telegramChatId,
 		alrt,
 	});
+	
 }
 
 // دالة لتعيين/حذف التنبيهات على  farebase
 async function manageAlertOnFirebase(action, alertData = null) {
 	let data = {};
 	const id = alertData.id;
-	alertStatus.textContent = `جاري ${
+	if(alertData.alrt) alertStatus.textContent = `جاري ${
 		action === "setAlert" ? "تعيين" : "حذف"
 	} التنبيه...`;
 	alertStatus.style.color = "#007bff";

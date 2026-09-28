@@ -37,7 +37,7 @@ async function startPage() {
 	/* if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz"); */
 
-	const slChId = gebi("chtIdSlct") || "";
+	const slChId = gebi("chtIdSlct") ;
 	telegramChatId = localStorage.getItem("idChat") || "";
 	const chtIdStrg = {
 		ch1: localStorage.getItem("chtId1") || "",
@@ -181,7 +181,8 @@ function gtPrcOfOther(symbol, exch = false) {
 }
 // Hide dropdown when clicking outside
 document.addEventListener("click", function (e) {
-	if (!document.querySelector(".dropdown-container").contains(e.target)) {
+	const dropdownContainer = document.querySelector(".dropdown-container");
+	if (dropdownContainer && !dropdownContainer.contains(e.target)) {
 		hideDropdown();
 	}
 });
@@ -200,6 +201,7 @@ function updateTargetPrice() {
 cptoDsply.addEventListener("change", () => {
 	const symbol = cptoDsply.value;
 	factorPric = allCrptCmpr.find(obj => obj.symbol == symbol).factor;
+	if (!selectedCurrency || currentPrice === null) return;
 	let rsltFnl = currentPrice * factorPric;
 	if (symbol == searchPrice.value) rsltFnl = 1;
 	currentPriceDisplay.textContent = rsltFnl;
