@@ -58,8 +58,6 @@ async function getCandles(symbolsMap) {
 		candles[symbol] =
 			data && Array.isArray(data) && data.length > 0 ? data : null;
 	});
-	//console.log('cndlis is : ' + JSON.stringify(candles));
-
 	return candles;
 }
 
@@ -78,7 +76,6 @@ async function checkAndSendAlerts() {
 		alrts.forEach(alert => {
 			const isStock = stocksFn(alert, tlgId);
 			if (isStock) return false;
-
 			const alrt = alert[1];
 			const { e, s, e2: exchangeId = e, s2: symbol = s } = alrt;
 			if (!symbolsMap.has(symbol)) {
@@ -118,8 +115,8 @@ async function checkAndSendAlerts() {
 	for (let k = 0; k < allAlerts.length; k++) {
 		const {
 			e: exchangeId,
-			s: symbol,
-			s2,
+			s,
+			s2: symbol = s,
 			t: targetPrice,
 			c: alertCondition,
 			tid: telegramChatId,
@@ -127,7 +124,6 @@ async function checkAndSendAlerts() {
 			//mt: meta,
 			f: factorPric,
 		} = allAlerts[k];
-
 		const candles = rsltcandles[s2];
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null;
@@ -307,6 +303,7 @@ async function fetchCandlestickData(exchangeId, symbol, interval, limit) {
 async function chngOfDb(promises) {
 	if (!promises || promises.length == 0) return;
 	try {
+		console.log("rah f chngOfDb");
 		await Promise.all(promises);
 	} catch (error) {
 		console.error("error respons", error);

@@ -33,6 +33,8 @@ function errCnsl(ping) {
 		}
 	}, 20000);
 }
+
+// binance web Socket
 function bncWebSocket(symbol) {
 	const symbolL = symbol.toLowerCase();
 	hndlWebSocket(symbolL);
@@ -59,6 +61,7 @@ function bncWebSocketMult() {
 		symbols.every((val, i) => val === scktSmblBnc[i]);
 	if (!symbols.length || (bncSckt && eq)) return;
 	else if (bncSckt) bncSckt.close();
+	console.log('fat');
 	scktSmblBnc = symbols;
 	bncSckt = new WebSocket("wss://stream.binance.com:9443/ws");
 	bncSckt.onopen = () => {
@@ -76,7 +79,7 @@ function bncWebSocketMult() {
 		if (data.e === "24hrTicker") {
 			const nowDate = Date.now();
 			const dfrnc = nowDate - oldTmBnc;
-			if (dfrnc > 3000) {
+			if (dfrnc > 5000) {
 				hndlAlrt(data.s, data.c);
 				oldTmBnc = nowDate;
 			}

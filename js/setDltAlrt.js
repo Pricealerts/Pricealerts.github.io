@@ -23,7 +23,7 @@ gebi("setAlertButton").addEventListener("click", async () => {
 		return;
 	}
 	if (!smbl || !currentExchangeId || prc == "NaN") {
-		alertStatus.textContent = "الرجاء اختيار منصة وعملة.";
+		alertStatus.textContent = "الرجاء اختيار منصة أو عملة صالحة.";
 		alertStatus.style.color = "red";
 		return;
 	}
@@ -72,35 +72,40 @@ gebi("setAlertButton").addEventListener("click", async () => {
 		}
 	}
 	const success = await manageAlertOnFirebase("setAlert", newAlrt);
-	if (success) {
-		alertStatus.textContent +=
-			(isTelegramAlert ? " تيليجرام" : "") +
-			(isBrowserAlert ? " تطبيق " : "") +
-			`تم تعيين تنبيه لـ ${newAlrt.s}.`;
-		alertStatus.style.color = "green";
-	}
+	/* if (success) {
+		 alertStatus.textContent =
+			` تم تعيين تنبيه لـ ${newAlrt.s} على ` +
+			(isTelegramAlert ? " التيليجرام " : "") +
+			(isBrowserAlert ? " التطبيق " : "") + ' بنجاح '; 
+		 alertStatus.style.color = "green";
+	} */
 });
-const sdtsd = 'cht1234'
-const chSnd = sdtsd.slice(3,sdtsd.length);
-console.log(chSnd);
 
-async function deleteAlert({ alertId, telegramChatId, alrt = false }) {
-	
+/* async function deleteAlert({
+	alertId,
+	telegramChatId,
+	alrt = false,
+	afch = true,
+}) {
 	await manageAlertOnFirebase("dltAlrt", {
 		id: alertId,
 		tId: telegramChatId,
 		alrt,
+		afch,
 	});
-	
-}
+} */
 
 // دالة لتعيين/حذف التنبيهات على  farebase
 async function manageAlertOnFirebase(action, alertData = null) {
+	console.log("alertData is :");
+	console.log(alertData);
+
 	let data = {};
 	const id = alertData.id;
-	if(alertData.alrt) alertStatus.textContent = `جاري ${
-		action === "setAlert" ? "تعيين" : "حذف"
-	} التنبيه...`;
+	if (!alertData.nAfch)
+		alertStatus.textContent = `جاري ${
+			action === "setAlert" ? "تعيين" : "حذف"
+		} التنبيه...`;
 	alertStatus.style.color = "#007bff";
 	if (alertData.alTp === "t" || action === "dltAlrt") {
 		try {
@@ -121,10 +126,14 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		}
 	} else data.status = "success";
 	if (data.status === "success") {
-		alertStatus.textContent = `${
-			action === "setAlert" ? "تم تعيين" : "تم حذف"
-		} التنبيه بنجاح.`;
+		if (!alertData.nAfch)
+			alertStatus.textContent = `${
+				action === "setAlert" ? "تم تعيين" : "تم حذف"
+			} التنبيه بنجاح.`;
 		alertStatus.style.color = "green";
+		setTimeout(() => {
+			alertStatus.textContent = "";
+		}, 4000);
 		if (action === "dltAlrt") return dltNtf(id);
 		else if (action === "setAlert" && !alertData.isAlrd) {
 			const alrtAddAry = ["id" + id, alertData];
@@ -153,7 +162,7 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		return false;
 	} else if (data.status == "notSuccess") {
 		alertStatus.textContent =
-			"فشل التأكد من معرّف دردشة التيليجرام (Chat ID) الخاص بك يرجى التأكد منه وإعادة المحاولة";
+			"فشل التأكد من معرّف دردشة ال تيليجرام (Chat ID) الخاص بك يرجى التأكد منه وإعادة المحاولة";
 		alertStatus.style.color = "red";
 		console.log(data);
 		return false;

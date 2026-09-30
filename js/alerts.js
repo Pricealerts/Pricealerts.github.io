@@ -20,12 +20,11 @@ async function loadUserAlertsDisplay() {
 			'<li class="no-alerts-message" style="color:red;">خطأ في تحميل التنبيهات.</li>';
 	}
 }
+
 function renderAlerts() {
 	const brwAlrts = alrtsStorg.filter(alert => alert[1].alTp === "b");
 	const tlgAlrts = alrtsStorg.filter(alert => alert[1].alTp !== "b");
 	let alrtlst = gebi("alertsListNtf");
-	console.log("alert strg is : ");
-	console.log(alrtsStorg);
 	alrtlst.innerHTML = !brwAlrts.length
 		? '<li class="no-alerts-message">لا توجد تنبيهات نشطة حاليًا.</li>'
 		: "";
@@ -57,10 +56,11 @@ function renderAlerts() {
 		let tpAlrt = "(النوع: تطبيق)";
 		if (alTp === "t") {
 			alrtlst = gebi("alertsList");
-			dltAlrt = `deleteAlert(${JSON.stringify({
-				alertId: alert[0],
-				telegramChatId: "cht" + telegramChatId,
+			dltAlrt = `manageAlertOnFirebase('dltAlrt',${JSON.stringify({
+				id: alert[0],
+				tId: "cht" + telegramChatId,
 			})})`;
+
 			tpAlrt = `(النوع: تيليجرام)
 				<br>   المعرف:   
 				 ${telegramChatId}  `;
@@ -81,6 +81,7 @@ function renderAlerts() {
 	brwsrAlrtIntrvl();
 	bncWebSocketMult();
 }
+
 let chkBrwsrIntrvl,
 	chkBrwsrY = false;
 function brwsrAlrtIntrvl() {
@@ -158,22 +159,22 @@ async function hndlAlrt(slctdSmbl, curentPrice) {
 		const alert = alerte[1];
 		const id = alerte[0];
 		curentPrice *= alert.f;
-		
+
 		if (
 			(alert.c === "l" && curentPrice <= alert.t) ||
 			(alert.c === "g" && curentPrice >= alert.t)
 		) {
-			
 			alert.prc = curentPrice;
-			if (alert.alTp !== "b"){
+			if (alert.alTp !== "b") {
 				proms.push(
-					deleteAlert({
-						alertId: id,
-						telegramChatId: "cht" + telegramChatId,
+					manageAlertOnFirebase("dltAlrt", {
+						id,
+						tId: "cht" + telegramChatId,
 						alrt: alert,
+						nAfch: true, //no afiche
 					}),
 				);
-			}else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
+			} else showBrowserNotification(alert.s, curentPrice, alert.t, alert.c);
 			dltNtf(id);
 		}
 	});
@@ -182,9 +183,7 @@ async function hndlAlrt(slctdSmbl, curentPrice) {
 
 function dltNtf(idDlt) {
 	gebi(idDlt).remove();
-	console.log(alrtsStorg);
 	alrtsStorg = alrtsStorg.filter(([id]) => id !== idDlt);
-	console.log(alrtsStorg);
 	localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
 	if (!alrtsStorg || alrtsStorg.length === 0) {
 		alertsListNtf.innerHTML =
@@ -192,7 +191,7 @@ function dltNtf(idDlt) {
 	}
 }
 
-// --- وظائف التنبيهات (تم تبسيطها) ---
+// --- وظائف التنبيهات (تم تبسيطها) --- //
 function requestNotificationPermission() {
 	if (!("Notification" in window)) {
 		// alert("هذا للتطبيق لا يدعم إشعارات سطح المكتب.");
@@ -214,7 +213,6 @@ function showBrowserNotification(symbol, price, targetPrice, condition) {
 		condition === "l"
 			? `أصبح ≥ ${targetPrice} USDT`
 			: `أصبح ≤ ${targetPrice} USDT`;
-
 	if (Notification.permission === "granted") {
 		// المحاولة عبر Service Worker (أفضل للهواتف)
 		navigator.serviceWorker.ready.then(function (registration) {

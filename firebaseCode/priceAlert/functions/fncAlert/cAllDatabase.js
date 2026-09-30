@@ -141,8 +141,6 @@ async function dltAlrt(data) {
 	const chatId = data.tId;
 	const chSnd = chatId.slice(3)
 	const alrtId = data.id;
-			console.log("chSnd is");
-			console.log(chSnd);
 	if (alrtId.length == 0) {
 		return { status: "error", message: "الرجاء توفير معرف التنبيه للحذف." };
 	}
