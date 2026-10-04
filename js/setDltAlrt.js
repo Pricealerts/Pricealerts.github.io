@@ -102,12 +102,13 @@ async function manageAlertOnFirebase(action, alertData = null) {
 
 	let data = {};
 	const id = alertData.id;
-	if (!alertData.nAfch)
+	if (!alertData.nAfch) {
 		alertStatus.textContent = `جاري ${
 			action === "setAlert" ? "تعيين" : "حذف"
 		} التنبيه...`;
-	alertStatus.style.color = "#007bff";
-	if (alertData.alTp === "t" || action === "dltAlrt") {
+		alertStatus.style.color = "#007bff";
+	}
+	if (alertData.alTp === "t" || (action === "dltAlrt" && !alertData.nAfch)) {
 		try {
 			await ftchFnctn(
 				{
@@ -126,34 +127,26 @@ async function manageAlertOnFirebase(action, alertData = null) {
 		}
 	} else data.status = "success";
 	if (data.status === "success") {
-		if (!alertData.nAfch)
+		alertStatus.style.color = "green";
+		if (!alertData.nAfch) {
 			alertStatus.textContent = `${
 				action === "setAlert" ? "تم تعيين" : "تم حذف"
 			} التنبيه بنجاح.`;
-		alertStatus.style.color = "green";
-		setTimeout(() => {
-			alertStatus.textContent = "";
-		}, 4000);
-		if (action === "dltAlrt") return dltNtf(id);
+			setTimeout(() => {
+				alertStatus.textContent = "";
+			}, 4000);
+		}
+		if (action === "dltAlrt" ) return dltNtf(id);
+		//else if (!alertData.nAfch) return false;
 		else if (action === "setAlert" && !alertData.isAlrd) {
 			const alrtAddAry = ["id" + id, alertData];
 			alrtsStorg.push(alrtAddAry);
 		}
 		localStorage.setItem("alrtsStorg", JSON.stringify(alrtsStorg));
 		renderAlerts();
-
 		if (!alertData.isAlrd && action === "setAlert") {
 			await checkForBrowserAlerts(); // فحص فوري
-			setTimeout(() => {
-				alertStatus.textContent = "";
-			}, 3000);
-			return true;
 		}
-
-		setTimeout(() => {
-			alertStatus.textContent = "";
-			if (alertData.isAlrd) dltNtf(id);
-		}, 3000);
 		return true;
 	} else if (data.status == "notPaid") {
 		alertStatus.textContent =

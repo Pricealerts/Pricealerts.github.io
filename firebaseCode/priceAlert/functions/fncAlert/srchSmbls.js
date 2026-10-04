@@ -116,7 +116,7 @@ async function checkAndSendAlerts() {
 		const {
 			e: exchangeId,
 			s,
-			s2: symbol = s,
+			s2 :symbol= s,
 			t: targetPrice,
 			c: alertCondition,
 			tid: telegramChatId,
@@ -124,7 +124,7 @@ async function checkAndSendAlerts() {
 			//mt: meta,
 			f: factorPric,
 		} = allAlerts[k];
-		const candles = rsltcandles[s2];
+		const candles = rsltcandles[symbol];
 		let triggeredByHistoricalPrice = false;
 		let actualTriggerPrice = null;
 		const rglrChatId = telegramChatId.slice(3);

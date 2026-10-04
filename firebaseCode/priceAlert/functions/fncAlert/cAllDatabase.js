@@ -106,9 +106,11 @@ async function setAlerte(data) {
 				alrtAdd.s
 			}</b> بلغت <b>${data.prc}</b> (الشرط: السعر ${
 				alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-			} ${alrtAdd.t})` */;
-			await sendTelegramMessage(data.tId, message);
-			return { status: "success" };
+			} ${alrtAdd.t})` */
+			const rspns = await sendTelegramMessage(data.tId, message);
+			if (!rspns.success) return { status: "notSuccess" };
+			rspns.status = "success";
+			return rspns;
 		}
 		const okUser = await cntctUser(data);
 		if (!okUser.okRspns) {
@@ -129,18 +131,20 @@ async function setAlerte(data) {
 }
 
 function msgPrc(alrtAdd) {
-			console.log("alrtAdd is");
-			console.log(alrtAdd);
-	return `🔔 تنبيه سعر ${ alrtAdd.s } في منصة <b> ${ EXCHANGES_CONFIG[alrtAdd.e].name } </b>
+	return `🔔 تنبيه سعر ${alrtAdd.s} في منصة <b> ${
+		EXCHANGES_CONFIG[alrtAdd.e].name
+	} </b>
 	 بلغت <b> ${alrtAdd.prc} </b> (الشرط: السعر ${
-		alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
-	} ${alrtAdd.t})`;
+			alrtAdd.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"
+		} ${alrtAdd.t})`;
 }
 ///////// delet alert
 async function dltAlrt(data) {
 	const chatId = data.tId;
-	const chSnd = chatId.slice(3)
+	const chSnd = chatId.slice(3);
 	const alrtId = data.id;
+	console.log("rah fdlt");
+
 	if (alrtId.length == 0) {
 		return { status: "error", message: "الرجاء توفير معرف التنبيه للحذف." };
 	}
@@ -148,8 +152,8 @@ async function dltAlrt(data) {
 		const ref = postsRef.child(`${chatId}/${alrtId}`);
 		let getChId = await ref.get();
 		if (data.alrt) {
-			const message =msgPrc(data.alrt);
-			if (getChId.exists()) await sendTelegramMessage(chSnd, message);
+			const message = msgPrc(data.alrt);
+			const rspns = await sendTelegramMessage(chSnd, message);
 		}
 		if (getChId.exists()) await ref.remove();
 		return { status: "success" };
@@ -167,7 +171,6 @@ async function cntctUser(data) {
 		const getChId = await callDb.get();
 		let gtChIdExixst;
 		if (!getChId.exists()) {
-			
 			let message = `لقد قمت بتعين تنبيه على  ${EXCHANGES_CONFIG[data.e].name}! 
 				ل<b> ${data.s} </b>  
 				(الشرط: السعر   ${data.c === "l" ? "أقل من أو يساوي" : "أعلى من أو يساوي"} ${

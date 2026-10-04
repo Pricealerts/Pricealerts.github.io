@@ -36,6 +36,9 @@ export const proxyRequestV2 = onRequest(
 				res.send("rah khawi" + data);
 				return null;
 			}
+			console.log('data is :');
+			console.log(data);
+			
 			 const { cAllDatabase } = await import("./fncAlert/cAllDatabase.js");
 			const rslt = await cAllDatabase(data);
 			if(!rslt) return false
