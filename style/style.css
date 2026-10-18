@@ -64,6 +64,7 @@ label {
 }
 select,
 input[type="number"],
+input[type="date"],
 input[type="text"],.txt {
 	width: 100%;
 	padding: 12px 15px;
@@ -80,6 +81,7 @@ input[type="text"],.txt {
 
 select:focus,
 input[type="number"]:focus,
+input[type="date"]:focus,
 input[type="text"]:focus {
 	border-color: #007bff;
 	box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
