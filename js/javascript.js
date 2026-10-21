@@ -119,8 +119,8 @@ String.prototype.tlc = function () {
 };
 searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
 searchPrice.addEventListener("keydown", ev => {
-	gebi('rpns').innerHTML = `ev.code is ${ev.code}
-	ev.key is ${ev.key}
+	gebi('rpns').innerHTML = `ev.code is ${ev.code}\n
+	ev.key is ${ev.key}\n
 	ev.keyCode is ${ev.keyCode}
 	`
 	if (ev.key == "Enter") {
