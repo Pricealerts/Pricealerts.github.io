@@ -119,11 +119,10 @@ String.prototype.tlc = function () {
 };
 searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
 searchPrice.addEventListener("keydown", ev => {
-	gebi('rpns').innerHTML = `ev.code is ${ev.code}\n
-	ev.key is ${ev.key}\n
-	ev.keyCode is ${ev.keyCode}
-	`
-	if (ev.key == "Enter") {
+	
+	if (ev.key === "Enter" || ev.code === "Enter") {
+		 // 1. إخفاء وأنزل لوحة المفاتيح فوراً
+        searchPrice.blur(); 
 		gtPrcOfOther(dropdownList.children[0].textContent);
 	}
 });
