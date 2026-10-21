@@ -37,7 +37,7 @@ async function startPage() {
 	/* if (localStorage.getItem("exchangeChoz"))
 		exchangeSelect.value = localStorage.getItem("exchangeChoz"); */
 
-	const slChId = gebi("chtIdSlct") ;
+	const slChId = gebi("chtIdSlct");
 	telegramChatId = localStorage.getItem("idChat") || "";
 	const chtIdStrg = {
 		ch1: localStorage.getItem("chtId1") || "",
@@ -86,8 +86,6 @@ async function startPage() {
 		alertStatus.textContent = "";
 	});
 
-	searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
-
 	alertTypeTelegramCheckbox.addEventListener("change", () => {
 		if (alertTypeTelegramCheckbox.checked)
 			telegramChatIdContainer.style.display = "block";
@@ -116,7 +114,15 @@ function hideDropdown() {
 		dropdownList.style.display = "none";
 	}, 200); // Give some time for click event
 }
-
+String.prototype.tlc = function () {
+	return this.toLowerCase();
+};
+searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
+searchPrice.addEventListener("keydown", ev => {
+	if (ev.key == "Enter") {
+		gtPrcOfOther(dropdownList.children[0].textContent);
+	}
+});
 function populateList(items) {
 	dropdownList.innerHTML = "";
 	items.forEach(symbol => {
@@ -124,15 +130,28 @@ function populateList(items) {
 		dropdownList.appendChild(div);
 	});
 }
-String.prototype.tlc = function () {
-	return this.toLowerCase();
-};
 async function filterList() {
 	const qr = searchPrice.value.tlc(); // qr = query
 	if (exchangeSelect.value !== "other") {
-		let filtered = allCrpto
+		const crpOrg = ["usdt", "usdc", "btc", "bnb", "usd"];
+		// التصحيح: نستخدم includes للتحقق مما إذا كان النص المدخل يحتوي على إحدى العملات
+		const orCr = crpOrg.filter(i => qr.includes(i))[0];
+		const prQr = qr.replace(orCr, "");
+		let filtered = [];
+		if (orCr) {
+			// التعبير النمطي للبحث ديناميكياً بناءً على العملة المستخرجة
+			const regex = new RegExp(`^${prQr}.*${orCr}$`);
+			// تصفية المصفوفة بناءً على الشرط
+			filtered = allCrpto.filter(item => regex.test(item.tlc()));
+		} else {
+			filtered = allCrpto.filter(c => c.tlc().includes(qr));
+		}
+		filtered = filtered.sort(
+			(a, b) => a.tlc().indexOf(qr) - b.tlc().indexOf(qr),
+		);
+		/* let filtered = allCrpto
 			.filter(c => c.tlc().includes(qr))
-			.sort((a, b) => a.tlc().indexOf(qr) - b.tlc().indexOf(qr));
+			.sort((a, b) => a.tlc().indexOf(qr) - b.tlc().indexOf(qr)); */
 		populateList(filtered);
 		return false;
 	}
@@ -179,6 +198,7 @@ function gtPrcOfOther(symbol, exch = false) {
 	//crncDsply.value = currency;
 	startPriceUpdates();
 }
+
 // Hide dropdown when clicking outside
 document.addEventListener("click", function (e) {
 	const dropdownContainer = document.querySelector(".dropdown-container");
@@ -265,3 +285,24 @@ document.querySelectorAll(".crbtBtn").forEach(btn => {
 		filterList();
 	});
 });
+/* 
+const crpOrg = ["usdt", "usdc", "btc"];
+
+// جلب القيمة من حقل الإدخال
+const inpt = document.getElementById("intpt").value;
+
+// التصحيح: نستخدم includes للتحقق مما إذا كان النص المدخل يحتوي على إحدى العملات
+const orCr = crpOrg.filter(i => inpt.includes(i))[0];
+
+// التصحيح: كتابة if بحرف صغير
+if (orCr) {
+	// التعبير النمطي للبحث ديناميكياً بناءً على العملة المستخرجة
+	const regex = new RegExp(`^ab.*${orCr}$`);
+
+	// تصفية المصفوفة بناءً على الشرط
+	const result = cryptoArray.filter(item => regex.test(item));
+
+	console.log(result); // لعرض النتيجة في المتصفح
+} else {
+	console.log("لم يتم العثور على عملة مطابقة في النص المدخل.");
+} */
