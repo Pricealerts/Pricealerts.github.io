@@ -119,7 +119,7 @@ String.prototype.tlc = function () {
 };
 searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
 searchPrice.addEventListener("keydown", ev => {
-	if (ev.key == "Enter") {
+	if (ev.code == "Enter") {
 		gtPrcOfOther(dropdownList.children[0].textContent);
 	}
 });
