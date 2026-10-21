@@ -123,7 +123,7 @@ searchPrice.addEventListener("keydown", ev => {
 	ev.key is ${ev.key}
 	ev.keyCode is ${ev.keyCode}
 	`
-	if (ev.code == "Enter") {
+	if (ev.key == "Enter") {
 		gtPrcOfOther(dropdownList.children[0].textContent);
 	}
 });
