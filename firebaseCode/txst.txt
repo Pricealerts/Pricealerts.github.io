@@ -9,7 +9,7 @@ npm install
 firebase deploy --only functions
 
 
-
+_test_51UYap30WcOQ7un3eJxqXiymvOld9zpGItMuDN7vDWg5V18CEgihe8NJ9Ziw2CdpkcT2pB1Loa4tOZzPANA3pj2xr00kM9vGPKd
 
 رفع الملف functions
 cd C:\Users\hp\Documents\progects\Pricealerts\firebaseCode\priceAlert
@@ -94,9 +94,17 @@ https://telegramwebhook-wgqzo7cltq-ew.a.run.app
 
 
 
-
-    
     
     
   * 20.19.6 (Currently using 64-bit executable)
     nvm uninstall 22.11.0
+Clé secrète de signature
+whsec_qPJW5n19aOrXKQvY5a7muGM8U3GVcwFh
+
+. تجربة عملية دفع كاملة (ببطاقة اختبار)
+
+بما أنك في وضع التجربة (Test Mode)، لا تستخدم بطاقتك البنكية الحقيقية، بل استخدم بطاقة الاختبار الرسمية من Stripe:
+• رقم البطاقة: اكتب الرقم 4242 مكرراً 4 مرات (4242 4242 4242 4242).
+• تاريخ الانتهاء (MM/YY): اكتب أي تاريخ مستقبلي (مثلاً 12/28).
+• رمز الأمان (CVC): اكتب أي 3 أرقام (مثلاً 123).
+• الرمز البريدي (ZIP): اكتب أي 5 أرقام (مثلاً 12345).

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>الدفع الإلكتروني عبر Visa</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- استدعاء Stripe الرسمي هنا قبل app.js -->
+  <script src="https://stripe.com"></script>
+</head>
+<body>
+
+  <div class="payment-container">
+    <h2>إتمام عملية الدفع</h2>
+    <p class="amount">المبلغ المطلوب: <strong>1.9 دولار</strong></p>
+
+    <form id="payment-form">
+      <div class="input-group">
+        <label for="cardholder-name">الاسم على البطاقة</label>
+        <input type="text" id="cardholder-name" placeholder="أحمد محمد" required>
+      </div>
+
+      <div class="input-group">
+        <label>بيانات بطاقة Visa</label>
+        <div id="card-element"></div>
+      </div>
+
+      <div id="card-errors" role="alert"></div>
+
+      <button id="submit-button" type="submit">ادفع الآن</button>
+    </form>
+
+    <div id="payment-message" class="hidden"></div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

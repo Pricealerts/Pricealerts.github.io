@@ -119,10 +119,9 @@ String.prototype.tlc = function () {
 };
 searchPrice.addEventListener("change", () => (alertStatus.textContent = ""));
 searchPrice.addEventListener("keydown", ev => {
-	
 	if (ev.key === "Enter" || ev.code === "Enter") {
-		 // 1. إخفاء وأنزل لوحة المفاتيح فوراً
-        searchPrice.blur(); 
+		// 1. إخفاء وأنزل لوحة المفاتيح فوراً
+        searchPrice.blur();
 		gtPrcOfOther(dropdownList.children[0].textContent);
 	}
 });
@@ -205,6 +204,8 @@ function gtPrcOfOther(symbol, exch = false) {
 // Hide dropdown when clicking outside
 document.addEventListener("click", function (e) {
 	const dropdownContainer = document.querySelector(".dropdown-container");
+	console.log(!dropdownContainer.contains(e.target));
+	
 	if (dropdownContainer && !dropdownContainer.contains(e.target)) {
 		hideDropdown();
 	}

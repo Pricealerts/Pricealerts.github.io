@@ -63,7 +63,6 @@ document.body.prepend(sidebar);
 
 const navbar = document.createElement("nav");
 navbar.innerHTML = `
-
 <!-- Overlay -->
 		<div id="overlay" class="overlay"></div>
 
@@ -72,9 +71,14 @@ navbar.innerHTML = `
 			<a href="https://pricealerts.web.app" style= "height: 100%; display: flex; align-items: center;">
 				<img id="imgNavbar" class="imgNavbar" src="${UserImage}" alt="">
 			</a>
+			<div>
 			<h1 class="hTitel">
 				منبه الأسعار 
 			</h1 >
+				<div class="sTitel" style="font-size: 12px;color: #666;">
+				راقب الأسعار بذكاء، ولا تفوت أي فرصة تداول
+				</div>
+			</div>
 			<div class="nav-title">
                 <button class="menu-btn" id="openSidebar">☰</button>
 			</div>

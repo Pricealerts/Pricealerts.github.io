@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			rel="icon"
+			href="https://pricealerts.github.io/imgs/web/favicon.ico"
+			sizes="any"
+		/>
+		<link
+			rel="canonical"
+			href="https://pricealerts.web.app/signin/index.html"
+		/>
+		<meta
+			name="description"
+			content="منصة Price Alerts لتنبيه أسعار العملات الرقمية والأسهم العالمية من عشر منصات تداول و 11 بورصة. تنبيهات فورية وسريعة."
+		/>
+		<meta
+			name="keywords"
+			content="تنبيه أسعار, عملات رقمية, أسهم, بورصة, تنبيهات سعر, تداول, Binance, KuCoin, nasdaq,nyse, OKX"
+		/>
+		<meta name="author" content="Price Alerts" />
+		<meta name="robots" content="index, follow" />
+
+		<!-- OG Meta for Social shares -->
+		<meta
+			property="og:title"
+			content="Price Alerts - تنبيهات أسعار العملات الرقمية والأسهم"
+		/>
+		<meta
+			property="og:description"
+			content="تنبيهات سعرية فورية لـ 10 منصات تداول و 11 بورصة أسهم."
+		/>
+		<meta property="og:url" content="https://pricealerts.web.app/" />
+		<meta property="og:type" content="website" />
+		<meta
+			property="og:image"
+			content="https://pricealerts.web.app/imgs/web/apple-touch-icon.png"
+		/>
+
+		<title>تسجيل الدخول / إنشاء حساب</title>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
+			rel="stylesheet"
+		/>
+		<!-- <script src="https://accounts.google.com/gsi/client" async defer></script> -->
+		<!-- مكتبة Google Identity -->
+		<script src="https://accounts.google.com/gsi/client" async defer></script>
+		<link
+			rel="stylesheet"
+			href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+		/>
+		<link
+			rel="stylesheet"
+			href="https://pricealerts.github.io/style/navbar.css"
+		/>
+        <script src="https://stripe.com"></script>
+		<link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+     <div class="payment-container">
+    <h2>إتمام عملية الدفع</h2>
+    <p class="amount">المبلغ المطلوب: <strong>1.9 دولار</strong></p>
+
+    <form id="payment-form">
+      <div class="input-group">
+        <label for="cardholder-name">الاسم على البطاقة</label>
+        <input type="text" id="cardholder-name" placeholder="أحمد محمد" required>
+      </div>
+
+      <div class="input-group">
+        <label>بيانات بطاقة Visa</label>
+        <!-- هنا سيقوم Stripe بوضع حقول البطاقة الآمنة -->
+        <div id="card-element"></div>
+      </div>
+
+      <!-- لعرض أخطاء البطاقة -->
+      <div id="card-errors" role="alert"></div>
+
+      <button id="submit-button" type="submit">ادفع الآن</button>
+    </form>
+
+    <div id="payment-message" class="hidden"></div>
+  </div>
+
+  <!-- استدعاء ملف الجافاسكريبت كـ Module لدعم Firebase الحديث -->
+   <script src="https://stripe.com"></script>
+   <script src="https://stripe.com"></script>
+
+  <script type="module" src="./js.js"></script>
+</body>
+</html>
