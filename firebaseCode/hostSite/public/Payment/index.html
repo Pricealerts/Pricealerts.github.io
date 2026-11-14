@@ -1,7 +1,7 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8" />
+	<head>
+		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<link
 			rel="icon"
@@ -39,7 +39,7 @@
 			content="https://pricealerts.web.app/imgs/web/apple-touch-icon.png"
 		/>
 
-		<title>تسجيل الدخول / إنشاء حساب</title>
+		<title>الدفع الاكترونـي</title>
 		<link
 			href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
 			rel="stylesheet"
@@ -55,39 +55,56 @@
 			rel="stylesheet"
 			href="https://pricealerts.github.io/style/navbar.css"
 		/>
-        <script src="https://stripe.com"></script>
 		<link rel="stylesheet" href="./style.css" />
-</head>
-<body>
-     <div class="payment-container">
-    <h2>إتمام عملية الدفع</h2>
-    <p class="amount">المبلغ المطلوب: <strong>1.9 دولار</strong></p>
+	</head>
+	<body>
+		<div id="cntnr" class="container pirantCntynr">
+			<div id="pirantCntynr" class="pirantCntynr"></div>
 
-    <form id="payment-form">
-      <div class="input-group">
-        <label for="cardholder-name">الاسم على البطاقة</label>
-        <input type="text" id="cardholder-name" placeholder="أحمد محمد" required>
-      </div>
+			<h2 style="border: none">الدفع الالكترونـــي</h2>
 
-      <div class="input-group">
-        <label>بيانات بطاقة Visa</label>
-        <!-- هنا سيقوم Stripe بوضع حقول البطاقة الآمنة -->
-        <div id="card-element"></div>
-      </div>
+		
 
-      <!-- لعرض أخطاء البطاقة -->
-      <div id="card-errors" role="alert"></div>
+			حاليا لايمكن التسديد بالطريقة العادية لذلك يمكنك التسديد عن طريق
+			<span style="color: #007bff">blockchain </span>
+			ثم أرسل لنا <span>transaction ID</span> للتحويلة .<br />
 
-      <button id="submit-button" type="submit">ادفع الآن</button>
-    </form>
+			<div class="container" style="border: 1px solid #ccc; color: #333">
+				العنوان : 0xED54425611A1262d6d594CeCdb6dE883eF6F9952
+				<button class="btnCpy" onclick="cpAdr()">
+					نسخ
+					<div id="isCpd" class="isCopd">تم النسخ بنجاح</div></button
+				><br />
+				الشبكة : BNB Smart Chain (BEP20) <br /><br />
+				إختر نوع الإشتراك : <br />
+				<div id="choseAbonm" class="radio-group">
+					<label class="radio-card">
+						<input type="radio" name="option" value="monthly 1.9$" checked />
+						<span class="box-content"> الإشتراك الشهري 1.9$</span>
+					</label>
 
-    <div id="payment-message" class="hidden"></div>
-  </div>
+					<label class="radio-card">
+						<input type="radio" name="option" value="annual 19$" />
+						<span class="box-content"> الإشتراك السنوي 19$</span>
+					</label>
+				</div>
+				<br />
+				transaction ID :
+				<input id="idTrnsctn" type="text" placeholder="ضع ID  التحويل هنا" />
+				<button id="sndMsg" class="sendBtn">إرسال</button>
+				<p id="respns"></p>
+			</div>
 
-  <!-- استدعاء ملف الجافاسكريبت كـ Module لدعم Firebase الحديث -->
-   <script src="https://stripe.com"></script>
-   <script src="https://stripe.com"></script>
-
-  <script type="module" src="./js.js"></script>
-</body>
+			<input
+				id="adrs"
+				style="display: none"
+				value="0xED54425611A1262d6d594CeCdb6dE883eF6F9952"
+			/>
+		</div>
+		<!-- استدعاء ملف الجافاسكريبت كـ Module لدعم Firebase الحديث -->
+		<script src="https://pricealerts.github.io/js/navbar.js"></script>
+		
+		<script type="module" src="./js/send.js"></script>
+		<script src="./js/js.js"></script>
+	</body>
 </html>

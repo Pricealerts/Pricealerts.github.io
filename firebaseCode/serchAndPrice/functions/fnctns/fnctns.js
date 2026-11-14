@@ -376,7 +376,7 @@ async function price(smbl) {
 	}
 }
 
-export { srchSmbls, price, stocksExchange, getExchangeSymbols, sendMesageFn };
+export { srchSmbls, price, stocksExchange, getExchangeSymbols, sendMesageFn  };
 
 
 

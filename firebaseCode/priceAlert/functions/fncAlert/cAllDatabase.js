@@ -181,6 +181,7 @@ async function cntctUser(data) {
 			const sendMsg = await sendTelegramMessage(idChat, message);
 			if (sendMsg.success) {
 				gtChIdExixst = { c: 0 /* //counter */ /* p: data.paidOrNo  */ };
+				
 				await callDb.set(gtChIdExixst);
 				//rspns.status = "success";
 				rspns.okRspns = true;

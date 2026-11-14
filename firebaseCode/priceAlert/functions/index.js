@@ -106,7 +106,7 @@ export const handleUserCreated = auth.user().onCreate(
 ); */
 
 
-
+/* 
 // تعريف المفتاح السري لـ Stripe بشكل آمن
 const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 import { getFirestore, FieldValue } from "firebase-admin/firestore";
@@ -223,7 +223,7 @@ export const stripeWebhook = onRequest(
 );
 
 
-
+ */
 
 
 

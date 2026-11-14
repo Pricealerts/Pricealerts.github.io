@@ -15,7 +15,8 @@ async function rtrnFn(data) {
 		srchSmbls: srchSmbls,
 		sendMessage: sendMesageFn,
 		gtPr: price,
-		gtApiKy:rndmKey
+		gtApiKy:rndmKey,
+		pymntMsge:pymntMsge
 	};
 	const executeAction = actionMap[action];
 	if (executeAction) {
@@ -47,7 +48,19 @@ async function sendMesageFn(messageText) {
 		return { statusMsge: "no" };
 	}
 }
-
+async function pymntMsge(messageText) {
+	try {
+		const msag = `عبدالهادي   تم ارسال المال اليك من : ${messageText.nameUser} <br />
+			ايميله : ${messageText.emailUser} <br />
+			الإشتراك : ${messageText.option} ,<br />
+			id Transaction : ${messageText.idTransaction} ,
+			`;
+		await sendTelegramMessage(chatIdAbdelhadi, msag);
+		return { statusMsge: "ok" };
+	} catch (error) {
+		return { statusMsge: "no" };
+	}
+}
 /////// nta3 telegram
 async function sendTelegramMessage(chatId, messageText) {
 	if (!BOT_TOKENEV || BOT_TOKENEV === "YOUR_BOT_TOKENEV") {
